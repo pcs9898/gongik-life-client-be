@@ -36,6 +36,8 @@ grpc:
       keepAliveWithoutCalls: true
       negotiationType: plaintext
 
+#TODO client들 추가하기
+
 
 management:
   tracing:
