@@ -1,16 +1,16 @@
 server:
-  port: 8005
+  port: 8006
 
 grpc:
   server:
-    port: 9005
+    port: 9006
 
 spring:
   application:
-    name: gongik-life-client-be-institution-service
+    name: gongik-life-client-be-community-service
 
   datasource:
-    url: jdbc:postgresql://192.168.0.24:5432/gongik_life_client_institution_db
+    url: jdbc:postgresql://192.168.0.24:5432/gongik_life_client_community_db
     driverClassName: org.postgresql.Driver
     username: postgres
     password: postgres
@@ -25,6 +25,7 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
+
   data:
     redis:
       host: 192.168.0.24
@@ -41,9 +42,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
-
-
 #grpc:
 #  client:
 #    gongik-life-client-be-auth-service:
