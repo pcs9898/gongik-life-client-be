@@ -1,1 +1,5 @@
 rootProject.name = 'gongik-life-client-be'
+include 'gongik-life-client-be-discovery'
+include 'gongik-life-client-be-grpc-common'
+include 'gongik-life-client-be-gateway'
+include 'gongik-life-client-be-auth-service'
