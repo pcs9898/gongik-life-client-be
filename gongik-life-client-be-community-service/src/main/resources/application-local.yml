@@ -35,7 +35,7 @@ spring:
   kafka:
     bootstrap-servers: 192.168.0.24:9092
     consumer:
-      group-id: gongik-life-group
+      group-id: gongik-life-client-be-community-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
