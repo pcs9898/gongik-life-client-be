@@ -1,18 +1,25 @@
 server:
-  port: 8003
-
-grpc:
-  server:
-    port: 9003
+  port: 8002
 
 spring:
   application:
-    name: gongik-life-client-be-auth-service
-
+    name: gongik-life-client-be-graphql
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      inspection:
+        enabled: true
+    websocket:
+      path: /graphql
+      keep-alive: 60
   data:
     redis:
-      port: 6379
       host: 192.168.0.24
+      port: 6379
+      client-type: lettuce
 
 eureka:
   client:
@@ -21,9 +28,13 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
 
-jwt:
-  secret: 1ad35d74dc65cc0ee9a3a409f7f87e332aa6aa89d9cc64c66cdf9a1ffdc534ee
-
+grpc:
+  client:
+    gongik-life-client-be-auth-service:
+      address: 'discovery:///gongik-life-client-be-auth-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 
 management:
