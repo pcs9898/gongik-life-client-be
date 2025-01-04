@@ -32,6 +32,17 @@ spring:
       port: 6379
       client-type: lettuce
 
+  kafka:
+    bootstrap-servers: 192.168.0.24:9092
+    consumer:
+      group-id: gongik-life-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
 #grpc:
 #  client:
 #    gongik-life-client-be-auth-service:
