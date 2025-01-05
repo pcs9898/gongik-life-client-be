@@ -42,6 +42,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
+  batch:
+    jdbc:
+      initialize-schema: always
 
 
 #grpc:
@@ -84,5 +87,7 @@ management:
           - prometheus
 
 logging:
+  level:
+    org.example.gongiklifeclientbeinstitutionservice: INFO
   pattern:
     level: "%5p [%X{traceId:-},%X{spanId:-}]"

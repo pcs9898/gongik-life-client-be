@@ -1,0 +1,10 @@
+package org.example.gongiklifeclientbeinstitutionservice.repository;
+
+import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionDiseaseRestriction;
+import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionDiseaseRestrictionId;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface InstitutionDiseaseRestrictionRepository extends
+    JpaRepository<InstitutionDiseaseRestriction, InstitutionDiseaseRestrictionId> {
+
+}
