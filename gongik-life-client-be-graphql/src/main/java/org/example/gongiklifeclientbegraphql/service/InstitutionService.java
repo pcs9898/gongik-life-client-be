@@ -19,11 +19,11 @@ public class InstitutionService {
     try {
       SearchInstitutionsResponse response = institutionBlockingStub.searchInstitutions(
           requestDto.toProto());
-      
+
       return SearchInstitutionsResultsDto.fromProto(response);
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
-      throw new RuntimeException("서비스 호출 실패: ", e);
+      throw e;
     }
   }
 }

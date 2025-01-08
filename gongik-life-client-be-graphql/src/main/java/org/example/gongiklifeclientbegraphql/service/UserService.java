@@ -2,6 +2,8 @@ package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.sendEmailVerificationCodeRequestDto;
@@ -20,8 +22,15 @@ public class UserService {
           requestDto.toProto());
       return resopnse.getSuccess();
     } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw new RuntimeException("서비스 호출 실패: ", e);
+      if (e.getCause() instanceof StatusRuntimeException statusEx) {
+        Status status = statusEx.getStatus();
+        String description = status.getDescription();
+        log.error("gRPC 호출 중 오류 발생: {}, Description: {}", status, description);
+        throw new RuntimeException("서비스 호출 실패: " + description, e);
+      } else {
+        log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
+        throw e;
+      }
     }
   }
 
