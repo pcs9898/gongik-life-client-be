@@ -12,6 +12,8 @@ type Query {
 
 type Mutation{
     sendEmailVerificationCode(email: String!): Boolean!
+
+    verifyEmailCode(email: String!, code: String!): Boolean!
 }
 
 type searchInstitutionsResults {

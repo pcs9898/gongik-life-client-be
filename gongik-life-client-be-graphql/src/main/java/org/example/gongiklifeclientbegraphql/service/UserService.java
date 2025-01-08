@@ -2,11 +2,13 @@ package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.sendEmailVerificationCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.verifyEmailCodeRequestDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +34,20 @@ public class UserService {
         throw e;
       }
     }
+  }
+
+  public boolean verifyEmailCode(verifyEmailCodeRequestDto requestDto) {
+    try {
+      VerifyEmailCodeResponse response = userBlockingStub.verifyEmailCode(
+          requestDto.toProto());
+
+      return response.getSuccess();
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
+      throw e;
+
+    }
+
   }
 
 }

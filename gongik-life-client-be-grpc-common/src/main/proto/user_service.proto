@@ -4,6 +4,8 @@ package com.gongik.userService.domain.service;
 
 service UserService {
   rpc SendEmailVerificationCode(SendEmailVerificationCodeRequest) returns (SendEmailVerificationCodeResponse);
+
+  rpc VerifyEmailCode(VerifyEmailCodeRequest) returns (VerifyEmailCodeResponse);
 }
 
 message SendEmailVerificationCodeRequest {
@@ -11,5 +13,14 @@ message SendEmailVerificationCodeRequest {
 }
 
 message SendEmailVerificationCodeResponse {
+  bool success = 1;
+}
+
+message VerifyEmailCodeRequest{
+  string email = 1;
+  string code = 2;
+}
+
+message VerifyEmailCodeResponse{
   bool success = 1;
 }
