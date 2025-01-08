@@ -15,11 +15,26 @@ spring:
     websocket:
       path: /graphql
       keep-alive: 60
+
+  cache:
+    type: redis
+
   data:
     redis:
-      host: 192.168.0.24
+      host: ${REMOTE_ADDRESS:192.168.0.50}
       port: 6379
       client-type: lettuce
+
+  kafka:
+    bootstrap-servers: ${REMOTE_ADDRESS:192.168.0.50}:9092
+    consumer:
+      group-id: gongik-life-client-be-institution-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 eureka:
   client:
@@ -35,8 +50,37 @@ grpc:
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+    gongik-life-client-be-user-service:
+      address: 'discovery:///gongik-life-client-be-user-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-community-service:
+      address: 'discovery:///gongik-life-client-be-community-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-institution-service:
+      address: 'discovery:///gongik-life-client-be-institution-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-notification-service:
+      address: 'discovery:///gongik-life-client-be-notification-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-report-service:
+      address: 'discovery:///gongik-life-client-be-report-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-workhours-service:
+      address: 'discovery:///gongik-life-client-be-workhours-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
-#TODO client들 추가하기
 
 
 management:
@@ -48,7 +92,7 @@ management:
       produce: b3_multi
   zipkin:
     tracing:
-      endpoint: "http://192.168.0.24:9411/api/v2/spans"
+      endpoint: "http://${REMOTE_ADDRESS:192.168.0.50}:9411/api/v2/spans"
   endpoints:
     web:
       exposure:
@@ -62,5 +106,8 @@ management:
           - prometheus
 
 logging:
+  #  level:
+  #    io.grpc: DEBUG
+  #    org.example.gongiklifeclientbegraphql: DEBUG
   pattern:
     level: "%5p [%X{traceId:-},%X{spanId:-}]"

@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package com.gongik.institutionService.domain.service;
+
+service InstitutionService {
+  rpc SearchInstitutions(SearchInstitutionsRequest) returns (SearchInstitutionsResponse);
+}
+
+message SearchInstitutionsRequest {
+  string searchKeyword = 1;
+  string cursor = 2;
+  int32 pageSize = 3;
+}
+
+message SearchInstitutionsResponse {
+  repeated SearchInstitution listSearchInstitution = 1;
+  PageInfo pageInfo = 2;
+}
+
+message PageInfo {
+  string endCursor = 1;
+  bool hasNextPage = 2;
+}
+
+message SearchInstitution {
+  string id = 1;
+  string name = 2;
+  string address = 3;
+  float average_rating = 4;
+}

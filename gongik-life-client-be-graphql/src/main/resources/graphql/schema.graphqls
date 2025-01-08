@@ -1,0 +1,32 @@
+# @authenticate는 사용자가 인증된 경우에만 필드나 객체에 접근할 수 있도록 합니다.
+directive @authenticate on FIELD_DEFINITION | OBJECT
+
+scalar Date
+
+type Query {
+    searchInstitutions(searchKeyword: String!, cursor: String, pageSize: Int!): searchInstitutionsResults
+
+    #    signUp( name: String!, email: String!, password: String!, confirmPassword: String!, enlistment_date: Date,institution_id: String): User
+
+}
+
+type Mutation{
+    sendEmailVerificationCode(email: String!): Boolean!
+}
+
+type searchInstitutionsResults {
+    listSearchInstitution: [SearchInstitution]
+    pageInfo: PageInfo
+}
+
+type PageInfo {
+    endCursor: String
+    hasNextPage: Boolean
+}
+
+type SearchInstitution {
+    id: ID
+    name: String
+    address: String
+    average_rating: Float
+}

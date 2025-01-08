@@ -4,13 +4,49 @@ server:
 grpc:
   server:
     port: 9004
+  client:
+    gongik-life-client-be-auth-service:
+      address: 'discovery:///gongik-life-client-be-auth-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-user-service:
+      address: 'discovery:///gongik-life-client-be-user-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-community-service:
+      address: 'discovery:///gongik-life-client-be-community-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-institution-service:
+      address: 'discovery:///gongik-life-client-be-institution-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-notification-service:
+      address: 'discovery:///gongik-life-client-be-notification-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-report-service:
+      address: 'discovery:///gongik-life-client-be-report-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-workhours-service:
+      address: 'discovery:///gongik-life-client-be-workhours-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 spring:
   application:
     name: gongik-life-client-be-user-service
 
   datasource:
-    url: jdbc:postgresql://192.168.0.24:5432/gongik_life_client_user_db
+    url: jdbc:postgresql://${REMOTE_ADDRESS:192.168.0.50}:5432/gongik_life_client_user_db
     driverClassName: org.postgresql.Driver
     username: postgres
     password: postgres
@@ -28,20 +64,25 @@ spring:
 
   data:
     redis:
-      host: 192.168.0.24
+      host: ${REMOTE_ADDRESS:192.168.0.50}
       port: 6379
       client-type: lettuce
 
   kafka:
-    bootstrap-servers: 192.168.0.24:9092
+    bootstrap-servers: ${REMOTE_ADDRESS:192.168.0.50}:9092
     consumer:
       group-id: gongik-life-client-be-user-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    properties:
+      auto.create.topics.enable: true
+
 
 #grpc:
 #  client:
@@ -69,7 +110,7 @@ management:
       produce: b3_multi
   zipkin:
     tracing:
-      endpoint: "http://192.168.0.24:9411/api/v2/spans"
+      endpoint: "http://${REMOTE_ADDRESS:192.168.0.50}:9411/api/v2/spans"
   endpoints:
     web:
       exposure:

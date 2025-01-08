@@ -7,7 +7,7 @@ spring:
   data:
     redis:
       port: 6379
-      host: 192.168.0.24
+      host: ${REMOTE_ADDRESS:192.168.0.50}
   cloud:
     gateway:
       routes:
@@ -27,9 +27,13 @@ spring:
           predicates:
             - Path=/graphql
             - Method=POST,GET,OPTIONS
-      #          filters:
-      #            - AuthenticationFilter
-      #
+              #          filters:
+            #            - AuthenticationFilter
+        - id: graphql_playground_route
+          uri: lb://gongik-life-client-be-graphql
+          predicates:
+            - Path=/graphiql
+            - Method=POST,GET,OPTIONS
       #        - id: graphql_subscription_route
       #          uri: lb:ws://gongik-life-client-be-graphql
       #          predicates:
@@ -111,7 +115,7 @@ management:
       produce: b3_multi
   zipkin:
     tracing:
-      endpoint: "http://192.168.0.24:9411/api/v2/spans"
+      endpoint: "http://${REMOTE_ADDRESS:192.168.0.50}:9411/api/v2/spans"
   endpoints:
     web:
       exposure:
