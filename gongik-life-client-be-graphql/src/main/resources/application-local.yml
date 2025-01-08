@@ -1,0 +1,66 @@
+server:
+  port: 8002
+
+spring:
+  application:
+    name: gongik-life-client-be-graphql
+  graphql:
+    path: /graphql
+    graphiql:
+      enabled: true
+      path: /graphiql
+    schema:
+      inspection:
+        enabled: true
+    websocket:
+      path: /graphql
+      keep-alive: 60
+  data:
+    redis:
+      host: 192.168.0.24
+      port: 6379
+      client-type: lettuce
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8000/eureka/
+    registerWithEureka: true
+    fetchRegistry: true
+
+grpc:
+  client:
+    gongik-life-client-be-auth-service:
+      address: 'discovery:///gongik-life-client-be-auth-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+#TODO client들 추가하기
+
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: b3
+      produce: b3_multi
+  zipkin:
+    tracing:
+      endpoint: "http://192.168.0.24:9411/api/v2/spans"
+  endpoints:
+    web:
+      exposure:
+        include:
+          - info
+          - health
+          - loggers
+          - mappings
+          - metrics
+          - shutdown
+          - prometheus
+
+logging:
+  pattern:
+    level: "%5p [%X{traceId:-},%X{spanId:-}]"
