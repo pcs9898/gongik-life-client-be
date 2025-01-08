@@ -4,6 +4,12 @@ server:
 grpc:
   server:
     port: 9003
+  client:
+    gongik-life-client-be-user-service:
+      address: 'discovery:///gongik-life-client-be-user-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
 
 spring:
   application:
@@ -12,10 +18,10 @@ spring:
   data:
     redis:
       port: 6379
-      host: 192.168.0.24
+      host: ${REMOTE_ADDRESS:192.168.0.50}
 
   kafka:
-    bootstrap-servers: 192.168.0.24:9092
+    bootstrap-servers: ${REMOTE_ADDRESS:192.168.0.50}:9092
     consumer:
       group-id: gongik-life-client-be-auth-group
       auto-offset-reset: earliest
@@ -46,7 +52,7 @@ management:
       produce: b3_multi
   zipkin:
     tracing:
-      endpoint: "http://192.168.0.24:9411/api/v2/spans"
+      endpoint: "http://${REMOTE_ADDRESS:192.168.0.50}:9411/api/v2/spans"
   endpoints:
     web:
       exposure:

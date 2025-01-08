@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package com.gongik.userService.domain.service;
+
+service UserService {
+  rpc SendEmailVerificationCode(SendEmailVerificationCodeRequest) returns (SendEmailVerificationCodeResponse);
+}
+
+message SendEmailVerificationCodeRequest {
+  string email = 1;
+}
+
+message SendEmailVerificationCodeResponse {
+  bool success = 1;
+}

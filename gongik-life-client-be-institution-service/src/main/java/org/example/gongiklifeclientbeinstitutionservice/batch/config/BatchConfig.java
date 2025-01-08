@@ -14,6 +14,7 @@ import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionTa
 import org.example.gongiklifeclientbeinstitutionservice.repository.RegionalMilitaryOfficeRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -24,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
+@EnableBatchProcessing
 @RequiredArgsConstructor
 public class BatchConfig {
 
@@ -39,11 +41,11 @@ public class BatchConfig {
   private final JobDurationListener jobDurationListener;
 
   @Bean
-  public Job importInstitutionJob(Step step1) {
+  public Job importInstitutionJob(Step SeedInstitutionsToPostgreSQLStep) {
     return new JobBuilder("importInstitutionJob", jobRepository)
         .incrementer(new RunIdIncrementer())
         .start(dataCheckDecider)
-        .on("NO_DATA").to(step1)
+        .on("NO_DATA").to(SeedInstitutionsToPostgreSQLStep)
         .from(dataCheckDecider).on("DATA_EXISTS").end()
         .build()
         .listener(jobDurationListener)
@@ -51,10 +53,10 @@ public class BatchConfig {
   }
 
   @Bean
-  public Step step1(InstitutionItemReader reader,
+  public Step SeedInstitutionsToPostgreSQLStep(InstitutionItemReader reader,
       InstitutionItemProcessor processor,
       InstitutionItemWriter writer) {
-    return new StepBuilder("step1", jobRepository)
+    return new StepBuilder("SeedInstitutionsToPostgreSQLStep", jobRepository)
         .<String[], InstitutionWithDiseaseRestrictionsDto>chunk(10, transactionManager)
         .reader(reader)
         .processor(processor)
@@ -65,9 +67,7 @@ public class BatchConfig {
   @Bean
   @StepScope
   public InstitutionItemReader institutionItemReader() {
-
     return new InstitutionItemReader();
-
   }
 
   @Bean

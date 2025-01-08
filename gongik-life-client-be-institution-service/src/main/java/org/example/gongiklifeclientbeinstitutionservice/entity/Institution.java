@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbeinstitutionservice.entity;
 
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitution;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -83,5 +84,13 @@ public class Institution {
 
   public UUID getId() {
     return this.id;
+  }
+
+  public SearchInstitution toProto() {
+    return SearchInstitution.newBuilder()
+        .setId(id.toString())
+        .setName(name)
+        .setAddress(address)
+        .build();
   }
 }
