@@ -18,12 +18,28 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class userSerivce {
 
-  private static final long CODE_EXPIRATION_MINUTES = 5;
+
+  private static final long CODE_EXPIRATION_MINUTES = 6;
+  private static final long RESEND_WAIT_MINUTES = 1;
   private final RedisTemplate<String, String> redisTemplate;
   private final EmailVerificationCodeProducer emailVerificationCodeProducer;
 
   public SendEmailVerificationCodeResponse sendEmailVerificationCode(
       SendEmailVerificationCodeRequest request) {
+
+    String email = request.getEmail();
+    String existingCode = redisTemplate.opsForValue().get("verification_code:" + email);
+
+    if (existingCode != null) {
+      Long expirationTime = redisTemplate.getExpire("verification_code:" + email, TimeUnit.MINUTES);
+      log.info("existingCodeHere: " + existingCode + "expirationTime: " + expirationTime);
+      if (expirationTime != null && expirationTime >= (CODE_EXPIRATION_MINUTES
+          - RESEND_WAIT_MINUTES)) {
+        log.info("existingCode2: " + existingCode);
+        throw new RuntimeException(
+            "Please wait for 1 minute before resending the code.");
+      }
+    }
 
     String VerificationCode = EmailVerificationCodeGenerator.generateCode();
 
@@ -34,11 +50,11 @@ public class userSerivce {
 
     CompletableFuture<Boolean> responseFuture = emailVerificationCodeProducer.sendEmailVerificationRequest(
         emailVerificationRequestDto);
-//
+
     boolean response;
 
     try {
-      responseFuture.get(); // CompletableFuture의 결과를 동기적으로 기다림
+      responseFuture.get();
 
       response = true;
     } catch (Exception e) {
