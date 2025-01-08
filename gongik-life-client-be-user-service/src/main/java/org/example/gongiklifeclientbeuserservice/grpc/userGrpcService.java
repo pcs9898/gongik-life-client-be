@@ -3,6 +3,8 @@ package org.example.gongiklifeclientbeuserservice.grpc;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,8 +27,15 @@ public class userGrpcService extends UserServiceGrpc.UserServiceImplBase {
       responseObserver.onNext(response);
       responseObserver.onCompleted();
     } catch (Exception e) {
-      log.info("sendEmailVerificationCode error : ", e);
-      responseObserver.onError(e);
+      log.error("sendEmailVerificationCode error: {}",
+          e.getLocalizedMessage());
+
+      StatusRuntimeException ex = Status.RESOURCE_EXHAUSTED
+          .withDescription(e.getLocalizedMessage())
+          .withCause(e)
+          .asRuntimeException();
+
+      responseObserver.onError(ex);
     }
 
   }
