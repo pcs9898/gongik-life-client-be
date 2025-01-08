@@ -3,6 +3,7 @@ package org.example.gongiklifeclientbegraphql.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.sendEmailVerificationCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.verifyEmailCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -21,5 +22,13 @@ public class UserController {
 
     return userService.sendEmailVerificationCode(requestDto);
   }
+
+  @MutationMapping
+  public boolean verifyEmailCode(
+      @Arguments verifyEmailCodeRequestDto requestDto) {
+
+    return userService.verifyEmailCode(requestDto);
+  }
+
 
 }
