@@ -5,7 +5,7 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVeri
 import lombok.Data;
 
 @Data
-public class sendEmailVerificationCodeRequestDto {
+public class SendEmailVerificationCodeRequestDto {
 
   private String email;
 

@@ -1,12 +1,17 @@
 package org.example.gongiklifeclientbeinstitutionservice.service;
 
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
+import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
+import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.elasticsearch.InstitutionSearchRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 public class InstitutionService {
 
   private final InstitutionSearchRepository institutionSearchRepository;
+  private final InstitutionRepository institutionRepository;
 
 
   public SearchInstitutionsResponse searchInstitutions(
@@ -46,5 +52,18 @@ public class InstitutionService {
         .build());
 
     return responseBuilder.build();
+  }
+
+  public GetInstitutionNameResponse getInstitutionName(GetInstitutionNameRequest request) {
+
+    String institutionId = request.getId();
+    log.info("getInstitutionName request : {}",
+        (institutionId != null && !institutionId.isEmpty()) ? institutionId : "null");
+    Institution institution = institutionRepository.findById(UUID.fromString(request.getId()))
+        .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
+
+    return GetInstitutionNameResponse.newBuilder()
+        .setName(institution.getName())
+        .build();
   }
 }

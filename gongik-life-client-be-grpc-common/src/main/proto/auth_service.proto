@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package com.gongik.authservice.domain.service;
+
+service AuthService {
+  rpc GenerateToken(GenerateTokenRequest) returns (GenerateTokenResponse);
+}
+
+message GenerateTokenRequest {
+  string email = 1;
+}
+
+message GenerateTokenResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+  string accessTokenExpiresAt = 3;
+}

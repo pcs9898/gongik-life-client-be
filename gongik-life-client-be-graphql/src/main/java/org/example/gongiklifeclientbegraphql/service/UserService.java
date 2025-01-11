@@ -7,8 +7,10 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.sendEmailVerificationCodeRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.verifyEmailCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpUserRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +20,7 @@ public class UserService {
   @GrpcClient("gongik-life-client-be-user-service")
   private UserServiceGrpc.UserServiceBlockingStub userBlockingStub;
 
-  public boolean sendEmailVerificationCode(sendEmailVerificationCodeRequestDto requestDto) {
+  public boolean sendEmailVerificationCode(SendEmailVerificationCodeRequestDto requestDto) {
     try {
       SendEmailVerificationCodeResponse resopnse = userBlockingStub.sendEmailVerificationCode(
           requestDto.toProto());
@@ -36,7 +38,7 @@ public class UserService {
     }
   }
 
-  public boolean verifyEmailCode(verifyEmailCodeRequestDto requestDto) {
+  public boolean verifyEmailCode(VerifyEmailCodeRequestDto requestDto) {
     try {
       VerifyEmailCodeResponse response = userBlockingStub.verifyEmailCode(
           requestDto.toProto());
@@ -50,4 +52,16 @@ public class UserService {
 
   }
 
+  public ServiceSignUpResponseDto signUp(SignUpUserRequestDto requestDto) {
+    try {
+      log.info("institutionId: {}", requestDto.getInstitutionId());
+      com.gongik.userService.domain.service.UserServiceOuterClass.SignUpResponse response = userBlockingStub.signUp(
+          requestDto.toProto());
+
+      return ServiceSignUpResponseDto.fromProto(response);
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
+      throw e;
+    }
+  }
 }

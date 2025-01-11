@@ -31,6 +31,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
@@ -52,6 +53,11 @@ dependencies {
     // https://mvnrepository.com/artifact/net.devh/grpc-spring-boot-starter
     implementation 'net.devh:grpc-spring-boot-starter:3.1.0.RELEASE'
     implementation project(':gongik-life-client-be-grpc-common')
+
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
 }
 

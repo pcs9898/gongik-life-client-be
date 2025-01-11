@@ -5,7 +5,7 @@ import org.example.gongiklifeclientbeinstitutionservice.entity.RegionalMilitaryO
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface RegionalMilitaryOfficeRepository extends
-    JpaRepository<RegionalMilitaryOffice, Long> {
+    JpaRepository<RegionalMilitaryOffice, Integer> {
 
   Optional<RegionalMilitaryOffice> findByOfficeName(String prefix);
 }

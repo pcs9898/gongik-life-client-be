@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface InstitutionTagRepository extends JpaRepository<InstitutionTag, Long> {
+public interface InstitutionTagRepository extends JpaRepository<InstitutionTag, Integer> {
 
   Optional<InstitutionTag> findByTagName(String tagName);
 }
