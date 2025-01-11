@@ -4,6 +4,8 @@ package com.gongik.institutionService.domain.service;
 
 service InstitutionService {
   rpc SearchInstitutions(SearchInstitutionsRequest) returns (SearchInstitutionsResponse);
+
+  rpc GetInstitutionName(GetInstitutionNameRequest) returns (GetInstitutionNameResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -26,5 +28,15 @@ message SearchInstitution {
   string id = 1;
   string name = 2;
   string address = 3;
-  float average_rating = 4;
+  optional float average_rating = 4;
+}
+
+
+message GetInstitutionNameRequest {
+  string id = 1;
+}
+
+
+message GetInstitutionNameResponse {
+  string name = 1;
 }

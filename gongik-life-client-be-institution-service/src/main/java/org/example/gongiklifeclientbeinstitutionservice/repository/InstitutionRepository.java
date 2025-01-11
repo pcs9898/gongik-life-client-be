@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InstitutionRepository extends JpaRepository<Institution, Long> {
+public interface InstitutionRepository extends JpaRepository<Institution, UUID> {
 
   @Query("SELECT COUNT(i) > 0 FROM Institution i")
   boolean existsAny();

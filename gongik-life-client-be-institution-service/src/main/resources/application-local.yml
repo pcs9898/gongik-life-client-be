@@ -121,5 +121,8 @@ management:
           - prometheus
 
 logging:
+  level:
+    root: INFO
+    org.example.gongiklifeclientbeinstitutionservice: DEBUG
   pattern:
     level: "%5p [%X{traceId:-},%X{spanId:-}]"

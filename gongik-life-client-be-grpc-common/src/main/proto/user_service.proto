@@ -6,6 +6,10 @@ service UserService {
   rpc SendEmailVerificationCode(SendEmailVerificationCodeRequest) returns (SendEmailVerificationCodeResponse);
 
   rpc VerifyEmailCode(VerifyEmailCodeRequest) returns (VerifyEmailCodeResponse);
+
+  rpc FindByEmailForAuth(FindByEmailForAuthRequest) returns (FindByEmailForAuthResponse);
+
+  rpc SignUp(SignUpRequest) returns (SignUpResponse);
 }
 
 message SendEmailVerificationCodeRequest {
@@ -23,4 +27,58 @@ message VerifyEmailCodeRequest{
 
 message VerifyEmailCodeResponse{
   bool success = 1;
+}
+message FindByEmailForAuthRequest{
+  string email = 1;
+}
+
+message FindByEmailForAuthResponse{
+  string id = 1;
+  string email = 2;
+  string password = 3;
+  string name = 4;
+  optional string bio = 5;
+  optional string enlistment_date = 6;
+  optional string discharge_date = 7;
+  optional InstitutionForAuth institution = 8;
+
+}
+
+message InstitutionForAuth {
+  string id = 1;
+  string name = 2;
+}
+
+
+message SignUpRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+  string confirmPassword = 4;
+  string bio = 5;
+  string institution_id = 6;
+  string enlistment_date = 7;
+  string discharge_date = 8;
+}
+
+message SignUpResponse {
+  SignUpUser user = 1;
+  string accessToken = 2;
+  string refreshToken = 3;
+  string accessTokenExpiresAt = 4;
+}
+
+message SignUpUser {
+  string id = 1;
+  string email = 2;
+  optional SignUpInstitution institution = 3;
+  string name = 4;
+  optional string bio = 5;
+  optional string enlistment_date = 6;
+  optional string discharge_date = 7;
+}
+
+message SignUpInstitution {
+  string id = 1;
+  string name = 2;
 }

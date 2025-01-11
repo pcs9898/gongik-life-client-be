@@ -4,9 +4,8 @@ directive @authenticate on FIELD_DEFINITION | OBJECT
 scalar Date
 
 type Query {
-    searchInstitutions(searchKeyword: String!, cursor: String, pageSize: Int!): searchInstitutionsResults
+    searchInstitutions(searchKeyword: String!, cursor: String, pageSize: Int!): SearchInstitutionsResponse!
 
-    #    signUp( name: String!, email: String!, password: String!, confirmPassword: String!, enlistment_date: Date,institution_id: String): User
 
 }
 
@@ -14,9 +13,11 @@ type Mutation{
     sendEmailVerificationCode(email: String!): Boolean!
 
     verifyEmailCode(email: String!, code: String!): Boolean!
+
+    signUp(name: String!,email: String!,password: String!,confirmPassword: String!,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): SignUpResponse!
 }
 
-type searchInstitutionsResults {
+type SearchInstitutionsResponse {
     listSearchInstitution: [SearchInstitution]
     pageInfo: PageInfo
 }
@@ -27,8 +28,29 @@ type PageInfo {
 }
 
 type SearchInstitution {
-    id: ID
-    name: String
-    address: String
+    id: ID!
+    name: String!
+    address: String!
     average_rating: Float
+}
+
+type SignUpResponse{
+    User: SignUpUser!
+    accessToken: String!
+    accessTokenExpiresAt: String!
+}
+
+type SignUpUser{
+    id: ID!
+    email: String!
+    institution: SignUpInstitution
+    name: String!
+    bio: String
+    enlistmentDate: String
+    dischargeDate: String
+}
+
+type SignUpInstitution{
+    id: ID!
+    name: String!
 }

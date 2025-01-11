@@ -4,7 +4,7 @@ import java.util.Optional;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface InstitutionCategoryRepository extends JpaRepository<InstitutionCategory, Long> {
+public interface InstitutionCategoryRepository extends JpaRepository<InstitutionCategory, Integer> {
 
   Optional<InstitutionCategory> findByCategoryName(String categoryName);
 }
