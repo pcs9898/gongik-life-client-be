@@ -30,13 +30,14 @@ public class CustomUserDetailsService implements UserDetailsService {
               .setEmail(email)
               .build()
       );
-      if (userResponse == null || userResponse.getEmail().isEmpty()) {
-        throw new UsernameNotFoundException("User not found with email: " + email);
-      }
     } catch (Exception e) {
       log.error("failed grpc findByEmailForAuth", e);
       throw e;
 
+    }
+
+    if (userResponse == null || userResponse.getEmail().isEmpty()) {
+      throw new UsernameNotFoundException("User not found with email: " + email);
     }
 
     // UserResponse에 필요한 모든 사용자 정보를 포함

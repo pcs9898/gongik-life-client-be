@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbeauthservice.dto.ServiceSignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SigninRequestDto;
+import org.example.gongiklifeclientbeauthservice.dto.ValidateAccessTokenRequestDto;
+import org.example.gongiklifeclientbeauthservice.dto.ValidateAccessTokenResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.response.Response;
 import org.example.gongiklifeclientbeauthservice.producer.UserLoginHistoryProducer;
 import org.example.gongiklifeclientbeauthservice.service.AuthService;
@@ -26,16 +28,13 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/signIn")
-
   public Response<SignInResponseDto> signIn(
-      @RequestBody SigninRequestDto signinRequestDto,
+      @RequestBody SigninRequestDto signinRequest,
       HttpServletRequest request,
       HttpServletResponse response
   ) {
-
     try {
-
-      ServiceSignInResponseDto serviceSignInResponse = authService.signIn(signinRequestDto);
+      ServiceSignInResponseDto serviceSignInResponse = authService.signIn(signinRequest);
 
       String ipAddress = getClientIpAddress(request);
 
@@ -59,6 +58,20 @@ public class AuthController {
       throw e;
     }
 
+  }
+
+  @PostMapping("/validateAccessToken")
+  public Response<ValidateAccessTokenResponseDto> validateAccessToken(
+      @RequestBody ValidateAccessTokenRequestDto request
+  ) {
+    try {
+
+      return Response.success(ValidateAccessTokenResponseDto.builder()
+          .userId(authService.validateAccessToken(request.getAccessToken())).build());
+    } catch (Exception e) {
+      log.error("validateAccessToken error", e);
+      throw e;
+    }
   }
 
   private String getClientIpAddress(HttpServletRequest request) {

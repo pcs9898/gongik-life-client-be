@@ -61,8 +61,8 @@ public class AuthService {
         .build();
   }
 
-  public boolean validateToken(String token) {
-    return tokenProvider.validateToken(token);
+  public String validateAccessToken(String token) {
+    return tokenProvider.validateAccessTokenAndGetId(token);
   }
 
 //  public TokenDto refreshAccessToken(String refreshToken) {
@@ -95,6 +95,13 @@ public class AuthService {
 //  public void signout(String accessToken) {
 //    String email = tokenProvider.getEmailFromToken(accessToken);
 //    refreshTokenRepository.deleteByEmail(email);
+//  }
+
+//  public ValidateAccessTokenResponseDto validateAccessToken(String accessToken) {
+//    String email = tokenProvider.getEmailFromToken(accessToken);
+//    return ValidateAccessTokenResponseDto.builder()
+//        .email(email)
+//        .build();
 //  }
 
   private void saveRefreshToken(String email, String refreshToken) {
