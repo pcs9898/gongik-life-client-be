@@ -20,11 +20,12 @@ public class SignUpUserDto {
     return SignUpUserDto.builder()
         .id(proto.getId())
         .email(proto.getEmail())
-        .institution(SignUpInstitutionDto.fromProto(proto.getInstitution()))
+        .institution(
+            proto.hasInstitution() ? SignUpInstitutionDto.fromProto(proto.getInstitution()) : null)
         .name(proto.getName())
-        .bio(proto.getBio())
-        .enlistmentDate(proto.getEnlistmentDate())
-        .dischargeDate(proto.getDischargeDate())
+        .bio(proto.hasBio() ? proto.getBio() : null)
+        .enlistmentDate(proto.hasEnlistmentDate() ? proto.getEnlistmentDate() : null)
+        .dischargeDate(proto.hasDischargeDate() ? proto.getDischargeDate() : null)
         .build();
   }
 

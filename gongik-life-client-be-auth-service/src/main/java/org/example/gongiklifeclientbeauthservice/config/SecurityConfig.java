@@ -28,10 +28,10 @@ public class SecurityConfig {
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/signin").permitAll()
-            .requestMatchers("/api/auth/refresh").permitAll()
-            .requestMatchers("/api/auth/validate").permitAll()
-            .requestMatchers("/api/auth/signout").permitAll()
+            .requestMatchers("/api/auth/signIn").permitAll()
+            .requestMatchers("/api/auth/refreshAccessToken").permitAll()
+            .requestMatchers("/api/auth/validateToken").permitAll()
+            .requestMatchers("/api/auth/signOut").permitAll()
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

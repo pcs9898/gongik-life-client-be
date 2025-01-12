@@ -7,7 +7,7 @@ service AuthService {
 }
 
 message GenerateTokenRequest {
-  string email = 1;
+  string userId = 1;
 }
 
 message GenerateTokenResponse {

@@ -28,10 +28,12 @@ spring:
   kafka:
     bootstrap-servers: ${REMOTE_ADDRESS:192.168.0.50}:9092
     consumer:
-      group-id: gongik-life-client-be-institution-group
+      group-id: gongik-life-client-be-graphql-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer

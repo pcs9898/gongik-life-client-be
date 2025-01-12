@@ -3,6 +3,7 @@ package org.example.gongiklifeclientbeauthservice.grpc;
 import com.gongik.authservice.domain.service.AuthServiceGrpc;
 import com.gongik.authservice.domain.service.AuthServiceOuterClass.GenerateTokenRequest;
 import com.gongik.authservice.domain.service.AuthServiceOuterClass.GenerateTokenResponse;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
   public void generateToken(GenerateTokenRequest request,
       StreamObserver<GenerateTokenResponse> responseObserver) {
     try {
-      TokenDto tokenDto = authService.generateTokenAndSaveRefreshToken(request.getEmail());
+      TokenDto tokenDto = authService.generateTokenAndSaveRefreshToken(request.getUserId());
       GenerateTokenResponse response = GenerateTokenResponse.newBuilder()
           .setAccessToken(tokenDto.getAccessToken())
           .setRefreshToken(tokenDto.getRefreshToken())
@@ -32,7 +33,13 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.error("generateToken error : ", e);
-      responseObserver.onError(e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
     }
   }
 }

@@ -42,6 +42,7 @@ dependencies {
     implementation 'io.micrometer:micrometer-core'
 
     implementation 'org.springframework.kafka:spring-kafka'
+    implementation project(':gongik-life-client-be-kafka-common-dto')
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
