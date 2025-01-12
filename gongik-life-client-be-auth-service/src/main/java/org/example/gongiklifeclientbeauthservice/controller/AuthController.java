@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbeauthservice.controller;
 
 import dto.UserToUser.UserLoginHistoryRequestDto;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,7 +11,6 @@ import org.example.gongiklifeclientbeauthservice.dto.RefreshAccessTokenResponseD
 import org.example.gongiklifeclientbeauthservice.dto.ServiceSignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SigninRequestDto;
-import org.example.gongiklifeclientbeauthservice.dto.ValidateAccessTokenRequestDto;
 import org.example.gongiklifeclientbeauthservice.dto.ValidateAccessTokenResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.response.Response;
 import org.example.gongiklifeclientbeauthservice.producer.UserLoginHistoryProducer;
@@ -62,14 +62,24 @@ public class AuthController {
 
   }
 
+  @SecurityRequirements
   @PostMapping("/validateAccessToken")
   public Response<ValidateAccessTokenResponseDto> validateAccessToken(
-      @RequestBody ValidateAccessTokenRequestDto request
+      HttpServletRequest request
+//      @RequestBody ValidateAccessTokenRequestDto requestDto
   ) {
     try {
+      String authHeader = request.getHeader("Authorization");
+      if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        String accessToken = authHeader.substring(7);
+        return Response.success(ValidateAccessTokenResponseDto.builder()
+            .userId(authService.validateAccessToken(accessToken)).build());
+      } else {
+        throw new RuntimeException("Missing or invalid Authorization header");
+      }
 
-      return Response.success(ValidateAccessTokenResponseDto.builder()
-          .userId(authService.validateAccessToken(request.getAccessToken())).build());
+//      return Response.success(ValidateAccessTokenResponseDto.builder()
+//          .userId(authService.validateAccessToken(requestDto.getAccessToken())).build());
     } catch (Exception e) {
       log.error("validateAccessToken error", e);
       throw e;
