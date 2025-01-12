@@ -93,6 +93,30 @@ public class AuthController {
     }
   }
 
+  @PostMapping("/signOut")
+  public Response<Void> signOut(
+      HttpServletRequest request,
+      HttpServletResponse response
+  ) {
+    try {
+      String refreshToken = extractRefreshTokenFromCookie(request);
+      if (refreshToken == null) {
+        throw new RuntimeException("refreshToken not found");
+      }
+
+      authService.signOut(refreshToken);
+
+      Cookie cookie = new Cookie("refreshToken", null);
+      cookie.setMaxAge(0);
+      response.addCookie(cookie);
+
+      return Response.success();
+    } catch (Exception e) {
+      log.error("signOut error", e);
+      throw e;
+    }
+  }
+
   private String getClientIpAddress(HttpServletRequest request) {
     String ipAddress = request.getHeader("X-Forwarded-For");
     if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
