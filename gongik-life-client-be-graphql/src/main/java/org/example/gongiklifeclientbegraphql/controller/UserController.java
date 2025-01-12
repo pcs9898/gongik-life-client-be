@@ -1,6 +1,8 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import dto.UserToUser.UserLoginHistoryRequestDto;
 import graphql.GraphQLContext;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
@@ -8,8 +10,10 @@ import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpUserRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.producer.UserLoginHistoryProducer;
 import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.springframework.graphql.data.method.annotation.Arguments;
+import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
@@ -18,6 +22,7 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class UserController {
 
+  private final UserLoginHistoryProducer userLoginHistoryProducer;
   private final UserService userService;
 
   @MutationMapping
@@ -38,17 +43,47 @@ public class UserController {
   @MutationMapping
   public SignUpResponseDto signUp(
       @Arguments SignUpUserRequestDto requestDto,
-      GraphQLContext context
+      GraphQLContext context,
+      @ContextValue(name = "request") HttpServletRequest request
   ) {
     ServiceSignUpResponseDto serviceSignUpResponse = userService.signUp(requestDto);
 
     context.put("refreshToken", serviceSignUpResponse.getRefreshToken());
+
+    String ipAddress = getClientIpAddress(request);
+
+    UserLoginHistoryRequestDto userLoginHistoryRequestDto = UserLoginHistoryRequestDto.builder()
+        .userId(serviceSignUpResponse.getUser().getId())
+        .ipAddress(ipAddress)
+        .build();
+
+    userLoginHistoryProducer.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
 
     return SignUpResponseDto.builder()
         .user(serviceSignUpResponse.getUser())
         .accessToken(serviceSignUpResponse.getAccessToken())
         .accessTokenExpiresAt(serviceSignUpResponse.getAccessTokenExpiresAt())
         .build();
+  }
+
+  private String getClientIpAddress(HttpServletRequest request) {
+    String ipAddress = request.getHeader("X-Forwarded-For");
+    if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+      ipAddress = request.getHeader("Proxy-Client-IP");
+    }
+    if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+      ipAddress = request.getHeader("WL-Proxy-Client-IP");
+    }
+    if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+      ipAddress = request.getHeader("HTTP_CLIENT_IP");
+    }
+    if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+      ipAddress = request.getHeader("HTTP_X_FORWARDED_FOR");
+    }
+    if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+      ipAddress = request.getRemoteAddr();
+    }
+    return ipAddress;
   }
 
 

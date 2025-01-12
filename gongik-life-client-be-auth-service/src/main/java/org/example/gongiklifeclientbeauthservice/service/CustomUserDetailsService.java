@@ -4,9 +4,9 @@ import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbeauthservice.model.CustomUserDetails;
-import org.example.gongiklifeclientbeauthservice.utils.TimestampConverter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomUserDetailsService implements UserDetailsService {
 
   @GrpcClient("gongik-life-client-be-user-service")
@@ -21,30 +22,40 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    FindByEmailForAuthResponse userResponse = userServiceStub.findByEmailForAuth(
-        FindByEmailForAuthRequest.newBuilder()
-            .setEmail(email)
-            .build()
-    );
 
-    if (userResponse == null || userResponse.getEmail().isEmpty()) {
-      throw new UsernameNotFoundException("User not found with email: " + email);
+    FindByEmailForAuthResponse userResponse;
+    try {
+      userResponse = userServiceStub.findByEmailForAuth(
+          FindByEmailForAuthRequest.newBuilder()
+              .setEmail(email)
+              .build()
+      );
+      if (userResponse == null || userResponse.getEmail().isEmpty()) {
+        throw new UsernameNotFoundException("User not found with email: " + email);
+      }
+    } catch (Exception e) {
+      log.error("failed grpc findByEmailForAuth", e);
+      throw e;
+
     }
 
     // UserResponse에 필요한 모든 사용자 정보를 포함
     return CustomUserDetails.builder()
+        .id(userResponse.getId())
         .email(userResponse.getEmail())
         .password(userResponse.getPassword())
         .name(userResponse.getName())
-        .bio(userResponse.getBio())
+        .bio(userResponse.getBio().isEmpty() ? null : userResponse.getBio())
         .enlistment_date(
-            TimestampConverter.convertStringToTimestamp(userResponse.getEnlistmentDate()))
+            userResponse.getEnlistmentDate().isEmpty() ? null : userResponse.getEnlistmentDate())
         .discharge_date(
-            TimestampConverter.convertStringToTimestamp(userResponse.getDischargeDate()))
-        .institution(CustomUserDetails.InstitutionForAuth.builder()
+            userResponse.getDischargeDate().isEmpty() ? null : userResponse.getDischargeDate())
+        .institution(userResponse.hasInstitution() ? CustomUserDetails.InstitutionForAuth.builder()
             .id(userResponse.getInstitution().getId())
             .name(userResponse.getInstitution().getName())
-            .build())
+            .build() : null)
         .build();
+
+
   }
 }

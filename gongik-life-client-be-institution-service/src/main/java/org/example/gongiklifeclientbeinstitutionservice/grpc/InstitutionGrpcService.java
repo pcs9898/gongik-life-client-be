@@ -5,6 +5,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,12 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("searchInstitutions error : ", e);
-      responseObserver.onError(e);
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
     }
   }
 
@@ -43,7 +49,13 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("getInstitutionName error : ", e);
-      responseObserver.onError(e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
     }
   }
 }

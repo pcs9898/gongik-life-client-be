@@ -58,6 +58,8 @@ dependencies {
     implementation project(':gongik-life-client-be-grpc-common')
 
 
+    implementation 'org.springframework.kafka:spring-kafka'
+    implementation project(':gongik-life-client-be-kafka-common-dto')
 }
 
 dependencyManagement {

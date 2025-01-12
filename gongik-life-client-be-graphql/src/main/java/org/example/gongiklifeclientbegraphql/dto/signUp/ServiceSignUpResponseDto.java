@@ -19,6 +19,7 @@ public class ServiceSignUpResponseDto {
 
 
   public static ServiceSignUpResponseDto fromProto(SignUpResponse proto) {
+
     return ServiceSignUpResponseDto.builder()
         .user(SignUpUserDto.fromProto(proto.getUser()))
         .accessToken(proto.getAccessToken())

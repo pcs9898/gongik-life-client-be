@@ -7,6 +7,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass;
+import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest;
@@ -235,7 +237,7 @@ public class UserSerivce {
     try {
       generateTokenResponse = authServiceBlockingStub.generateToken(
           GenerateTokenRequest.newBuilder()
-              .setEmail(request.getEmail())
+              .setUserId(newUser.getId().toString())
               .build());
       if (generateTokenResponse == null) {
         log.error("generateTokenResponse is null");
@@ -251,10 +253,19 @@ public class UserSerivce {
         .setId(newUser.getId().toString())
         .setEmail(newUser.getEmail())
         .setName(newUserProfile.getName())
-        .setBio(newUserProfile.getBio().isEmpty() ? "" : newUserProfile.getBio())
-        .setEnlistmentDate(
-            request.getEnlistmentDate().isEmpty() ? "" : request.getEnlistmentDate())
-        .setDischargeDate(request.getDischargeDate().isEmpty() ? "" : request.getDischargeDate());
+        .setBio(newUserProfile.getBio().isEmpty() ? null : newUserProfile.getBio());
+
+    if (!newUserProfile.getBio().isEmpty()) {
+      signUpUserBuilder.setBio(newUserProfile.getBio());
+    }
+
+    if (newUserProfile.getEnlistmentDate() != null) {
+      signUpUserBuilder.setEnlistmentDate(newUserProfile.getEnlistmentDate().toString());
+    }
+
+    if (newUserProfile.getDischargeDate() != null) {
+      signUpUserBuilder.setDischargeDate(newUserProfile.getDischargeDate().toString());
+    }
 
     if (getInstitutionNameRequest != null) {
       signUpUserBuilder.setInstitution(UserServiceOuterClass.SignUpInstitution.newBuilder()
@@ -288,4 +299,49 @@ public class UserSerivce {
     return "true".equals(isVerified);
   }
 
+  public FindByEmailForAuthResponse findByEmailForAuth(FindByEmailForAuthRequest request) {
+    String email = request.getEmail();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+    UserAuth userAuth = userAuthRepository.findByUser(user)
+        .orElseThrow(() -> new RuntimeException("User auth not found with email: " + email));
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(() -> new RuntimeException("User profile not found with email: " + email));
+
+    UserServiceOuterClass.FindByEmailForAuthResponse.Builder findByEmailForAuthResponseBuilder = UserServiceOuterClass.FindByEmailForAuthResponse.newBuilder()
+        .setId(user.getId().toString())
+        .setEmail(user.getEmail())
+        .setPassword(userAuth.getPasswordHash())
+        .setName(userProfile.getName())
+        .setBio(userProfile.getBio().isEmpty() ? "" : userProfile.getBio())
+        .setEnlistmentDate(userProfile.getEnlistmentDate() == null ? ""
+            : userProfile.getEnlistmentDate().toString())
+        .setDischargeDate(userProfile.getDischargeDate() == null ? ""
+            : userProfile.getDischargeDate().toString());
+
+    GetInstitutionNameResponse getInstitutionNameRequest = null;
+    if (userProfile.getInstitutionId() != null) {
+      try {
+        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+            GetInstitutionNameRequest.newBuilder().setId(userProfile.getInstitutionId().toString())
+                .build());
+        log.info("Institution name retrieved for institution ID: {}",
+            userProfile.getInstitutionId().toString());
+      } catch (Exception e) {
+        log.error("Error occurred while getting institution name: ", e);
+        throw e;
+      }
+    }
+
+    if (getInstitutionNameRequest != null) {
+      findByEmailForAuthResponseBuilder.setInstitution(
+          UserServiceOuterClass.InstitutionForAuth.newBuilder()
+              .setId(userProfile.getInstitutionId().toString())
+              .setName(getInstitutionNameRequest.getName()));
+    }
+
+    return findByEmailForAuthResponseBuilder.build();
+  }
 }

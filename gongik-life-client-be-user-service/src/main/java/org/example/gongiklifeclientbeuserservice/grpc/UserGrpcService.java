@@ -9,12 +9,11 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
-import dto.UserToUser.LoginHistoryRequestDto;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.example.gongiklifeclientbeuserservice.producer.LoginHistoryProducer;
 import org.example.gongiklifeclientbeuserservice.service.UserSerivce;
 
 @GrpcService
@@ -22,7 +21,7 @@ import org.example.gongiklifeclientbeuserservice.service.UserSerivce;
 @RequiredArgsConstructor
 public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
 
-  private final LoginHistoryProducer loginHistoryProducer;
+
   private final UserSerivce userService;
 
   @Override
@@ -38,7 +37,12 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
       log.error("sendEmailVerificationCode error: {} - {}",
           e.getMessage(), e.getLocalizedMessage());
 
-      responseObserver.onError(e);
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
     }
   }
 
@@ -55,7 +59,12 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
       log.error("verifyEmailCode error: {} - {}",
           e.getMessage(), e.getLocalizedMessage());
 
-      responseObserver.onError(e);
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
 
     }
   }
@@ -65,11 +74,6 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
     try {
       SignUpResponse response = userService.signUp(request);
 
-      LoginHistoryRequestDto loginHistoryRequestDto = LoginHistoryRequestDto.builder()
-          .id(response.getUser().getId())
-          .build();
-      loginHistoryProducer.sendLoginHistoryRequest(loginHistoryRequestDto);
-
       responseObserver.onNext(response);
       responseObserver.onCompleted();
 
@@ -77,13 +81,33 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
       log.error("signUp error: {} - {}",
           e.getMessage(), e.getLocalizedMessage());
 
-      responseObserver.onError(e);
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
     }
   }
 
   @Override
   public void findByEmailForAuth(FindByEmailForAuthRequest request,
       StreamObserver<FindByEmailForAuthResponse> responseObserver) {
-    super.findByEmailForAuth(request, responseObserver);
+    try {
+      FindByEmailForAuthResponse response = userService.findByEmailForAuth(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("findByEmailForAuth error: {} - {}",
+          e.getMessage(), e.getLocalizedMessage());
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
   }
 }

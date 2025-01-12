@@ -33,20 +33,20 @@ public class JwtTokenProvider {
     this.key = Keys.hmacShaKeyFor(keyBytes);
   }
 
-  public TokenDto generateAccessToken(String email) {
-    return generateToken(email, accessTokenValidityInMilliseconds, true);
+  public TokenDto generateAccessToken(String id) {
+    return generateToken(id, accessTokenValidityInMilliseconds, true);
   }
 
-  public String generateRefreshToken(String email) {
-    return generateToken(email, refreshTokenValidityInMilliseconds, false).getRefreshToken();
+  public String generateRefreshToken(String id) {
+    return generateToken(id, refreshTokenValidityInMilliseconds, false).getRefreshToken();
   }
 
-  private TokenDto generateToken(String email, long validityInMilliseconds, boolean isAccessToken) {
+  private TokenDto generateToken(String id, long validityInMilliseconds, boolean isAccessToken) {
     Date now = new Date();
     Date validity = new Date(now.getTime() + validityInMilliseconds);
 
     String token = Jwts.builder()
-        .subject(email)
+        .subject(id)
         .issuedAt(now)
         .expiration(validity)
         .signWith(key)   // 알고리즘 명시적 지정

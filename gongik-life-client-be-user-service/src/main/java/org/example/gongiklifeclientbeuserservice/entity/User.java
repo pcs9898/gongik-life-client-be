@@ -30,11 +30,9 @@ public class User extends Auditable {
   private String email;
 
   @Column(name = "is_active", nullable = false)
-  private boolean isActive = true;
+  @Builder.Default
+  private boolean isActive = true; // builder랑 충돌해서 계속 ture가 됨, builder는 비어있으면 그냥 false처리한다고 함
 
-  @Column(name = "last_login_at")
-  @Temporal(TemporalType.TIMESTAMP)
-  private Date lastLoginAt;
 
   @Column(name = "deleted_at")
   @Temporal(TemporalType.TIMESTAMP)
