@@ -6,6 +6,8 @@ scalar Date
 type Query {
     searchInstitutions(searchKeyword: String!, cursor: String, pageSize: Int!): SearchInstitutionsResponse!
 
+    myProfile: myProfileResponse! @authenticate
+
 
 }
 
@@ -51,6 +53,21 @@ type SignUpUser{
 }
 
 type SignUpInstitution{
+    id: ID!
+    name: String!
+}
+
+type myProfileResponse{
+    id: ID!
+    email: String!
+    institution: myProfileInstitution
+    name: String!
+    bio: String
+    enlistmentDate: String
+    dischargeDate: String
+}
+
+type myProfileInstitution{
     id: ID!
     name: String!
 }

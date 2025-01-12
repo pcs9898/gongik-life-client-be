@@ -10,6 +10,8 @@ service UserService {
   rpc FindByEmailForAuth(FindByEmailForAuthRequest) returns (FindByEmailForAuthResponse);
 
   rpc SignUp(SignUpRequest) returns (SignUpResponse);
+
+  rpc MyProfile(MyProfileRequest) returns (MyProfileResponse);
 }
 
 message SendEmailVerificationCodeRequest {
@@ -79,6 +81,25 @@ message SignUpUser {
 }
 
 message SignUpInstitution {
+  string id = 1;
+  string name = 2;
+}
+
+message  MyProfileRequest{
+  string userId = 1;
+}
+
+message MyProfileResponse{
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  optional string bio = 4;
+  optional string enlistment_date = 5;
+  optional string discharge_date = 6;
+  optional MyProfileInstitution institution = 7;
+}
+
+message MyProfileInstitution {
   string id = 1;
   string name = 2;
 }

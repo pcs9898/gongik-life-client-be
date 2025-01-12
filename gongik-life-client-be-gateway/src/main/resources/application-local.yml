@@ -20,21 +20,18 @@ spring:
             - PreserveHostHeader
             - DedupeResponseHeader=Access-Control-Allow-Origin
             - DedupeResponseHeader=Set-Cookie
-
-        #          filters:
-        #            - name: CircuitBreaker
-        #              args:
-        #                name: authCircuitBreaker
-        #                fallbackUri: forward:/fallback/authFailure
+            - name: CircuitBreaker
+              args:
+                name: authCircuitBreaker
+                fallbackUri: forward:/fallback/authFailure
 
         - id: graphql_route
           uri: lb://gongik-life-client-be-graphql
           predicates:
             - Path=/graphql
             - Method=POST,GET,OPTIONS
-            #          filters:
-            #            - AuthenticationFilter
           filters:
+            - AuthenticationFilter
             - PreserveHostHeader
             - DedupeResponseHeader=Access-Control-Allow-Origin
             - DedupeResponseHeader=Set-Cookie
@@ -45,6 +42,7 @@ spring:
             - Path=/graphiql/**
             - Method=POST,GET,OPTIONS
           filters:
+            #            - AuthenticationFilter
             - PreserveHostHeader    # 호스트 헤더 유지
             - DedupeResponseHeader=Access-Control-Allow-Origin    # CORS 헤더 중복 제거
             - DedupeResponseHeader=Set-Cookie
