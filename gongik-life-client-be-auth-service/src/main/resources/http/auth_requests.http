@@ -11,15 +11,17 @@ Content-Type: application/json
 ### Validate Access Token
 POST http://localhost:8001/api/auth/validateAccessToken
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY3MDY3ODMsImV4cCI6MTczNjcwODU4M30.TUt7sFVrGxtcI-cKN5M1bjlx1c7tqyXomD33UTy6QjwWsaq-Y9PVFz_kFXFZt5E7
 
-{
-  "accessToken": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY2NzE2NTAsImV4cCI6MTczNjY3MzQ1MH0.HwplMXyZ43ROg-42i9Endb8mxqaTnIg7xCpSg4aCb5tOKYHRfpkY5adUnnlywnFz"
-}
+//{
+//  "accessToken": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY3MDMzNzAsImV4cCI6MTczNjcwNTE3MH0.NQbdD4-9y044LZQRULklRMamSr2XM0L764NhrvsBhyFQHXv8k0rghdQJJPwzgbXF"
+//}
+
 
 ### Refresh Access Token
 POST http://localhost:8001/api/auth/refreshAccessToken
 Content-Type: application/json
-Cookie: refreshToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY2NzE2MTEsImV4cCI6MTczNzg4MTIxMX0.taqUehBYKI5oU13agsrNOP2dCOGK1mhc7YwV7mL6dBoZsk_ga5FHiHswQR9Kf5jy
+Cookie: refreshToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY3MDY2MjksImV4cCI6MTczNzkxNjIyOX0.Stowo3gO2R_PGv3Stt06mdF9n6vTxPLcE7Oj_QQTBZuy5J8t1-BI5HwmVfMYoRzO
 
 {
 }
@@ -27,7 +29,7 @@ Cookie: refreshToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYj
 ### Sign Out
 POST http://localhost:8001/api/auth/signOut
 Content-Type: application/json
-Cookie: refreshToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY2NzMyNTEsImV4cCI6MTczNzg4Mjg1MX0.H2i7tva6VbpSd_2QMZDcc7twXwSieKRJMwfibuBNVaEnQYkC33fVVx7SO13yotkd
+Cookie: refreshToken=eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIzZTA5N2U4YS02MjU1LTRjNTMtYjljOS0zMTRlZGFkMTYxOGYiLCJpYXQiOjE3MzY3MDY2MjksImV4cCI6MTczNzkxNjIyOX0.Stowo3gO2R_PGv3Stt06mdF9n6vTxPLcE7Oj_QQTBZuy5J8t1-BI5HwmVfMYoRzO
 
 {
 }

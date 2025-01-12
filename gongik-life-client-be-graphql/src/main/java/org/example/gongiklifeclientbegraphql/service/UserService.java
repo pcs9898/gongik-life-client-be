@@ -1,12 +1,15 @@
 package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.userService.domain.service.UserServiceGrpc;
+import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbegraphql.dto.me.MyProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpUserRequestDto;
@@ -59,6 +62,22 @@ public class UserService {
           requestDto.toProto());
 
       return ServiceSignUpResponseDto.fromProto(response);
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public MyProfileResponseDto myProfile(String userId) {
+    try {
+      MyProfileResponse response = userBlockingStub.myProfile(
+          MyProfileRequest.newBuilder()
+              .setUserId(userId)
+              .build()
+      );
+
+      return MyProfileResponseDto.fromProto(response);
+      
     } catch (Exception e) {
       log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
       throw e;

@@ -6,9 +6,11 @@ import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.idl.SchemaDirectiveWiring;
 import graphql.schema.idl.SchemaDirectiveWiringEnvironment;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class AuthenticationDirective implements SchemaDirectiveWiring {
 
   @Override
@@ -24,7 +26,7 @@ public class AuthenticationDirective implements SchemaDirectiveWiring {
     // 인증 검사를 수행하는 새로운 DataFetcher를 생성합니다.
     DataFetcher<?> authDataFetcher = (DataFetchingEnvironment dataFetchingEnvironment) -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
-      if (userId == null || userId.trim().isEmpty()) {
+      if (userId == null || userId.trim().isEmpty() || userId.equals("-1")) {
         throw new org.example.gongiklifeclientbegraphql.exception.UnauthorizedException(
             "Unauthorized: Missing X-USER-ID header");
       }

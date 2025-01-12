@@ -2,9 +2,11 @@ package org.example.gongiklifeclientbegraphql.controller;
 
 import dto.UserToUser.UserLoginHistoryRequestDto;
 import graphql.GraphQLContext;
+import graphql.schema.DataFetchingEnvironment;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.me.MyProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpResponseDto;
@@ -15,6 +17,7 @@ import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -64,6 +67,18 @@ public class UserController {
         .accessToken(serviceSignUpResponse.getAccessToken())
         .accessTokenExpiresAt(serviceSignUpResponse.getAccessTokenExpiresAt())
         .build();
+  }
+
+  @QueryMapping
+  public MyProfileResponseDto myProfile(DataFetchingEnvironment dataFetchingEnvironment) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      return userService.myProfile(userId);
+    } catch (Exception e) {
+      log.error("me error: {}", e);
+      throw e;
+    }
   }
 
   private String getClientIpAddress(HttpServletRequest request) {

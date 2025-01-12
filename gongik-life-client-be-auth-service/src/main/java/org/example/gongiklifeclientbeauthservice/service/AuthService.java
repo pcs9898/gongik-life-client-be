@@ -62,8 +62,8 @@ public class AuthService {
         .build();
   }
 
-  public String validateAccessToken(String token) {
-    return tokenProvider.validateAccessTokenAndGetId(token);
+  public String validateAccessToken(String accessToken) {
+    return tokenProvider.validateAccessTokenAndGetId(accessToken);
   }
 
   public RefreshAccessTokenResponseDto refreshAccessToken(String refreshToken) {

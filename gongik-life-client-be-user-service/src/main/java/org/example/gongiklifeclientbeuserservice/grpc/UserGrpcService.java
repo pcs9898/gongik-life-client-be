@@ -3,6 +3,8 @@ package org.example.gongiklifeclientbeuserservice.grpc;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest;
@@ -108,6 +110,29 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
               .withCause(e)  // 원인 예외 포함
               .asRuntimeException()
       );
+    }
+  }
+
+  @Override
+  public void myProfile(MyProfileRequest request,
+      StreamObserver<MyProfileResponse> responseObserver) {
+    try {
+      MyProfileResponse response = userService.myProfile(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("myProfile error: {} - {}",
+          e.getMessage(), e.getLocalizedMessage());
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+
+
     }
   }
 }
