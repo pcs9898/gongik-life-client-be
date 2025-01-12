@@ -1,6 +1,6 @@
-package org.example.gongiklifeclientbeuserservice.producer;
+package org.example.gongiklifeclientbegraphql.producer;
 
-import dto.UserToUser.LoginHistoryRequestDto;
+import dto.UserToUser.UserLoginHistoryRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class LoginHistoryProducer {
+public class UserLoginHistoryProducer {
 
   private final KafkaTemplate<String, Object> kafkaTemplate;
   private static final String TOPIC = "login-history-topic";
 
-  public void sendLoginHistoryRequest(LoginHistoryRequestDto request) {
+  public void sendUserLoginHistoryRequest(UserLoginHistoryRequestDto request) {
 
     kafkaTemplate.send(TOPIC, request);
   }

@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginHistoryRequestDto {
+public class UserLoginHistoryRequestDto {
 
-  private String id;
+  private String userId;
+  private String ipAddress;
 }

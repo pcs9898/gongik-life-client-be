@@ -14,8 +14,13 @@ spring:
         - id: auth_route
           uri: lb://gongik-life-client-be-auth-service
           predicates:
-            - Path=/auth/**
+            - Path=/api/auth/**
             - Method=POST,GET,OPTIONS
+          filters:
+            - PreserveHostHeader
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+            - DedupeResponseHeader=Set-Cookie
+
         #          filters:
         #            - name: CircuitBreaker
         #              args:
@@ -29,6 +34,11 @@ spring:
             - Method=POST,GET,OPTIONS
             #          filters:
             #            - AuthenticationFilter
+          filters:
+            - PreserveHostHeader
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+            - DedupeResponseHeader=Set-Cookie
+
         - id: graphql_playground_route
           uri: lb://gongik-life-client-be-graphql
           predicates:

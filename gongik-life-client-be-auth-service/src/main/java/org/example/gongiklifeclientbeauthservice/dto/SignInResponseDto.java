@@ -1,18 +1,20 @@
-package org.example.gongiklifeclientbegraphql.dto.signUp;
+package org.example.gongiklifeclientbeauthservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignUpResponseDto {
+public class SignInResponseDto {
 
-  private SignUpUserDto user;
+  private SignInUserDto user;
   private String accessToken;
   private String accessTokenExpiresAt;
+
 
 }

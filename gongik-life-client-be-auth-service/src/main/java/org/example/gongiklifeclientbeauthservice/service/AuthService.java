@@ -2,6 +2,8 @@ package org.example.gongiklifeclientbeauthservice.service;
 
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbeauthservice.dto.ServiceSignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SigninRequestDto;
 import org.example.gongiklifeclientbeauthservice.dto.TokenDto;
 import org.example.gongiklifeclientbeauthservice.model.CustomUserDetails;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
   @Value("${jwt.refresh-token-validity}")
@@ -24,29 +27,32 @@ public class AuthService {
   private final AuthenticationManager authenticationManager;
   private final RedisTemplate<String, String> redisTemplate;
 
-  public TokenDto signin(SigninRequestDto request) {
-    // 1. 인증
+
+  public ServiceSignInResponseDto signIn(SigninRequestDto request) {
+
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
     );
 
     CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-    TokenDto tokenInfos = generateTokenAndSaveRefreshToken(userDetails.getEmail());
+    TokenDto tokenInfos = generateTokenAndSaveRefreshToken(userDetails.getId());
 
-    return TokenDto.builder()
+    return ServiceSignInResponseDto.builder()
+        .user(userDetails.toSignInUserDto())
         .accessToken(tokenInfos.getAccessToken())
         .refreshToken(tokenInfos.getRefreshToken())
-        .accessTokenExpiresAt(tokenInfos.getAccessTokenExpiresAt())
+        .accessTokenExpiresAt(tokenInfos.getAccessTokenExpiresAt().toString())
         .build();
+
   }
 
-  public TokenDto generateTokenAndSaveRefreshToken(String email) {
+  public TokenDto generateTokenAndSaveRefreshToken(String id) {
     // 1. 토큰 생성
-    TokenDto accessTokenDto = tokenProvider.generateAccessToken(email);
-    String refreshToken = tokenProvider.generateRefreshToken(email);
+    TokenDto accessTokenDto = tokenProvider.generateAccessToken(id);
+    String refreshToken = tokenProvider.generateRefreshToken(id);
     // 2. Refresh 토큰 저장
-    saveRefreshToken(email, refreshToken);
+    saveRefreshToken(id, refreshToken);
 
     return TokenDto.builder()
         .accessToken(accessTokenDto.getAccessToken())

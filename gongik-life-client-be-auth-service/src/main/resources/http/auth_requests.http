@@ -1,0 +1,27 @@
+### Sign In User
+POST http://localhost:8001/api/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "1@93.com",
+  "password": "1234"
+}
+> {%
+  client.global.set("accessToken", response.body.accessToken);
+%}
+
+### Verify Token
+POST http://localhost:8080/auth/verify-token
+Content-Type: application/json
+
+{
+  "accessToken": "{{accessToken}}"
+}
+
+### Refresh Token
+POST http://localhost:8080/auth/refresh-token
+Content-Type: application/json
+
+{
+  "token": "{{authToken}}"
+}
