@@ -98,4 +98,17 @@ public class AuthService {
     return redisTemplate.opsForValue().get(key);
   }
 
+  public void signOut(String refreshToken) {
+    String userId = tokenProvider.validateRefreshTokenAndGetId(refreshToken);
+
+    String key = "user:" + userId + ":refreshToken";
+
+    String foundRefreshToken = getRefreshToken(userId);
+
+    if (foundRefreshToken == null) {
+      throw new RuntimeException("Refresh token not found, already signed out");
+    }
+
+    redisTemplate.delete(key);
+  }
 }
