@@ -3,6 +3,7 @@ package org.example.gongiklifeclientbeauthservice.service;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbeauthservice.dto.RefreshAccessTokenResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.ServiceSignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SigninRequestDto;
 import org.example.gongiklifeclientbeauthservice.dto.TokenDto;
@@ -42,17 +43,17 @@ public class AuthService {
         .user(userDetails.toSignInUserDto())
         .accessToken(tokenInfos.getAccessToken())
         .refreshToken(tokenInfos.getRefreshToken())
-        .accessTokenExpiresAt(tokenInfos.getAccessTokenExpiresAt().toString())
+        .accessTokenExpiresAt(tokenInfos.getAccessTokenExpiresAt())
         .build();
 
   }
 
-  public TokenDto generateTokenAndSaveRefreshToken(String id) {
+  public TokenDto generateTokenAndSaveRefreshToken(String userId) {
     // 1. 토큰 생성
-    TokenDto accessTokenDto = tokenProvider.generateAccessToken(id);
-    String refreshToken = tokenProvider.generateRefreshToken(id);
+    TokenDto accessTokenDto = tokenProvider.generateAccessToken(userId);
+    String refreshToken = tokenProvider.generateRefreshToken(userId);
     // 2. Refresh 토큰 저장
-    saveRefreshToken(id, refreshToken);
+    saveRefreshToken(userId, refreshToken);
 
     return TokenDto.builder()
         .accessToken(accessTokenDto.getAccessToken())
@@ -65,48 +66,36 @@ public class AuthService {
     return tokenProvider.validateAccessTokenAndGetId(token);
   }
 
-//  public TokenDto refreshAccessToken(String refreshToken) {
-//    // 1. Refresh 토큰 검증
-//    if (!tokenProvider.validateToken(refreshToken)) {
-//      throw new InvalidTokenException("Invalid refresh token");
-//    }
-//
-//    // 2. 토큰에서 사용자 정보 추출
-//    String email = tokenProvider.getEmailFromToken(refreshToken);
-//
-//    // 3. DB의 Refresh 토큰과 비교
-//    RefreshToken savedToken = refreshTokenRepository.findByEmail(email)
-//        .orElseThrow(() -> new InvalidTokenException("Refresh token not found"));
-//
-//    if (!savedToken.getToken().equals(refreshToken)) {
-//      throw new InvalidTokenException("Refresh token mismatch");
-//    }
-//
-//    // 4. 새로운 액세스 토큰 발급
-//    String newAccessToken = tokenProvider.generateAccessToken(email);
-//
-//    return TokenDto.builder()
-//        .accessToken(newAccessToken)
-//        .refreshToken(refreshToken)
-//        .accessTokenExpiresIn(tokenProvider.getAccessTokenExpiresIn())
-//        .build();
-//  }
+  public RefreshAccessTokenResponseDto refreshAccessToken(String refreshToken) {
 
-//  public void signout(String accessToken) {
-//    String email = tokenProvider.getEmailFromToken(accessToken);
-//    refreshTokenRepository.deleteByEmail(email);
-//  }
+    String userId = tokenProvider.validateRefreshTokenAndGetId(refreshToken);
 
-//  public ValidateAccessTokenResponseDto validateAccessToken(String accessToken) {
-//    String email = tokenProvider.getEmailFromToken(accessToken);
-//    return ValidateAccessTokenResponseDto.builder()
-//        .email(email)
-//        .build();
-//  }
+    String foundRefreshToken = getRefreshToken(userId);
 
-  private void saveRefreshToken(String email, String refreshToken) {
-    String key = "user:" + email + ":refreshToken";
+    if (!refreshToken.equals(foundRefreshToken)) {
+      throw new RuntimeException("Refresh token mismatch");
+    }
+
+    TokenDto tokenDto = tokenProvider.generateAccessToken(userId);
+
+    return RefreshAccessTokenResponseDto.builder()
+        .accessToken(tokenDto.getAccessToken())
+        .accessTokenExpiresAt(tokenDto.getAccessTokenExpiresAt())
+        .build();
+
+
+  }
+
+
+  private void saveRefreshToken(String userId, String refreshToken) {
+    String key = "user:" + userId + ":refreshToken";
     redisTemplate.opsForValue()
         .set(key, refreshToken, refreshTokenValidityInMilliseconds, TimeUnit.MILLISECONDS);
   }
+
+  private String getRefreshToken(String userId) {
+    String key = "user:" + userId + ":refreshToken";
+    return redisTemplate.opsForValue().get(key);
+  }
+
 }

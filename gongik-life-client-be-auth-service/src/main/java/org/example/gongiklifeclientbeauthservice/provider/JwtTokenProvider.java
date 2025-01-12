@@ -58,7 +58,7 @@ public class JwtTokenProvider {
     if (isAccessToken) {
       return TokenDto.builder()
           .accessToken(token)
-          .accessTokenExpiresAt(validity)
+          .accessTokenExpiresAt(validity.toString())
           .build();
     } else {
       return TokenDto.builder()
@@ -98,7 +98,21 @@ public class JwtTokenProvider {
           .getPayload();
       return claims.getSubject();
     } catch (Exception e) {
-      log.info("Invalid token ", e);
+      log.info("Invalid Access Token ", e);
+      throw e;
+    }
+  }
+
+  public String validateRefreshTokenAndGetId(String refreshToken) {
+    try {
+      Claims claims = Jwts.parser()
+          .verifyWith((SecretKey) key)
+          .build()
+          .parseSignedClaims(refreshToken)
+          .getPayload();
+      return claims.getSubject();
+    } catch (Exception e) {
+      log.info("Invalid Refresh Token ", e);
       throw e;
     }
   }
