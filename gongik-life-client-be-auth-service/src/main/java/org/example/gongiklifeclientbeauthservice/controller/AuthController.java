@@ -1,10 +1,12 @@
 package org.example.gongiklifeclientbeauthservice.controller;
 
 import dto.UserToUser.UserLoginHistoryRequestDto;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbeauthservice.dto.RefreshAccessTokenResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.ServiceSignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SignInResponseDto;
 import org.example.gongiklifeclientbeauthservice.dto.SigninRequestDto;
@@ -74,6 +76,23 @@ public class AuthController {
     }
   }
 
+  @PostMapping("/refreshAccessToken")
+  public Response<RefreshAccessTokenResponseDto> refreshAccessToken(
+      HttpServletRequest request
+  ) {
+    try {
+      String refreshToken = extractRefreshTokenFromCookie(request);
+      if (refreshToken == null) {
+        throw new RuntimeException("refreshToken not found");
+      }
+
+      return Response.success(authService.refreshAccessToken(refreshToken));
+    } catch (Exception e) {
+      log.error("refreshAccessToken error", e);
+      throw e;
+    }
+  }
+
   private String getClientIpAddress(HttpServletRequest request) {
     String ipAddress = request.getHeader("X-Forwarded-For");
     if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
@@ -92,6 +111,18 @@ public class AuthController {
       ipAddress = request.getRemoteAddr();
     }
     return ipAddress;
+  }
+
+  private String extractRefreshTokenFromCookie(HttpServletRequest request) {
+    Cookie[] cookies = request.getCookies();
+    if (cookies != null) {
+      for (Cookie cookie : cookies) {
+        if ("refreshToken".equals(cookie.getName())) {
+          return cookie.getValue();
+        }
+      }
+    }
+    return null;
   }
 
 }

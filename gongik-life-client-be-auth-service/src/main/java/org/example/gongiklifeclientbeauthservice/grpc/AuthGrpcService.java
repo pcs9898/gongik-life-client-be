@@ -26,7 +26,7 @@ public class AuthGrpcService extends AuthServiceGrpc.AuthServiceImplBase {
       GenerateTokenResponse response = GenerateTokenResponse.newBuilder()
           .setAccessToken(tokenDto.getAccessToken())
           .setRefreshToken(tokenDto.getRefreshToken())
-          .setAccessTokenExpiresAt(tokenDto.getAccessTokenExpiresAt().toString())
+          .setAccessTokenExpiresAt(tokenDto.getAccessTokenExpiresAt())
           .build();
 
       responseObserver.onNext(response);
