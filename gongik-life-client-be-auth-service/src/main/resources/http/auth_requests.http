@@ -3,25 +3,27 @@ POST http://localhost:8001/api/auth/signIn
 Content-Type: application/json
 
 {
-  "email": "1@93.com",
+  "email": "1@90.com",
   "password": "1234"
 }
 > {%
   client.global.set("accessToken", response.body.accessToken);
 %}
 
-### Verify Token
-POST http://localhost:8080/auth/verify-token
+### Validate Access Token
+POST http://localhost:8001/api/auth/validateAccessToken
 Content-Type: application/json
 
 {
-  "accessToken": "{{accessToken}}"
+  "accessToken": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiI1MjdhNDJmOC0yY2U4LTQ3ZDItOGM3Mi0xNjRlYjIxYTk2NWQiLCJpYXQiOjE3MzY2Njg4NTAsImV4cCI6MTczNjY2ODg3MH0.aMvEwrOnx483rACmcnzPlw2ZYeyTlASQACcMp6vJflAQxAJcBH4-Col8cOX8iK0m"
 }
 
-### Refresh Token
+### Refresh Access Token
 POST http://localhost:8080/auth/refresh-token
 Content-Type: application/json
 
 {
   "token": "{{authToken}}"
 }
+
+//  "accessToken": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiIyNmI2YmM2ZC02YjBhLTQzODEtOGE3OS01YWVhZTgyNzY0MTkiLCJpYXQiOjE3MzY2NjgzOTUsImV4cCI6MTczNjY3MDE5NX0.xFwd7tIACELziYrTbj33lmidGxNoFbL1OOdZcFc21qN6_rB-uUujpShWat5fZbEa"

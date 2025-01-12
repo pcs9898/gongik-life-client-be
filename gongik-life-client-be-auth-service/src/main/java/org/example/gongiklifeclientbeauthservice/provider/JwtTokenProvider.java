@@ -9,11 +9,13 @@ import jakarta.annotation.PostConstruct;
 import java.security.Key;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbeauthservice.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
 
   @Value("${jwt.secret}")
@@ -35,6 +37,7 @@ public class JwtTokenProvider {
 
   public TokenDto generateAccessToken(String id) {
     return generateToken(id, accessTokenValidityInMilliseconds, true);
+
   }
 
   public String generateRefreshToken(String id) {
@@ -84,6 +87,20 @@ public class JwtTokenProvider {
         .getPayload();
 
     return claims.getSubject();
+  }
+
+  public String validateAccessTokenAndGetId(String accessToken) {
+    try {
+      Claims claims = Jwts.parser()
+          .verifyWith((SecretKey) key)
+          .build()
+          .parseSignedClaims(accessToken)
+          .getPayload();
+      return claims.getSubject();
+    } catch (Exception e) {
+      log.info("Invalid token ", e);
+      throw e;
+    }
   }
 
   public Long getAccessTokenExpiresIn() {
