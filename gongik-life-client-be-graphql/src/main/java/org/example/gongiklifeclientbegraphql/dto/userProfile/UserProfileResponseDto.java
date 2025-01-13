@@ -1,16 +1,16 @@
-package org.example.gongiklifeclientbegraphql.dto.myProfile;
+package org.example.gongiklifeclientbegraphql.dto.userProfile;
 
-import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class MyProfileResponseDto {
+public class UserProfileResponseDto {
 
   private String id;
   private String email;
-  private MyProfileInstitutionDto institution;
+  private UserProfileInstitutionDto institution;
   private String name;
   private String bio;
   private String enlistmentDate;
@@ -18,7 +18,7 @@ public class MyProfileResponseDto {
 
   @Data
   @Builder
-  private static class MyProfileInstitutionDto {
+  private static class UserProfileInstitutionDto {
 
     private String id;
     private String name;
@@ -26,12 +26,11 @@ public class MyProfileResponseDto {
 
   }
 
-  public static MyProfileResponseDto fromProto(MyProfileResponse response) {
-    return MyProfileResponseDto.builder()
+  public static UserProfileResponseDto fromProto(UserProfileResponse response) {
+    return UserProfileResponseDto.builder()
         .id(response.getId())
-        .email(response.getEmail())
         .name(response.getName())
-        .institution(response.hasInstitution() ? MyProfileInstitutionDto.builder()
+        .institution(response.hasInstitution() ? UserProfileInstitutionDto.builder()
             .id(response.getInstitution().getId())
             .name(response.getInstitution().getName())
             .build() : null)

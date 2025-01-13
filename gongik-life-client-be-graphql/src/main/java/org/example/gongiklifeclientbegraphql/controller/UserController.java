@@ -6,11 +6,13 @@ import graphql.schema.DataFetchingEnvironment;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gongiklifeclientbegraphql.dto.me.MyProfileResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.myProfile.MyProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpUserRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.producer.UserLoginHistoryProducer;
 import org.example.gongiklifeclientbegraphql.service.UserService;
@@ -75,6 +77,18 @@ public class UserController {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       return userService.myProfile(userId);
+    } catch (Exception e) {
+      log.error("me error: {}", e);
+      throw e;
+    }
+  }
+
+  @QueryMapping
+  public UserProfileResponseDto userProfile(
+      @Arguments UserProfileRequestDto requestDto
+  ) {
+    try {
+      return userService.userProfile(requestDto.getUserId());
     } catch (Exception e) {
       log.error("me error: {}", e);
       throw e;
