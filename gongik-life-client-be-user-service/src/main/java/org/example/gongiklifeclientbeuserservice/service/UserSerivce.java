@@ -16,6 +16,9 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVeri
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileInstitution;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
 import dto.UserToEmail.EmailVerificationRequestDto;
@@ -396,5 +399,54 @@ public class UserSerivce {
     }
 
     return myProfileResponseBuilder.build();
+  }
+
+  public UserProfileResponse userProfile(UserProfileRequest request) {
+    String userId = request.getUserId();
+
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
+
+    UserProfileResponse.Builder userProfileResponseBuilder = UserProfileResponse.newBuilder()
+        .setId(user.getId().toString())
+        .setName(userProfile.getName());
+
+    if (!userProfile.getBio().isEmpty()) {
+      userProfileResponseBuilder.setBio(userProfile.getBio());
+    }
+
+    if (userProfile.getEnlistmentDate() != null) {
+      userProfileResponseBuilder.setEnlistmentDate(userProfile.getEnlistmentDate().toString());
+    }
+
+    if (userProfile.getDischargeDate() != null) {
+      userProfileResponseBuilder.setDischargeDate(userProfile.getDischargeDate().toString());
+    }
+
+    GetInstitutionNameResponse getInstitutionNameRequest = null;
+    if (userProfile.getInstitutionId() != null) {
+      try {
+        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+            GetInstitutionNameRequest.newBuilder().setId(userProfile.getInstitutionId().toString())
+                .build());
+        log.info("Institution name retrieved for institution ID: {}",
+            userProfile.getInstitutionId().toString());
+      } catch (Exception e) {
+        log.error("Error occurred while getting institution name: ", e);
+        throw e;
+      }
+    }
+
+    if (getInstitutionNameRequest != null) {
+      userProfileResponseBuilder.setInstitution(
+          UserProfileInstitution.newBuilder()
+              .setId(userProfile.getInstitutionId().toString())
+              .setName(getInstitutionNameRequest.getName()));
+    }
+
+    return userProfileResponseBuilder.build();
   }
 }
