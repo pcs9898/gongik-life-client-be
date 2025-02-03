@@ -594,6 +594,15 @@ public class UserSerivce {
   }
 
   public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
+    if ((request.hasInstitutionId() || request.hasEnlistmentDate() || request.hasDischargeDate()) &&
+        !(request.hasInstitutionId() && request.hasEnlistmentDate()
+            && request.hasDischargeDate())) {
+      throw Status.INVALID_ARGUMENT
+          .withDescription(
+              "Institution ID, Enlistment Date, and Discharge Date must all be provided together.")
+          .asRuntimeException();
+    }
+
     User user = userRepository.findById(UUID.fromString(request.getUserId()))
         .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
 
