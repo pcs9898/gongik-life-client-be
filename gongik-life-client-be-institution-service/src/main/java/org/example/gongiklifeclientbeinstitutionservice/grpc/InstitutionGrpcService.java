@@ -3,6 +3,8 @@ package org.example.gongiklifeclientbeinstitutionservice.grpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import io.grpc.Status;
@@ -49,6 +51,26 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("getInstitutionName error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void institution(InstitutionRequest request,
+      StreamObserver<InstitutionResponse> responseObserver) {
+    try {
+      InstitutionResponse response = institutionService.institution(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("institution error : ", e);
 
       responseObserver.onError(
           Status.INTERNAL

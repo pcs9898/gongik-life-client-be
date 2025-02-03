@@ -26,6 +26,8 @@ public class GraphqlConfig {
         .scalar(ExtendedScalars.Date)
         .scalar(ExtendedScalars.DateTime)
         .scalar(ExtendedScalars.GraphQLLong)
+        .scalar(ExtendedScalars.GraphQLBigDecimal)
+        
         .directive("authenticate", authenticationDirective);
   }
 

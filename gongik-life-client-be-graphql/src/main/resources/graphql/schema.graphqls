@@ -10,6 +10,8 @@ type Query {
 
     userProfile(userId: ID!): UserProfileResponse!
 
+    institution(institutionId: ID!): InstitutionResponse!
+
 }
 
 type Mutation{
@@ -18,6 +20,8 @@ type Mutation{
     verifyEmailCode(email: String!, code: String!): Boolean!
 
     signUp(name: String!,email: String!,password: String!,confirmPassword: String!,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): SignUpResponse!
+
+    updateProfile(name: String,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): UpdateProfileResponse! @authenticate
 }
 
 type SearchInstitutionsResponse {
@@ -81,7 +85,40 @@ type UserProfileResponse{
     enlistmentDate: String
     dischargeDate: String
 }
+
 type UserProfileInstitution{
     id: ID!
     name: String!
+}
+
+type UpdateProfileResponse{
+    id: ID!
+    email: String!
+    institution: UpdateProfileInstitution
+    name: String!
+    bio: String
+    enlistmentDate: String
+    dischargeDate: String
+}
+
+type UpdateProfileInstitution{
+    id: ID!
+    name: String!
+}
+
+type InstitutionResponse{
+    id: ID!
+    name: String!
+    institutionCategoryId: Int!
+    address: String!
+    phoneNumber: String!
+    tagId: Int
+    regionalMilitaryOfficeId: Int!
+    region: String!
+    parentInstitution: String
+    sexualCriminalRecordRestriction:Boolean!
+    averageWorkhours:Int
+    averageRating: Float
+    reviewCount: Int!
+    diseaseRestrictions: [Int]
 }

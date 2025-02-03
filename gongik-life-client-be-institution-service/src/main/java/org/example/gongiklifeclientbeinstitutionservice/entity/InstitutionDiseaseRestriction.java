@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbeinstitutionservice.entity;
 
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
@@ -22,12 +23,12 @@ public class InstitutionDiseaseRestriction {
   @EmbeddedId
   private InstitutionDiseaseRestrictionId id;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("institutionId")
   @JoinColumn(name = "institution_id", nullable = false)
   private Institution institution;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("diseaseId")
   @JoinColumn(name = "disease_id", nullable = false)
   private DiseaseRestriction diseaseRestriction;

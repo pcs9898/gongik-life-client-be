@@ -11,6 +11,8 @@ import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendE
 import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpUserRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
@@ -94,6 +96,24 @@ public class UserController {
       throw e;
     }
   }
+
+  @MutationMapping
+  public UpdateProfileResponseDto updateProfile(
+      @Arguments UpdateProfileRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return userService.updateProfile(requestDto);
+    } catch (Exception e) {
+      log.error("updateProfile error: {}", e);
+      throw e;
+    }
+  }
+
 
   private String getClientIpAddress(HttpServletRequest request) {
     String ipAddress = request.getHeader("X-Forwarded-For");

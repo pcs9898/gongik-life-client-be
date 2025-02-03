@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbeinstitutionservice.batch.config;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbeinstitutionservice.batch.listener.JobDurationListener;
 import org.example.gongiklifeclientbeinstitutionservice.batch.processor.InstitutionItemProcessor;
 import org.example.gongiklifeclientbeinstitutionservice.batch.reader.InstitutionItemReader;
@@ -14,7 +15,6 @@ import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionTa
 import org.example.gongiklifeclientbeinstitutionservice.repository.RegionalMilitaryOfficeRepository;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -25,8 +25,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@EnableBatchProcessing
+//@EnableBatchProcessing
 @RequiredArgsConstructor
+@Slf4j
 public class BatchConfig {
 
   private final JobRepository jobRepository;
@@ -42,6 +43,9 @@ public class BatchConfig {
 
   @Bean
   public Job importInstitutionJob(Step SeedInstitutionsToPostgreSQLStep) {
+
+    log.info("importInstitutionJob");
+
     return new JobBuilder("importInstitutionJob", jobRepository)
         .incrementer(new RunIdIncrementer())
         .start(dataCheckDecider)

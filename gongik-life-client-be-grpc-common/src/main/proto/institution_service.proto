@@ -6,6 +6,8 @@ service InstitutionService {
   rpc SearchInstitutions(SearchInstitutionsRequest) returns (SearchInstitutionsResponse);
 
   rpc GetInstitutionName(GetInstitutionNameRequest) returns (GetInstitutionNameResponse);
+
+  rpc Institution(InstitutionRequest) returns (InstitutionResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -39,4 +41,25 @@ message GetInstitutionNameRequest {
 
 message GetInstitutionNameResponse {
   string name = 1;
+}
+
+message InstitutionRequest {
+  string institutionId = 1;
+}
+
+message InstitutionResponse {
+  string id = 1;
+  string name = 2;
+  int32 institutionCategoryId = 3;
+  string address = 4;
+  string phoneNumber = 5;
+  int32 regionalMilitaryOfficeId = 6;
+  string region = 7;
+  bool sexualCriminalRecordRestriction = 8;
+  int32 reviewCount = 9;
+  optional int32 tagId = 10;
+  optional string parentInstitution = 11;
+  optional int32 averageWorkhours = 12;
+  optional double averageRating = 13;
+  repeated int32 diseaseRestrictions = 14;
 }
