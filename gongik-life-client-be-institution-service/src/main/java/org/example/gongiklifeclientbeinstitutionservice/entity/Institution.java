@@ -13,11 +13,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -120,7 +118,7 @@ public class Institution {
   }
 
   @Transactional
-  public InstitutionResponse toInstitutionResponseProto() {
+  public InstitutionResponse.Builder toInstitutionResponseProto() {
     InstitutionResponse.Builder builder = InstitutionResponse.newBuilder()
         .setId(id.toString())
         .setName(name)
@@ -144,22 +142,22 @@ public class Institution {
     if (averageRating != null) {
       builder.setAverageRating(averageRating);
     }
+// not work with jpa relation
+//    // diseaseRestrictions 컬렉션을 복사하여 순회
+//    Set<InstitutionDiseaseRestriction> diseaseRestrictionsCopy;
+//    synchronized (diseaseRestrictions) {
+//      diseaseRestrictionsCopy = new HashSet<>(diseaseRestrictions);
+//    }
+//
+//    log.info("diseaseRestrictions@@@ : {}", diseaseRestrictionsCopy);
+//    if (diseaseRestrictionsCopy != null && !diseaseRestrictionsCopy.isEmpty()) {
+//      int[] diseaseRestrictionIds = diseaseRestrictionsCopy.stream()
+//          .mapToInt(restriction -> restriction.getDiseaseRestriction().getId())
+//          .toArray();
+//      builder.addAllDiseaseRestrictions(
+//          Arrays.stream(diseaseRestrictionIds).boxed().collect(Collectors.toList()));
+//    }
 
-    // diseaseRestrictions 컬렉션을 복사하여 순회
-    Set<InstitutionDiseaseRestriction> diseaseRestrictionsCopy;
-    synchronized (diseaseRestrictions) {
-      diseaseRestrictionsCopy = new HashSet<>(diseaseRestrictions);
-    }
-
-    log.info("diseaseRestrictions@@@ : {}", diseaseRestrictionsCopy);
-    if (diseaseRestrictionsCopy != null && !diseaseRestrictionsCopy.isEmpty()) {
-      int[] diseaseRestrictionIds = diseaseRestrictionsCopy.stream()
-          .mapToInt(restriction -> restriction.getDiseaseRestriction().getId())
-          .toArray();
-      builder.addAllDiseaseRestrictions(
-          Arrays.stream(diseaseRestrictionIds).boxed().collect(Collectors.toList()));
-    }
-
-    return builder.build();
+    return builder;
   }
 }
