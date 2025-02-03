@@ -16,6 +16,12 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVeri
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileInstitution;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileInstitution;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
 import dto.UserToEmail.EmailVerificationRequestDto;
@@ -47,29 +53,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserSerivce {
 
-  @GrpcClient("gongik-life-client-be-auth-service")
-  private AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
-
-  @GrpcClient("gongik-life-client-be-institution-service")
-  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionServiceBlockingStub;
-
-
   private static final long EMAIL_VERIFICATION_CODE_EXPIRATION_MINUTES = 6;
   private static final long EMAIL_VERIFICATION_CODE_RESEND_WAIT_MINUTES = 1;
   private static final long VERIFIED_EMAIL_EXPIRATION_MINUTES = 30;
   private static final String VERIFIED_EMAIL = "verified:email:";
   private static final String VERIFICATION_CODE = "verification:code:";
-
-
   private final RedisTemplate<String, String> redisTemplate;
   private final EmailVerificationCodeProducer emailVerificationCodeProducer;
-
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
   private final UserAuthRepository userAuthRepository;
   private final UserProfileRepository userProfileRepository;
   private final AuthTypeRepository authTypeRepository;
-
+  @GrpcClient("gongik-life-client-be-auth-service")
+  private AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
+  @GrpcClient("gongik-life-client-be-institution-service")
+  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionServiceBlockingStub;
 
   public SendEmailVerificationCodeResponse sendEmailVerificationCode(
       SendEmailVerificationCodeRequest request) {
@@ -164,130 +163,265 @@ public class UserSerivce {
     return VerifyEmailCodeResponse.newBuilder().setSuccess(true).build();
   }
 
+//  @Transactional()
+//  public SignUpResponse signUp(SignUpRequest request) {
+//    log.info("Starting signUp process for email: {}", request.getEmail());
+//
+//    // 이메일 중복 확인
+//    boolean emailExists = userRepository.existsByEmail(request.getEmail());
+//    if (emailExists) {
+//      log.error("Email is already registered: {}", request.getEmail());
+//      throw Status.ALREADY_EXISTS
+//          .withDescription("Email is already registered.")
+//          .asRuntimeException();
+//    }
+//
+//    boolean isVerified = isEmailVerified(request.getEmail());
+//    if (!isVerified) {
+//      log.error("Email is not verified: {}", request.getEmail());
+//      throw Status.PERMISSION_DENIED
+//          .withDescription("Email is not verified.")
+//          .asRuntimeException();
+//    }
+//
+//    if (!request.getPassword().equals(request.getConfirmPassword())) {
+//      log.error("Password and password confirm do not match for email: {}", request.getEmail());
+//      throw Status.INVALID_ARGUMENT
+//          .withDescription("Password and password confirm are not same.")
+//          .asRuntimeException();
+//    }
+//
+//    String hashedPassword = passwordEncoder.encode(request.getPassword());
+//
+//    // 사용자 생성
+//    User newUser = User.builder()
+//        .email(request.getEmail())
+//        .build();
+//    userRepository.save(newUser);
+//    log.info("New user created with ID: {}", newUser.getId());
+//
+//    UserAuth newUserAuth = UserAuth.builder()
+//        .user(newUser)
+//        .authTypeId(1)
+//        .passwordHash(hashedPassword)
+//        .build();
+//    userAuthRepository.save(newUserAuth);
+//    log.info("New user auth created for user ID: {}", newUser.getId());
+//
+//    UserProfile newUserProfile = UserProfile.builder()
+//        .user(newUser)
+//        .name(request.getName())
+//        .institutionId(request.getInstitutionId().isEmpty() ? null
+//            : UUID.fromString(request.getInstitutionId()))
+//        .bio(request.getBio().isEmpty() ? null : request.getBio())
+//        .enlistmentDate(request.getEnlistmentDate().isEmpty() ? null
+//            : TimestampConverter.convertStringToDate(request.getEnlistmentDate()))
+//        .dischargeDate(request.getDischargeDate().isEmpty() ? null
+//            : TimestampConverter.convertStringToDate(request.getDischargeDate()))
+//        .build();
+//    userProfileRepository.save(newUserProfile);
+//    log.info("New user profile created for user ID: {}", newUser.getId());
+//
+//    GetInstitutionNameResponse getInstitutionNameRequest = null;
+//    if (!request.getInstitutionId().isEmpty()) {
+//      try {
+//        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+//            GetInstitutionNameRequest.newBuilder().setId(request.getInstitutionId()).build());
+//        log.info("Institution name retrieved for institution ID: {}", request.getInstitutionId());
+//      } catch (Exception e) {
+//        log.error("Error occurred while getting institution name: ", e);
+//        throw e;
+//      }
+//    }
+//
+//    GenerateTokenResponse generateTokenResponse;
+//    try {
+//      generateTokenResponse = authServiceBlockingStub.generateToken(
+//          GenerateTokenRequest.newBuilder()
+//              .setUserId(newUser.getId().toString())
+//              .build());
+//      if (generateTokenResponse == null) {
+//        log.error("generateTokenResponse is null");
+//        throw new RuntimeException("Failed to generate token: response is null");
+//      }
+//      log.info("generateTokenResponse: {}", generateTokenResponse);
+//    } catch (Exception e) {
+//      log.error("Error occurred while generating token: ", e);
+//      throw e;
+//    }
+//
+//    UserServiceOuterClass.SignUpUser.Builder signUpUserBuilder = UserServiceOuterClass.SignUpUser.newBuilder()
+//        .setId(newUser.getId().toString())
+//        .setEmail(newUser.getEmail())
+//        .setName(newUserProfile.getName())
+//        .setBio(newUserProfile.getBio().isEmpty() ? null : newUserProfile.getBio());
+//try{
+//
+//  if (!newUserProfile.getBio().isEmpty()) {
+//    signUpUserBuilder.setBio(newUserProfile.getBio());
+//  }
+//
+//  if (newUserProfile.getEnlistmentDate() != null) {
+//    signUpUserBuilder.setEnlistmentDate(newUserProfile.getEnlistmentDate().toString());
+//  }
+//
+//  if (newUserProfile.getDischargeDate() != null) {
+//    signUpUserBuilder.setDischargeDate(newUserProfile.getDischargeDate().toString());
+//  }
+//
+//  if (getInstitutionNameRequest != null) {
+//    signUpUserBuilder.setInstitution(UserServiceOuterClass.SignUpInstitution.newBuilder()
+//        .setId(request.getInstitutionId())
+//        .setName(getInstitutionNameRequest.getName())
+//        .build());
+//  }
+//}catch(Exception e){
+//
+//  log.error("Error occurred while setting up user profile: ", e);
+//  throw e;
+//}
+//
+//    SignUpResponse response = SignUpResponse.newBuilder()
+//        .setUser(signUpUserBuilder.build())
+//        .setRefreshToken(generateTokenResponse.getRefreshToken())
+//        .setAccessToken(generateTokenResponse.getAccessToken())
+//        .setAccessTokenExpiresAt(generateTokenResponse.getAccessTokenExpiresAt())
+//        .build();
+//
+//    log.info("SignUpResponse: {}", response);
+//
+//    return response;
+//  }
+
 
   @Transactional()
   public SignUpResponse signUp(SignUpRequest request) {
     log.info("Starting signUp process for email: {}", request.getEmail());
 
-    // 이메일 중복 확인
-    boolean emailExists = userRepository.existsByEmail(request.getEmail());
-    if (emailExists) {
-      log.error("Email is already registered: {}", request.getEmail());
-      throw Status.ALREADY_EXISTS
-          .withDescription("Email is already registered.")
-          .asRuntimeException();
-    }
+    try {
+      // 이메일 중복 확인
+      boolean emailExists = userRepository.existsByEmail(request.getEmail());
+      if (emailExists) {
+        log.error("Email is already registered: {}", request.getEmail());
+        throw Status.ALREADY_EXISTS
+            .withDescription("Email is already registered.")
+            .asRuntimeException();
+      }
 
-    boolean isVerified = isEmailVerified(request.getEmail());
-    if (!isVerified) {
-      log.error("Email is not verified: {}", request.getEmail());
-      throw Status.PERMISSION_DENIED
-          .withDescription("Email is not verified.")
-          .asRuntimeException();
-    }
+      boolean isVerified = isEmailVerified(request.getEmail());
+      if (!isVerified) {
+        log.error("Email is not verified: {}", request.getEmail());
+        throw Status.PERMISSION_DENIED
+            .withDescription("Email is not verified.")
+            .asRuntimeException();
+      }
 
-    if (!request.getPassword().equals(request.getConfirmPassword())) {
-      log.error("Password and password confirm do not match for email: {}", request.getEmail());
-      throw Status.INVALID_ARGUMENT
-          .withDescription("Password and password confirm are not same.")
-          .asRuntimeException();
-    }
+      if (!request.getPassword().equals(request.getConfirmPassword())) {
+        log.error("Password and password confirm do not match for email: {}", request.getEmail());
+        throw Status.INVALID_ARGUMENT
+            .withDescription("Password and password confirm are not same.")
+            .asRuntimeException();
+      }
 
-    String hashedPassword = passwordEncoder.encode(request.getPassword());
+      String hashedPassword = passwordEncoder.encode(request.getPassword());
 
-    // 사용자 생성
-    User newUser = User.builder()
-        .email(request.getEmail())
-        .build();
-    userRepository.save(newUser);
-    log.info("New user created with ID: {}", newUser.getId());
+      // 사용자 생성
+      User newUser = User.builder()
+          .email(request.getEmail())
+          .build();
+      userRepository.save(newUser);
+      log.info("New user created with ID: {}", newUser.getId());
 
-    UserAuth newUserAuth = UserAuth.builder()
-        .user(newUser)
-        .authTypeId(1)
-        .passwordHash(hashedPassword)
-        .build();
-    userAuthRepository.save(newUserAuth);
-    log.info("New user auth created for user ID: {}", newUser.getId());
+      UserAuth newUserAuth = UserAuth.builder()
+          .user(newUser)
+          .authTypeId(1)
+          .passwordHash(hashedPassword)
+          .build();
+      userAuthRepository.save(newUserAuth);
+      log.info("New user auth created for user ID: {}", newUser.getId());
 
-    UserProfile newUserProfile = UserProfile.builder()
-        .user(newUser)
-        .name(request.getName())
-        .institutionId(request.getInstitutionId().isEmpty() ? null
-            : UUID.fromString(request.getInstitutionId()))
-        .bio(request.getBio().isEmpty() ? null : request.getBio())
-        .enlistmentDate(request.getEnlistmentDate().isEmpty() ? null
-            : TimestampConverter.convertStringToDate(request.getEnlistmentDate()))
-        .dischargeDate(request.getDischargeDate().isEmpty() ? null
-            : TimestampConverter.convertStringToDate(request.getDischargeDate()))
-        .build();
-    userProfileRepository.save(newUserProfile);
-    log.info("New user profile created for user ID: {}", newUser.getId());
+      UserProfile newUserProfile = UserProfile.builder()
+          .user(newUser)
+          .name(request.getName())
+          .institutionId(request.getInstitutionId().isEmpty() ? null
+              : UUID.fromString(request.getInstitutionId()))
+          .bio(request.getBio().isEmpty() ? null : request.getBio())
+          .enlistmentDate(request.getEnlistmentDate().isEmpty() ? null
+              : TimestampConverter.convertStringToDate(request.getEnlistmentDate()))
+          .dischargeDate(request.getDischargeDate().isEmpty() ? null
+              : TimestampConverter.convertStringToDate(request.getDischargeDate()))
+          .build();
+      userProfileRepository.save(newUserProfile);
+      log.info("New user profile created for user ID: {}", newUser.getId());
 
-    GetInstitutionNameResponse getInstitutionNameRequest = null;
-    if (!request.getInstitutionId().isEmpty()) {
+      GetInstitutionNameResponse getInstitutionNameRequest = null;
+      if (!request.getInstitutionId().isEmpty()) {
+        try {
+          getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+              GetInstitutionNameRequest.newBuilder().setId(request.getInstitutionId()).build());
+          log.info("Institution name retrieved for institution ID: {}", request.getInstitutionId());
+        } catch (Exception e) {
+          log.error("Error occurred while getting institution name: ", e);
+          throw e;
+        }
+      }
+
+      GenerateTokenResponse generateTokenResponse;
       try {
-        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
-            GetInstitutionNameRequest.newBuilder().setId(request.getInstitutionId()).build());
-        log.info("Institution name retrieved for institution ID: {}", request.getInstitutionId());
+        generateTokenResponse = authServiceBlockingStub.generateToken(
+            GenerateTokenRequest.newBuilder()
+                .setUserId(newUser.getId().toString())
+                .build());
+        if (generateTokenResponse == null) {
+          log.error("generateTokenResponse is null");
+          throw new RuntimeException("Failed to generate token: response is null");
+        }
+        log.info("generateTokenResponse: {}", generateTokenResponse);
       } catch (Exception e) {
-        log.error("Error occurred while getting institution name: ", e);
+        log.error("Error occurred while generating token: ", e);
         throw e;
       }
-    }
 
-    GenerateTokenResponse generateTokenResponse;
-    try {
-      generateTokenResponse = authServiceBlockingStub.generateToken(
-          GenerateTokenRequest.newBuilder()
-              .setUserId(newUser.getId().toString())
-              .build());
-      if (generateTokenResponse == null) {
-        log.error("generateTokenResponse is null");
-        throw new RuntimeException("Failed to generate token: response is null");
+      UserServiceOuterClass.SignUpUser.Builder signUpUserBuilder = UserServiceOuterClass.SignUpUser.newBuilder()
+          .setId(newUser.getId().toString())
+          .setEmail(newUser.getEmail())
+          .setName(newUserProfile.getName());
+
+      if (newUserProfile.getBio() != null && !newUserProfile.getBio().isEmpty()) {
+        signUpUserBuilder.setBio(newUserProfile.getBio());
       }
-      log.info("generateTokenResponse: {}", generateTokenResponse);
+
+      if (newUserProfile.getEnlistmentDate() != null) {
+        signUpUserBuilder.setEnlistmentDate(newUserProfile.getEnlistmentDate().toString());
+      }
+
+      if (newUserProfile.getDischargeDate() != null) {
+        signUpUserBuilder.setDischargeDate(newUserProfile.getDischargeDate().toString());
+      }
+
+      if (getInstitutionNameRequest != null) {
+        signUpUserBuilder.setInstitution(UserServiceOuterClass.SignUpInstitution.newBuilder()
+            .setId(request.getInstitutionId())
+            .setName(getInstitutionNameRequest.getName())
+            .build());
+      }
+
+      SignUpResponse response = SignUpResponse.newBuilder()
+          .setUser(signUpUserBuilder.build())
+          .setRefreshToken(generateTokenResponse.getRefreshToken())
+          .setAccessToken(generateTokenResponse.getAccessToken())
+          .setAccessTokenExpiresAt(generateTokenResponse.getAccessTokenExpiresAt())
+          .build();
+
+      log.info("SignUpResponse: {}", response);
+
+      return response;
     } catch (Exception e) {
-      log.error("Error occurred while generating token: ", e);
+      log.error("signUp error: ", e);
       throw e;
     }
-
-    UserServiceOuterClass.SignUpUser.Builder signUpUserBuilder = UserServiceOuterClass.SignUpUser.newBuilder()
-        .setId(newUser.getId().toString())
-        .setEmail(newUser.getEmail())
-        .setName(newUserProfile.getName())
-        .setBio(newUserProfile.getBio().isEmpty() ? null : newUserProfile.getBio());
-
-    if (!newUserProfile.getBio().isEmpty()) {
-      signUpUserBuilder.setBio(newUserProfile.getBio());
-    }
-
-    if (newUserProfile.getEnlistmentDate() != null) {
-      signUpUserBuilder.setEnlistmentDate(newUserProfile.getEnlistmentDate().toString());
-    }
-
-    if (newUserProfile.getDischargeDate() != null) {
-      signUpUserBuilder.setDischargeDate(newUserProfile.getDischargeDate().toString());
-    }
-
-    if (getInstitutionNameRequest != null) {
-      signUpUserBuilder.setInstitution(UserServiceOuterClass.SignUpInstitution.newBuilder()
-          .setId(request.getInstitutionId())
-          .setName(getInstitutionNameRequest.getName())
-          .build());
-    }
-
-    SignUpResponse response = SignUpResponse.newBuilder()
-        .setUser(signUpUserBuilder.build())
-        .setRefreshToken(generateTokenResponse.getRefreshToken())
-        .setAccessToken(generateTokenResponse.getAccessToken())
-        .setAccessTokenExpiresAt(generateTokenResponse.getAccessTokenExpiresAt())
-        .build();
-
-    log.info("SignUpResponse: {}", response);
-
-    return response;
   }
+
 
   private void saveEmailVerificationCode(String email, String code) {
     String key = VERIFICATION_CODE + email;
@@ -303,49 +437,61 @@ public class UserSerivce {
   }
 
   public FindByEmailForAuthResponse findByEmailForAuth(FindByEmailForAuthRequest request) {
-    String email = request.getEmail();
-    User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    try {
+      String email = request.getEmail();
+      User user = userRepository.findByEmail(email)
+          .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
-    UserAuth userAuth = userAuthRepository.findByUser(user)
-        .orElseThrow(() -> new RuntimeException("User auth not found with email: " + email));
+      UserAuth userAuth = userAuthRepository.findByUser(user)
+          .orElseThrow(() -> new RuntimeException("User auth not found with email: " + email));
 
-    UserProfile userProfile = userProfileRepository.findByUser(user)
-        .orElseThrow(() -> new RuntimeException("User profile not found with email: " + email));
+      UserProfile userProfile = userProfileRepository.findByUser(user)
+          .orElseThrow(() -> new RuntimeException("User profile not found with email: " + email));
 
-    UserServiceOuterClass.FindByEmailForAuthResponse.Builder findByEmailForAuthResponseBuilder = UserServiceOuterClass.FindByEmailForAuthResponse.newBuilder()
-        .setId(user.getId().toString())
-        .setEmail(user.getEmail())
-        .setPassword(userAuth.getPasswordHash())
-        .setName(userProfile.getName())
-        .setBio(userProfile.getBio().isEmpty() ? null : userProfile.getBio())
-        .setEnlistmentDate(userProfile.getEnlistmentDate() == null ? ""
-            : userProfile.getEnlistmentDate().toString())
-        .setDischargeDate(userProfile.getDischargeDate() == null ? ""
-            : userProfile.getDischargeDate().toString());
+      UserServiceOuterClass.FindByEmailForAuthResponse.Builder findByEmailForAuthResponseBuilder = UserServiceOuterClass.FindByEmailForAuthResponse.newBuilder()
+          .setId(user.getId().toString())
+          .setEmail(user.getEmail())
+          .setPassword(userAuth.getPasswordHash())
+          .setName(userProfile.getName())
+          .setEnlistmentDate(userProfile.getEnlistmentDate() == null ? ""
+              : userProfile.getEnlistmentDate().toString())
+          .setDischargeDate(userProfile.getDischargeDate() == null ? ""
+              : userProfile.getDischargeDate().toString());
 
-    GetInstitutionNameResponse getInstitutionNameRequest = null;
-    if (userProfile.getInstitutionId() != null) {
-      try {
-        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
-            GetInstitutionNameRequest.newBuilder().setId(userProfile.getInstitutionId().toString())
-                .build());
-        log.info("Institution name retrieved for institution ID: {}",
-            userProfile.getInstitutionId().toString());
-      } catch (Exception e) {
-        log.error("Error occurred while getting institution name: ", e);
-        throw e;
+      if (userProfile.getBio() != null && !userProfile.getBio().isEmpty()) {
+        findByEmailForAuthResponseBuilder.setBio(userProfile.getBio());
       }
-    }
 
-    if (getInstitutionNameRequest != null) {
-      findByEmailForAuthResponseBuilder.setInstitution(
-          UserServiceOuterClass.InstitutionForAuth.newBuilder()
-              .setId(userProfile.getInstitutionId().toString())
-              .setName(getInstitutionNameRequest.getName()));
-    }
+      GetInstitutionNameResponse getInstitutionNameRequest = null;
+      if (userProfile.getInstitutionId() != null) {
+        try {
+          getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+              GetInstitutionNameRequest.newBuilder()
+                  .setId(userProfile.getInstitutionId().toString())
+                  .build());
+          log.info("Institution name retrieved for institution ID: {}",
+              userProfile.getInstitutionId().toString());
+        } catch (Exception e) {
+          log.error("Error occurred while getting institution name: ", e);
+          throw e;
+        }
+      }
 
-    return findByEmailForAuthResponseBuilder.build();
+      if (getInstitutionNameRequest != null) {
+        findByEmailForAuthResponseBuilder.setInstitution(
+            UserServiceOuterClass.InstitutionForAuth.newBuilder()
+                .setId(userProfile.getInstitutionId().toString())
+                .setName(getInstitutionNameRequest.getName()));
+      }
+
+      return findByEmailForAuthResponseBuilder.build();
+    } catch (Exception e) {
+      log.error("Error in findByEmailForAuth: ", e);
+      throw Status.INTERNAL
+          .withDescription("Internal server error")
+          .withCause(e)
+          .asRuntimeException();
+    }
   }
 
   public MyProfileResponse myProfile(MyProfileRequest request) {
@@ -396,5 +542,150 @@ public class UserSerivce {
     }
 
     return myProfileResponseBuilder.build();
+  }
+
+  public UserProfileResponse userProfile(UserProfileRequest request) {
+    String userId = request.getUserId();
+
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
+
+    UserProfileResponse.Builder userProfileResponseBuilder = UserProfileResponse.newBuilder()
+        .setId(user.getId().toString())
+        .setName(userProfile.getName());
+
+    if (!userProfile.getBio().isEmpty()) {
+      userProfileResponseBuilder.setBio(userProfile.getBio());
+    }
+
+    if (userProfile.getEnlistmentDate() != null) {
+      userProfileResponseBuilder.setEnlistmentDate(userProfile.getEnlistmentDate().toString());
+    }
+
+    if (userProfile.getDischargeDate() != null) {
+      userProfileResponseBuilder.setDischargeDate(userProfile.getDischargeDate().toString());
+    }
+
+    GetInstitutionNameResponse getInstitutionNameRequest = null;
+    if (userProfile.getInstitutionId() != null) {
+      try {
+        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+            GetInstitutionNameRequest.newBuilder().setId(userProfile.getInstitutionId().toString())
+                .build());
+        log.info("Institution name retrieved for institution ID: {}",
+            userProfile.getInstitutionId().toString());
+      } catch (Exception e) {
+        log.error("Error occurred while getting institution name: ", e);
+        throw e;
+      }
+    }
+
+    if (getInstitutionNameRequest != null) {
+      userProfileResponseBuilder.setInstitution(
+          UserProfileInstitution.newBuilder()
+              .setId(userProfile.getInstitutionId().toString())
+              .setName(getInstitutionNameRequest.getName()));
+    }
+
+    return userProfileResponseBuilder.build();
+  }
+
+  public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
+    User user = userRepository.findById(UUID.fromString(request.getUserId()))
+        .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(
+            () -> new RuntimeException("User profile not found with ID: " + request.getUserId()));
+
+    if (request.hasName()) {
+      userProfile.setName(request.getName());
+      if (request.getName().isEmpty()) {
+        throw Status.INVALID_ARGUMENT
+            .withDescription("Name cannot be empty.")
+            .asRuntimeException();
+      } else {
+        userProfile.setName(request.getName());
+      }
+    }
+    if (request.hasBio()) {
+      if (request.getBio().isEmpty()) {
+        userProfile.setBio(null);
+      } else {
+        userProfile.setBio(request.getBio());
+      }
+
+    }
+    if (request.hasEnlistmentDate()) {
+      if (request.getEnlistmentDate().isEmpty()) {
+        userProfile.setEnlistmentDate(null);
+      } else {
+        userProfile.setEnlistmentDate(
+            TimestampConverter.convertStringToDate(request.getEnlistmentDate()));
+      }
+    }
+    if (request.hasDischargeDate()) {
+      if (request.getDischargeDate().isEmpty()) {
+        userProfile.setDischargeDate(null);
+      } else {
+        userProfile.setDischargeDate(
+            TimestampConverter.convertStringToDate(request.getDischargeDate()));
+      }
+    }
+    if (request.hasInstitutionId()) {
+      if (request.getInstitutionId().isEmpty()) {
+        userProfile.setInstitutionId(null);
+      } else {
+        userProfile.setInstitutionId(UUID.fromString(request.getInstitutionId()));
+      }
+    }
+
+    userProfileRepository.save(userProfile);
+
+    UpdateProfileResponse.Builder responseBuilder = UpdateProfileResponse.newBuilder()
+        .setId(user.getId().toString())
+        .setEmail(user.getEmail());
+
+    if (userProfile.getName() != null) {
+      responseBuilder.setName(userProfile.getName());
+    }
+
+    if (userProfile.getBio() != null && !userProfile.getBio().isEmpty()) {
+      responseBuilder.setBio(userProfile.getBio());
+    }
+
+    if (userProfile.getEnlistmentDate() != null) {
+      responseBuilder.setEnlistmentDate(userProfile.getEnlistmentDate().toString());
+    }
+
+    if (userProfile.getDischargeDate() != null) {
+      responseBuilder.setDischargeDate(userProfile.getDischargeDate().toString());
+    }
+
+    if (userProfile.getInstitutionId() != null) {
+      try {
+        String institutionName = getInstitutionName(userProfile.getInstitutionId());
+
+        responseBuilder.setInstitution(UpdateProfileInstitution.newBuilder()
+            .setId(userProfile.getInstitutionId().toString())
+            .setName(institutionName));
+      } catch (Exception e) {
+        log.error("Error occurred while getting institution name: ", e);
+        throw e;
+      }
+    }
+
+    return responseBuilder.build();
+
+  }
+
+  private String getInstitutionName(UUID institutionId) {
+
+    GetInstitutionNameResponse response = institutionServiceBlockingStub.getInstitutionName(
+        GetInstitutionNameRequest.newBuilder().setId(institutionId.toString()).build());
+    return response.getName();
   }
 }

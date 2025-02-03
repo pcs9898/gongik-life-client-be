@@ -1,4 +1,4 @@
-package org.example.gongiklifeclientbegraphql.dto.me;
+package org.example.gongiklifeclientbegraphql.dto.myProfile;
 
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import lombok.Builder;

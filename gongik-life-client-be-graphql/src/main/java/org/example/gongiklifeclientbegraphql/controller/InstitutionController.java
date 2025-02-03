@@ -2,6 +2,8 @@ package org.example.gongiklifeclientbegraphql.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
 import org.example.gongiklifeclientbegraphql.service.InstitutionService;
@@ -24,13 +26,13 @@ public class InstitutionController {
 
     return institutionService.searchInstitutions(requestDto);
   }
+
+  @QueryMapping
+  public InstitutionResponseDto institution(
+      @Arguments InstitutionRequestDto requestDto
+  ) {
+
+    return institutionService.institution(requestDto);
+  }
 }
 
-//@Argument(name = "searchKeyword") String searchKeyword,
-//@Argument(name = "cursor") String cursor,
-//@Argument(name = "pageSize") int pageSize) {
-//
-//SearchInstitutionsRequestDto requestDto = new SearchInstitutionsRequestDto();
-//    requestDto.setSearchKeyword(searchKeyword);
-//    requestDto.setCursor(cursor);
-//    requestDto.setPageSize(pageSize);
