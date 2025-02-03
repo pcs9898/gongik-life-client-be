@@ -37,9 +37,7 @@ public class UserAuth extends Auditable {
 
   @Column(name = "auth_type_id", nullable = false)
   private int authTypeId;
-
-  @Column(name = "auth_id", length = 255)
-  private String authId;
+  
 
   @Column(name = "password_hash", length = 255)
   private String passwordHash;

@@ -4,6 +4,7 @@ import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
@@ -15,6 +16,8 @@ import org.example.gongiklifeclientbegraphql.dto.myProfile.MyProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.signUp.SignUpUserRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
 import org.springframework.stereotype.Service;
@@ -96,6 +99,19 @@ public class UserService {
       );
 
       return UserProfileResponseDto.fromProto(response);
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public UpdateProfileResponseDto updateProfile(UpdateProfileRequestDto requestDto) {
+    try {
+      UpdateProfileResponse response = userBlockingStub.updateProfile(
+          requestDto.toProto()
+      );
+
+      return UpdateProfileResponseDto.fromProto(response);
     } catch (Exception e) {
       log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
       throw e;

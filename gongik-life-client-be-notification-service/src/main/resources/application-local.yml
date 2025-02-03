@@ -46,7 +46,7 @@ spring:
     name: gongik-life-client-be-notification-service
 
   datasource:
-    url: jdbc:postgresql://${REMOTE_ADDRESS:192.168.0.50}:5432/gongik_life_client_notification_db
+    url: jdbc:postgresql://localhost:5432/gongik_life_client_notification_db
     driverClassName: org.postgresql.Driver
     username: postgres
     password: postgres
@@ -64,12 +64,12 @@ spring:
 
   data:
     redis:
-      host: ${REMOTE_ADDRESS:192.168.0.50}
+      host: localhost
       port: 6379
       client-type: lettuce
 
   kafka:
-    bootstrap-servers: ${REMOTE_ADDRESS:192.168.0.50}:9092
+    bootstrap-servers: localhost:9092
     consumer:
       group-id: gongik-life-client-be-notification-group
       auto-offset-reset: earliest
@@ -107,7 +107,7 @@ management:
       produce: b3_multi
   zipkin:
     tracing:
-      endpoint: "http://${REMOTE_ADDRESS:192.168.0.50}:9411/api/v2/spans"
+      endpoint: "http://localhost:9411/api/v2/spans"
   endpoints:
     web:
       exposure:

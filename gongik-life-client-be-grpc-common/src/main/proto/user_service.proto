@@ -14,6 +14,8 @@ service UserService {
   rpc MyProfile(MyProfileRequest) returns (MyProfileResponse);
 
   rpc UserProfile(UserProfileRequest) returns (UserProfileResponse);
+
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
 }
 
 message SendEmailVerificationCodeRequest {
@@ -120,6 +122,30 @@ message UserProfileResponse{
 }
 
 message UserProfileInstitution {
+  string id = 1;
+  string name = 2;
+}
+
+message UpdateProfileRequest{
+  string userId = 1;
+  optional string name = 2;
+  optional string bio = 3;
+  optional string enlistment_date = 4;
+  optional string discharge_date = 5;
+  optional string institution_id = 6;
+}
+
+message UpdateProfileResponse{
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  optional string bio = 4;
+  optional string enlistment_date = 5;
+  optional string discharge_date = 6;
+  optional UpdateProfileInstitution institution = 7;
+}
+
+message UpdateProfileInstitution {
   string id = 1;
   string name = 2;
 }

@@ -49,6 +49,7 @@ public class InstitutionItemProcessor implements
           .name(name)
           .parentInstitution(parentInstitution)
           .address(address)
+          .reviewCount(0)
           .phoneNumber(phoneNumber)
           .regionalMilitaryOffice(regionalMilitaryOffice.get())
           .sexualCriminalRecordRestriction(sexualCriminalRecordRestriction)

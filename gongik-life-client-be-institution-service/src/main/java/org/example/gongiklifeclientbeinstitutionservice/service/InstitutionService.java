@@ -2,9 +2,12 @@ package org.example.gongiklifeclientbeinstitutionservice.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
+import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +18,7 @@ import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRe
 import org.example.gongiklifeclientbeinstitutionservice.repository.elasticsearch.InstitutionSearchRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -65,5 +69,15 @@ public class InstitutionService {
     return GetInstitutionNameResponse.newBuilder()
         .setName(institution.getName())
         .build();
+  }
+
+  @Transactional(readOnly = true)
+  public InstitutionResponse institution(InstitutionRequest request) {
+    Institution institution = institutionRepository.findById(
+            UUID.fromString(request.getInstitutionId()))
+        .orElseThrow(() -> new NotFoundException("Institution not found, wrong institution id"));
+
+    return institution.toInstitutionResponseProto();
+
   }
 }
