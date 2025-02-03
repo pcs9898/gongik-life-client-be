@@ -9,6 +9,10 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVeri
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
 import io.grpc.Status;
@@ -96,6 +100,7 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
   public void findByEmailForAuth(FindByEmailForAuthRequest request,
       StreamObserver<FindByEmailForAuthResponse> responseObserver) {
     try {
+      log.info("findByEmailForAuth request: {}", request);
       FindByEmailForAuthResponse response = userService.findByEmailForAuth(request);
 
       responseObserver.onNext(response);
@@ -131,7 +136,48 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
               .withCause(e)  // 원인 예외 포함
               .asRuntimeException()
       );
+    }
+  }
 
+  @Override
+  public void userProfile(UserProfileRequest request,
+      StreamObserver<UserProfileResponse> responseObserver) {
+    try {
+      UserProfileResponse response = userService.userProfile(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("userProfile error: {} - {}",
+          e.getMessage(), e.getLocalizedMessage());
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void updateProfile(UpdateProfileRequest request,
+      StreamObserver<UpdateProfileResponse> responseObserver) {
+    try {
+      UpdateProfileResponse response = userService.updateProfile(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("updateProfile error: {} - {}",
+          e.getMessage(), e.getLocalizedMessage());
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
 
     }
   }
