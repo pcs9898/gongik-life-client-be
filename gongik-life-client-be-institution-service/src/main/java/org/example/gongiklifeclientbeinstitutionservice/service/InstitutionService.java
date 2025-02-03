@@ -10,10 +10,12 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
+import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionDiseaseRestrictionRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.elasticsearch.InstitutionSearchRepository;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +29,7 @@ public class InstitutionService {
 
   private final InstitutionSearchRepository institutionSearchRepository;
   private final InstitutionRepository institutionRepository;
+  private final InstitutionDiseaseRestrictionRepository institutionDiseaseRestrictionRepository;
 
 
   public SearchInstitutionsResponse searchInstitutions(
@@ -77,7 +80,19 @@ public class InstitutionService {
             UUID.fromString(request.getInstitutionId()))
         .orElseThrow(() -> new NotFoundException("Institution not found, wrong institution id"));
 
-    return institution.toInstitutionResponseProto();
+    List<Integer> diseaseids = institutionDiseaseRestrictionRepository.findByInstitutionId(
+            institution.getId()).stream()
+        .map(a -> {
+          return a.getDiseaseRestriction().getId();
+        })
+        .collect(Collectors.toList());
+
+    log.info("diseaseids : {}", diseaseids);
+
+    InstitutionResponse.Builder response = institution.toInstitutionResponseProto();
+    response.addAllDiseaseRestrictions(diseaseids);
+
+    return response.build();
 
   }
 }
