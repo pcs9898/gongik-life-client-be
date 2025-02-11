@@ -7,6 +7,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass;
+import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileInstitution;
@@ -488,7 +490,7 @@ public class UserSerivce {
     } catch (Exception e) {
       log.error("Error in findByEmailForAuth: ", e);
       throw Status.INTERNAL
-          .withDescription("Internal server error")
+          .withDescription("Error in findByEmailForAuth: ")
           .withCause(e)
           .asRuntimeException();
     }
@@ -594,14 +596,6 @@ public class UserSerivce {
   }
 
   public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
-    if ((request.hasInstitutionId() || request.hasEnlistmentDate() || request.hasDischargeDate()) &&
-        !(request.hasInstitutionId() && request.hasEnlistmentDate()
-            && request.hasDischargeDate())) {
-      throw Status.INVALID_ARGUMENT
-          .withDescription(
-              "Institution ID, Enlistment Date, and Discharge Date must all be provided together.")
-          .asRuntimeException();
-    }
 
     User user = userRepository.findById(UUID.fromString(request.getUserId()))
         .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
@@ -609,6 +603,20 @@ public class UserSerivce {
     UserProfile userProfile = userProfileRepository.findByUser(user)
         .orElseThrow(
             () -> new RuntimeException("User profile not found with ID: " + request.getUserId()));
+
+    if (request.hasInstitutionId()) {
+      boolean hasUserProfileDates = userProfile.getDischargeDate() != null &&
+          userProfile.getEnlistmentDate() != null;
+      boolean hasRequestDates = request.hasEnlistmentDate() &&
+          request.hasDischargeDate();
+
+      if (!hasUserProfileDates && !hasRequestDates) {
+        throw Status.INVALID_ARGUMENT
+            .withDescription(
+                "Institution ID, Enlistment Date, and Discharge Date must all be provided.")
+            .asRuntimeException();
+      }
+    }
 
     if (request.hasName()) {
       userProfile.setName(request.getName());
@@ -696,5 +704,26 @@ public class UserSerivce {
     GetInstitutionNameResponse response = institutionServiceBlockingStub.getInstitutionName(
         GetInstitutionNameRequest.newBuilder().setId(institutionId.toString()).build());
     return response.getName();
+  }
+
+  public CheckUserInstitutionResponse checkUserInstitution(CheckUserInstitutionRequest request) {
+    String userId = request.getUserId();
+    String institutionId = request.getInstitutionId();
+
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
+
+    if (userProfile.getInstitutionId() == null) {
+      return CheckUserInstitutionResponse.newBuilder().setUserName("").build();
+    }
+
+    if (userProfile.getInstitutionId().toString().equals(institutionId)) {
+      return CheckUserInstitutionResponse.newBuilder().setUserName(userProfile.getName()).build();
+    }
+
+    return CheckUserInstitutionResponse.newBuilder().setUserName("").build();
   }
 }

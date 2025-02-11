@@ -1,0 +1,49 @@
+PUT /institutions_index_new
+{
+  "mappings": {
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+POST /_reindex
+{
+  "source": {
+    "index": "institutions_index"
+  },
+  "dest": {
+    "index": "institutions_index_new"
+  }
+}
+
+DELETE /institutions_index
+
+POST /_aliases
+{
+  "actions": [
+    {
+      "remove": {
+        "index": "institutions_index_new",
+        "alias": "institutions_index"
+      }
+    },
+    {
+      "add": {
+        "index": "institutions_index_new",
+        "alias": "institutions_index"
+      }
+    }
+  ]
+}

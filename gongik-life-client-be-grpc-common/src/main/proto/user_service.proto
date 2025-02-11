@@ -16,6 +16,9 @@ service UserService {
   rpc UserProfile(UserProfileRequest) returns (UserProfileResponse);
 
   rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
+
+  rpc CheckUserInstitution(CheckUserInstitutionRequest) returns (CheckUserInstitutionResponse);
+
 }
 
 message SendEmailVerificationCodeRequest {
@@ -149,3 +152,13 @@ message UpdateProfileInstitution {
   string id = 1;
   string name = 2;
 }
+
+message CheckUserInstitutionRequest {
+  string userId = 1;
+  string institutionId = 2;
+}
+
+message CheckUserInstitutionResponse {
+  string userName = 1;
+}
+

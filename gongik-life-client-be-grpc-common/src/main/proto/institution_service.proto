@@ -8,6 +8,8 @@ service InstitutionService {
   rpc GetInstitutionName(GetInstitutionNameRequest) returns (GetInstitutionNameResponse);
 
   rpc Institution(InstitutionRequest) returns (InstitutionResponse);
+
+  rpc CreateInstitutionReview(CreateInstitutionReviewRequest) returns (InstitutionReviewResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -62,4 +64,46 @@ message InstitutionResponse {
   optional int32 averageWorkhours = 12;
   optional double averageRating = 13;
   repeated int32 diseaseRestrictions = 14;
+}
+
+
+message InstitutionReviewResponse {
+  string id = 1;
+  string institutionId = 2;
+  InstitutionReviewUser user = 3;
+  float rating = 4;
+  int32 facilityRating = 5;
+  int32 locationRating = 6;
+  int32 staffRating = 7;
+  int32 visitorRating = 8;
+  int32 vacationFreedomRating = 9;
+  string mainTasks = 10;
+  string prosCons = 11;
+  int32 averageWorkhours = 12;
+  int32 workTypeRulesId = 13;
+  int32 uniformWearingRulesId = 14;
+  int32 socialServicePeopleCountId = 15;
+  int32 likeCount = 16;
+  string createdAt = 17;
+}
+
+message CreateInstitutionReviewRequest {
+  string userId = 1;
+  string institutionId = 2;
+  int32 facilityRating = 3;
+  int32 locationRating = 4;
+  int32 staffRating = 5;
+  int32 visitorRating = 6;
+  int32 vacationFreedomRating = 7;
+  string mainTasks = 8;
+  string prosCons = 9;
+  int32 averageWorkhours = 10;
+  int32 workTypeRulesId = 11;
+  int32 uniformWearingRulesId = 12;
+  int32 socialServicePeopleCountId = 13;
+}
+
+message InstitutionReviewUser {
+  string id = 1;
+  string name = 2;
 }
