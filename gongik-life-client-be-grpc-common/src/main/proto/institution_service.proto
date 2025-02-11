@@ -10,6 +10,8 @@ service InstitutionService {
   rpc Institution(InstitutionRequest) returns (InstitutionResponse);
 
   rpc CreateInstitutionReview(CreateInstitutionReviewRequest) returns (InstitutionReviewResponse);
+
+  rpc DeleteInstitutionReview(DeleteInstitutionReviewRequest) returns (DeleteInstitutionReviewResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -106,4 +108,13 @@ message CreateInstitutionReviewRequest {
 message InstitutionReviewUser {
   string id = 1;
   string name = 2;
+}
+
+message DeleteInstitutionReviewRequest {
+  string institutionReviewId = 1;
+  string userId = 2;
+}
+
+message DeleteInstitutionReviewResponse {
+  bool success = 1;
 }

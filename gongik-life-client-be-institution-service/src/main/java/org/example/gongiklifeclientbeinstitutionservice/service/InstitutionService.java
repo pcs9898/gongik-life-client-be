@@ -1,6 +1,8 @@
 package org.example.gongiklifeclientbeinstitutionservice.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
@@ -126,8 +128,8 @@ public class InstitutionService {
       throw Status.INVALID_ARGUMENT
           .withDescription("User and institution does not match")
           .asRuntimeException();
-
     }
+
     // 2. 있다면 내가 앞서 동일한 기관에 대한 리뷰를 작성했는지 확인 repository
     boolean existsByUserIdAndInstitutionId = institutionReviewRepository
         .existsByUserIdAndInstitutionId(UUID.fromString(request.getUserId()),
@@ -155,5 +157,39 @@ public class InstitutionService {
     return response;
 
 
+  }
+
+
+  @Transactional
+  public DeleteInstitutionReviewResponse deleteInstitutionReview(
+      DeleteInstitutionReviewRequest request) {
+    InstitutionReview institutionReview = institutionReviewRepository.findById(
+            UUID.fromString(request.getInstitutionReviewId()))
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription("Institution review not found, wrong institution review id")
+            .asRuntimeException()
+
+        );
+
+    if (!institutionReview.getUserId().equals(UUID.fromString(request.getUserId()))) {
+      throw Status.PERMISSION_DENIED
+          .withDescription("You can delete only your institution review")
+          .asRuntimeException();
+    }
+
+    Institution institution = institutionRepository.findById(
+            institutionReview.getInstitution().getId())
+        .orElseThrow(() ->
+            Status.NOT_FOUND
+                .withDescription("Institution not found, wrong institution id")
+                .asRuntimeException()
+        );
+
+    institution.setReviewCount(institution.getReviewCount() - 1);
+    institutionRepository.save(institution);
+
+    institutionReviewRepository.delete(institutionReview);
+
+    return DeleteInstitutionReviewResponse.newBuilder().setSuccess(true).build();
   }
 }

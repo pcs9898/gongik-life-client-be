@@ -33,7 +33,7 @@ type Mutation{
 
     createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): InstitutionReview! @authenticate
 
-    deleteInstitutionReview(id: ID!): Boolean! @authenticate
+    deleteInstitutionReview(institutionReviewId: String!): DeleteInstitutionReviewResponse! @authenticate
 }
 
 type SearchInstitutionsResponse {
@@ -173,4 +173,9 @@ input CreateInstitutionReviewInput {
 type InstitutionReviewUser{
     id: ID!
     name: String!
+}
+
+type DeleteInstitutionReviewResponse{
+    institutionReviewId: ID!
+    success: Boolean!
 }
