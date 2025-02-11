@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
@@ -50,39 +52,32 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-//      log.info("createInstitutionReview requestDto: {}", requestDto);
-//      InstitutionReviewResponse response = InstitutionReviewResponse.newBuilder()
-//          .setId("tempId")
-//          .setInstitutionId(requestDto.getInstitutionId())
-//          .setUser(
-//              InstitutionReviewUser.newBuilder().setId("tempUserId").setName("tempUserName")
-//                  .build())
-//          .setRating(5.0f)
-//          .setFacilityRating(requestDto.getFacilityRating())
-//          .setLocationRating(requestDto.getLocationRating())
-//          .setStaffRating(requestDto.getStaffRating())
-//          .setVisitorRating(requestDto.getVisitorRating())
-//          .setVacationFreedomRating(requestDto.getVacationFreedomRating())
-//          .setMainTasks(requestDto.getMainTasks())
-//          .setProsCons(requestDto.getProsCons())
-//          .setAverageWorkhours(requestDto.getAverageWorkhours())
-//          .setWorkTypeRulesId(requestDto.getWorkTypeRulesId())
-//          .setUniformWearingRulesId(requestDto.getUniformWearingRulesId())
-//          .setSocialServicePeopleCountId(requestDto.getSocialServicePeopleCountId())
-//          .setLikeCount(0)
-//          .setCreatedAt("2025-02-10T14:14:26.682+09:00")
-//          .build();
-//
-//      institutionService.createInstitutionReview(requestDto);
       return institutionService.createInstitutionReview(requestDto);
-
 
     } catch (Exception e) {
       log.error("createInstitutionReview error: {}", e);
       throw e;
 
     }
+  }
 
+  @MutationMapping
+  public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
+      @Arguments DeleteInstitutionReviewRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return institutionService.deleteInstitutionReview(requestDto);
+
+    } catch (Exception e) {
+      log.error("deleteInstitutionReview error: {}", e);
+      throw e;
+
+    }
   }
 
 }
