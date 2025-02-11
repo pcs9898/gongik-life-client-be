@@ -1,5 +1,8 @@
 package org.example.gongiklifeclientbeinstitutionservice.entity;
 
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewUser;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,7 +11,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.Instant;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import java.util.Date;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +26,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "institution_reviews")
-public class InstitutionReview {
+public class InstitutionReview extends Auditable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,48 +42,90 @@ public class InstitutionReview {
   @Column(nullable = false)
   private Double rating;
 
-  @Column(name = "facility_rating")
-  private Double facilityRating;
+  @Column(name = "facility_rating", nullable = false)
+  private Integer facilityRating;
 
-  @Column(name = "location_rating")
-  private Double locationRating;
+  @Column(name = "location_rating", nullable = false)
+  private Integer locationRating;
 
-  @Column(name = "staff_rating")
-  private Double staffRating;
+  @Column(name = "staff_rating", nullable = false)
+  private Integer staffRating;
 
-  @Column(name = "visitor_rating")
-  private Double visitorRating;
+  @Column(name = "visitor_rating", nullable = false)
+  private Integer visitorRating;
 
-  @Column(name = "vacation_freedom_rating")
-  private Double vacationFreedomRating;
+  @Column(name = "vacation_freedom_rating", nullable = false)
+  private Integer vacationFreedomRating;
 
-  @Column(name = "main_tasks")
+  @Column(name = "main_tasks", nullable = false)
   private String mainTasks;
 
-  @Column(name = "pros_cons")
+  @Column(name = "pros_cons", nullable = false)
   private String prosCons;
 
-  @Column(name = "average_workhours")
+  @Column(name = "average_workhours", nullable = false)
   private Integer averageWorkhours;
 
-  @ManyToOne
-  @JoinColumn(name = "work_type_rules_id", nullable = false)
-  private WorkTypeRule workTypeRule;
+  @Column(name = "work_type_rules_id", nullable = false)
+  private Integer workTypeRuleId;
 
-  @ManyToOne
-  @JoinColumn(name = "uniform_wearing_rules_id", nullable = false)
-  private UniformWearingRule uniformWearingRule;
+  @Column(name = "uniform_wearing_rules_id", nullable = false)
+  private Integer uniformWearingRuleId;
 
-  @ManyToOne
-  @JoinColumn(name = "social_service_people_count_id", nullable = false)
-  private SocialServicePeopleCount socialServicePeopleCount;
+  @Column(name = "social_service_people_count_id", nullable = false)
+  private Integer socialServicePeopleCountId;
 
-  @Column(name = "created_at", updatable = false)
-  private Instant createdAt;
-
-  @Column(name = "updated_at")
-  private Instant updatedAt;
+  @Column(name = "like_count", nullable = false)
+  private Integer likeCount = 0;
 
   @Column(name = "deleted_at")
-  private Instant deletedAt;
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date deletedAt;
+
+
+  public static InstitutionReview fromProto(CreateInstitutionReviewRequest request,
+      Institution institution, Double rating) {
+    return InstitutionReview.builder()
+        .userId(UUID.fromString(request.getUserId()))
+        .institution(institution)
+        .rating(rating)
+        .facilityRating(request.getFacilityRating())
+        .locationRating(request.getLocationRating())
+        .staffRating(request.getStaffRating())
+        .visitorRating(request.getVisitorRating())
+        .vacationFreedomRating(request.getVacationFreedomRating())
+        .mainTasks(request.getMainTasks())
+        .prosCons(request.getProsCons())
+        .averageWorkhours(request.getAverageWorkhours())
+        .workTypeRuleId(request.getWorkTypeRulesId())
+        .uniformWearingRuleId(request.getUniformWearingRulesId())
+        .socialServicePeopleCountId(request.getSocialServicePeopleCountId())
+        .likeCount(0)
+        .build();
+  }
+
+  public InstitutionReviewResponse toProto(String username) {
+    return InstitutionReviewResponse.newBuilder()
+        .setId(id.toString())
+        .setInstitutionId(institution.getId().toString())
+        .setUser(InstitutionReviewUser.newBuilder()
+            .setId(userId.toString())
+            .setName(username)
+            .build())
+        .setRating(rating.floatValue())
+        .setFacilityRating(facilityRating)
+        .setLocationRating(locationRating)
+        .setStaffRating(staffRating)
+        .setVisitorRating(visitorRating)
+        .setVacationFreedomRating(vacationFreedomRating)
+        .setMainTasks(mainTasks)
+        .setProsCons(prosCons)
+        .setAverageWorkhours(averageWorkhours)
+        .setWorkTypeRulesId(workTypeRuleId)
+        .setUniformWearingRulesId(uniformWearingRuleId)
+        .setSocialServicePeopleCountId(socialServicePeopleCountId)
+        .setLikeCount(likeCount)
+        .setCreatedAt(getCreatedAt().toString())
+        .build();
+  }
 }

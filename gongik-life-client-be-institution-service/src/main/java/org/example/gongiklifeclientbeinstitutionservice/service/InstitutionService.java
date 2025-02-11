@@ -1,22 +1,30 @@
 package org.example.gongiklifeclientbeinstitutionservice.service;
 
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
+import com.gongik.userService.domain.service.UserServiceGrpc;
+import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
+import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
+import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionDiseaseRestrictionRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRepository;
+import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionReviewRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.elasticsearch.InstitutionSearchRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -30,7 +38,9 @@ public class InstitutionService {
   private final InstitutionSearchRepository institutionSearchRepository;
   private final InstitutionRepository institutionRepository;
   private final InstitutionDiseaseRestrictionRepository institutionDiseaseRestrictionRepository;
-
+  private final InstitutionReviewRepository institutionReviewRepository;
+  @GrpcClient("gongik-life-client-be-user-service")
+  private UserServiceGrpc.UserServiceBlockingStub userServiceBlockingStub;
 
   public SearchInstitutionsResponse searchInstitutions(
       SearchInstitutionsRequest request) {
@@ -90,9 +100,60 @@ public class InstitutionService {
     log.info("diseaseids : {}", diseaseids);
 
     InstitutionResponse.Builder response = institution.toInstitutionResponseProto();
-    response.addAllDiseaseRestrictions(diseaseids);
 
+    response.addAllDiseaseRestrictions(diseaseids);
     return response.build();
+
+  }
+
+  @Transactional
+  public InstitutionReviewResponse createInstitutionReview(CreateInstitutionReviewRequest request) {
+    Institution institution = institutionRepository.findById(
+            UUID.fromString(request.getInstitutionId()))
+        .orElseThrow(() ->
+
+            Status.INVALID_ARGUMENT
+                .withDescription("Institution not found, wrong institution id")
+                .asRuntimeException()
+        );
+
+    // 1. 내 프로필 정보가져와서 기관id있는지 확인 grpc
+    String userName = userServiceBlockingStub.checkUserInstitution(
+        CheckUserInstitutionRequest.newBuilder().setUserId(request.getUserId())
+            .setInstitutionId(request.getInstitutionId()).build()).getUserName();
+
+    if (userName.isEmpty()) {
+      throw Status.INVALID_ARGUMENT
+          .withDescription("User and institution does not match")
+          .asRuntimeException();
+
+    }
+    // 2. 있다면 내가 앞서 동일한 기관에 대한 리뷰를 작성했는지 확인 repository
+    boolean existsByUserIdAndInstitutionId = institutionReviewRepository
+        .existsByUserIdAndInstitutionId(UUID.fromString(request.getUserId()),
+            UUID.fromString(request.getInstitutionId()));
+
+    if (existsByUserIdAndInstitutionId) {
+      throw Status.INVALID_ARGUMENT
+          .withDescription("User already reviewed this institution")
+          .asRuntimeException();
+
+    }
+
+    // 3. 없다면 리뷰 생성 respository
+    Double rating = (double) (request.getFacilityRating() + request.getLocationRating()
+        + request.getStaffRating() + request.getVisitorRating()
+        + request.getVacationFreedomRating())
+        / 5;
+
+    institution.setReviewCount(institution.getReviewCount() + 1);
+    institutionRepository.save(institution);
+
+    InstitutionReviewResponse response = institutionReviewRepository
+        .save(InstitutionReview.fromProto(request, institution, rating)).toProto(userName);
+    log.info("response : {}", response);
+    return response;
+
 
   }
 }

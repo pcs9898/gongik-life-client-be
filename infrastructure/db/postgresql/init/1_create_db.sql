@@ -1,0 +1,17 @@
+CREATE
+DATABASE gongik_life_client_user_db;
+
+CREATE
+DATABASE gongik_life_client_institution_db;
+
+CREATE
+DATABASE gongik_life_client_community_db;
+
+CREATE
+DATABASE gongik_life_client_workhours_db;
+
+CREATE
+DATABASE gongik_life_client_notification_db;
+
+CREATE
+DATABASE gongik_life_client_report_db;

@@ -12,6 +12,14 @@ type Query {
 
     institution(institutionId: ID!): InstitutionResponse!
 
+    institutionReview(id: ID!): InstitutionReview
+
+    myInstitutionReview: [InstitutionReview!]! @authenticate
+
+    institutionReviews: [InstitutionReview!]!
+
+
+
 }
 
 type Mutation{
@@ -22,6 +30,10 @@ type Mutation{
     signUp(name: String!,email: String!,password: String!,confirmPassword: String!,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): SignUpResponse!
 
     updateProfile(name: String,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): UpdateProfileResponse! @authenticate
+
+    createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): InstitutionReview! @authenticate
+
+    deleteInstitutionReview(id: ID!): Boolean! @authenticate
 }
 
 type SearchInstitutionsResponse {
@@ -121,4 +133,44 @@ type InstitutionResponse{
     averageRating: Float
     reviewCount: Int!
     diseaseRestrictions: [Int]
+}
+
+type InstitutionReview {
+    id: ID!
+    institutionId: ID!
+    user: InstitutionReviewUser!
+    rating: Float!
+    facilityRating: Int!
+    locationRating: Int!
+    staffRating: Int!
+    visitorRating: Int!
+    vacationFreedomRating: Int!
+    mainTasks: String!
+    prosCons: String!
+    averageWorkhours: Int!
+    workTypeRulesId: Int!
+    uniformWearingRulesId: Int!
+    socialServicePeopleCountId: Int!
+    likeCount: Int!
+    createdAt: String!
+}
+
+input CreateInstitutionReviewInput {
+    institutionId: ID!
+    facilityRating: Int!
+    locationRating: Int!
+    staffRating: Int!
+    visitorRating: Int!
+    vacationFreedomRating: Int!
+    mainTasks: String!
+    prosCons: String!
+    averageWorkhours: Int!
+    workTypeRulesId: Int!
+    uniformWearingRulesId: Int!
+    socialServicePeopleCountId: Int!
+}
+
+type InstitutionReviewUser{
+    id: ID!
+    name: String!
 }

@@ -86,7 +86,7 @@ public class Institution {
   @Column(name = "deleted_at")
   private Instant deletedAt;
 
-  @OneToMany(mappedBy = "institution", fetch = FetchType.EAGER)
+  @OneToMany(mappedBy = "institution", fetch = FetchType.LAZY)
   private Set<InstitutionDiseaseRestriction> diseaseRestrictions = new HashSet<>();
 
 

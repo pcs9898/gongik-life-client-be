@@ -4,6 +4,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.InstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
@@ -33,6 +35,17 @@ public class InstitutionService {
     try {
       return InstitutionResponseDto.fromProto(
           institutionBlockingStub.institution(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public InstitutionReviewResponseDto createInstitutionReview(
+      CreateInstitutionReviewRequestDto requestDto) {
+    try {
+      return InstitutionReviewResponseDto.fromProto(
+          institutionBlockingStub.createInstitutionReview(requestDto.toProto()));
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;

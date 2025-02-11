@@ -1,10 +1,12 @@
 package org.example.gongiklifeclientbeinstitutionservice.grpc;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import io.grpc.Status;
@@ -78,6 +80,27 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
               .withCause(e)  // 원인 예외 포함
               .asRuntimeException()
       );
+    }
+  }
+
+  @Override
+  public void createInstitutionReview(CreateInstitutionReviewRequest request,
+      StreamObserver<InstitutionReviewResponse> responseObserver) {
+    try {
+      InstitutionReviewResponse response = institutionService.createInstitutionReview(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("createInstitutionReview error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+
     }
   }
 }
