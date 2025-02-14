@@ -13,8 +13,10 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
+import dto.institution.LikeInstitutionReviewRequestDto;
 import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,8 +26,11 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
+import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReviewLike;
+import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReviewLikeId;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionDiseaseRestrictionRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRepository;
+import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionReviewLikeRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionReviewRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.elasticsearch.InstitutionSearchRepository;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +46,8 @@ public class InstitutionService {
   private final InstitutionRepository institutionRepository;
   private final InstitutionDiseaseRestrictionRepository institutionDiseaseRestrictionRepository;
   private final InstitutionReviewRepository institutionReviewRepository;
+  private final InstitutionReviewLikeRepository institutionReviewLikeRepository;
+
   @GrpcClient("gongik-life-client-be-user-service")
   private UserServiceGrpc.UserServiceBlockingStub userServiceBlockingStub;
 
@@ -192,4 +199,36 @@ public class InstitutionService {
 
     return DeleteInstitutionReviewResponse.newBuilder().setSuccess(true).build();
   }
+
+  @Transactional
+  public void likeInstitutionReview(LikeInstitutionReviewRequestDto requestDto) {
+    // 1. 리뷰가 존재하는지 확인
+    InstitutionReview institutionReview = institutionReviewRepository.findById(
+            UUID.fromString(requestDto.getInstitutionReviewId()))
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription("Institution review not found, wrong institution review id")
+            .asRuntimeException()
+        );
+
+    // 2. 이미 좋아요를 눌렀는지 확인
+    boolean existsByUserIdAndInstitutionReviewId = institutionReviewLikeRepository
+        .existsById_InstitutionReviewIdAndId_UserId(UUID.fromString(requestDto.getUserId()),
+            UUID.fromString(requestDto.getInstitutionReviewId()));
+
+    if (existsByUserIdAndInstitutionReviewId) {
+      throw Status.INVALID_ARGUMENT
+          .withDescription("User already liked this review")
+          .asRuntimeException();
+    }
+
+    // 3. 좋아요 생성
+    InstitutionReviewLike newLike = new InstitutionReviewLike(
+        new InstitutionReviewLikeId(institutionReview.getId(),
+            UUID.fromString(requestDto.getUserId())), LocalDateTime.now());
+
+    institutionReviewLikeRepository.save(newLike);
+
+    institutionReview.setLikeCount(institutionReview.getLikeCount() + 1);
+  }
+
 }

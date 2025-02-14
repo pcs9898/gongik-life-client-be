@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import dto.institution.LikeInstitutionReviewRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteI
 import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
 import org.example.gongiklifeclientbegraphql.service.InstitutionService;
@@ -63,7 +65,7 @@ public class InstitutionController {
 
   @MutationMapping
   public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
-      @Arguments DeleteInstitutionReviewRequestDto requestDto,
+      @Argument DeleteInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
     try {
@@ -79,6 +81,26 @@ public class InstitutionController {
 
     }
   }
+
+  @MutationMapping
+  public LikeInstitutionReviewResponseDto likeInstitutionReview(
+      @Argument("likeInstitutionReviewInput") LikeInstitutionReviewRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return institutionService.likeInstitutionReview(requestDto);
+
+    } catch (Exception e) {
+      log.error("likeInstitutionReview error: {}", e);
+      throw e;
+
+    }
+  }
+
 
 }
 
