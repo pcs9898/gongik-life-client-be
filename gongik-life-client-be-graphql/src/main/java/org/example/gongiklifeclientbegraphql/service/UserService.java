@@ -8,8 +8,10 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfile
 import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
+import dto.UserToUser.UserLoginHistoryRequestDto;
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.myProfile.MyProfileResponseDto;
@@ -20,12 +22,15 @@ import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileRequ
 import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.producer.UserLoginHistoryProducer;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
+  private final UserLoginHistoryProducer userLoginHistoryProducer;
   @GrpcClient("gongik-life-client-be-user-service")
   private UserServiceGrpc.UserServiceBlockingStub userBlockingStub;
 
@@ -116,5 +121,9 @@ public class UserService {
       log.error("gRPC 호출 중 알 수 없는 오류 발생: ", e);
       throw e;
     }
+  }
+
+  public void sendUserLoginHistoryRequest(UserLoginHistoryRequestDto userLoginHistoryRequestDto) {
+    userLoginHistoryProducer.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
   }
 }

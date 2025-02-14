@@ -16,7 +16,6 @@ import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileResp
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
-import org.example.gongiklifeclientbegraphql.producer.UserLoginHistoryProducer;
 import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.ContextValue;
@@ -29,7 +28,7 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class UserController {
 
-  private final UserLoginHistoryProducer userLoginHistoryProducer;
+
   private final UserService userService;
 
   @MutationMapping
@@ -64,7 +63,7 @@ public class UserController {
         .ipAddress(ipAddress)
         .build();
 
-    userLoginHistoryProducer.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
+    userService.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
 
     return SignUpResponseDto.builder()
         .user(serviceSignUpResponse.getUser())
