@@ -6,11 +6,13 @@ import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
@@ -47,7 +49,7 @@ public class InstitutionController {
   }
 
   @MutationMapping
-  public InstitutionReviewResponseDto createInstitutionReview(
+  public CreateInstitutionReviewResponseDto createInstitutionReview(
       @Argument("createInstitutionReviewInput") CreateInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
@@ -118,6 +120,26 @@ public class InstitutionController {
       log.error("unlikeInstitutionReview error: {}", e);
       throw e;
     }
+  }
+
+  @QueryMapping
+  public InstitutionReviewResponseDto institutionReview(
+      @Argument("institutionReviewInput") InstitutionReviewRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return institutionService.institutionReview(requestDto);
+
+    } catch (Exception e) {
+      log.error("institutionReview error: {}", e);
+      throw e;
+    }
+
+
   }
 
 
