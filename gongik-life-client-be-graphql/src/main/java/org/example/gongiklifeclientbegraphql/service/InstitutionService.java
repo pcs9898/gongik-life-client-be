@@ -4,6 +4,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import dto.institution.LikeInstitutionReviewRequestDto;
+import dto.institution.UnlikeInstitutionReviewRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -16,7 +17,9 @@ import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponse
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
+import org.example.gongiklifeclientbegraphql.dto.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.LikeInstitutionReviewProducer;
+import org.example.gongiklifeclientbegraphql.producer.UnlikeInstitutionReviewProducer;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,6 +28,8 @@ import org.springframework.stereotype.Service;
 public class InstitutionService {
 
   private final LikeInstitutionReviewProducer likeInstitutionReviewProducer;
+  private final UnlikeInstitutionReviewProducer unlikeInstitutionReviewProducer;
+
   @GrpcClient("gongik-life-client-be-institution-service")
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
@@ -87,6 +92,16 @@ public class InstitutionService {
     likeInstitutionReviewProducer.sendLikeInstitutionReviewRequest(requestDto);
 
     return LikeInstitutionReviewResponseDto.builder()
+        .success(true)
+        .build();
+  }
+
+  public UnlikeInstitutionReviewResponseDto unlikeInstitutionReview(
+      UnlikeInstitutionReviewRequestDto requestDto) {
+
+    unlikeInstitutionReviewProducer.sendUnlikeInstitutionReviewRequest(requestDto);
+
+    return UnlikeInstitutionReviewResponseDto.builder()
         .success(true)
         .build();
   }

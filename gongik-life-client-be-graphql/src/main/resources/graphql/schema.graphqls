@@ -33,6 +33,8 @@ type Mutation{
     deleteInstitutionReview(institutionReviewId: String!): DeleteInstitutionReviewResponse! @authenticate
 
     likeInstitutionReview(likeInstitutionReviewInput: LikeInstitutionReviewInput!): LikeInstitutionReviewResponse! @authenticate
+
+    unlikeInstitutionReview(unlikeInstitutionReviewInput: UnlikeInstitutionReviewInput!): UnlikeInstitutionReviewResponse! @authenticate
 }
 
 type SearchInstitutionsResponse {
@@ -184,5 +186,13 @@ input LikeInstitutionReviewInput{
 }
 
 type LikeInstitutionReviewResponse{
+    success: Boolean!
+}
+
+input UnlikeInstitutionReviewInput{
+    institutionReviewId: ID!
+}
+
+type UnlikeInstitutionReviewResponse{
     success: Boolean!
 }
