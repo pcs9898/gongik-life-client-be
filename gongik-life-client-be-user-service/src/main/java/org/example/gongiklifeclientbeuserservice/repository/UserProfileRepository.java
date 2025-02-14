@@ -11,4 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface UserProfileRepository extends JpaRepository<UserProfile, UUID> {
 
   Optional<UserProfile> findByUser(User user);
+
+//  @Query("SELECT up.name FROM UserProfile up WHERE up.user.id = :userId")
+//  Optional<String> findNameByUserId(@Param("userId") UUID userId);
 }

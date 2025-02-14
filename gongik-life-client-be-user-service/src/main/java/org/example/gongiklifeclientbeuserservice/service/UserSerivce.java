@@ -11,6 +11,8 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInst
 import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileInstitution;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
@@ -739,5 +741,17 @@ public class UserSerivce {
     }
 
     return CheckUserInstitutionResponse.newBuilder().setUserName("").build();
+  }
+
+  public GetUserNameByIdResponse getUserNameById(GetUserNameByIdRequest request) {
+    String userId = request.getUserId();
+
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
+
+    return GetUserNameByIdResponse.newBuilder().setUserName(userProfile.getName()).build();
   }
 }

@@ -1,10 +1,11 @@
-package org.example.gongiklifeclientbegraphql.dto.createInsitutionReview;
+package org.example.gongiklifeclientbegraphql.dto.institutionReview;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 
 @Data
 @Builder
@@ -29,15 +30,17 @@ public class InstitutionReviewResponseDto {
   private int socialServicePeopleCountId;
   private int likeCount;
   private String createdAt;
+  private Boolean isLiked;
 
   public static InstitutionReviewResponseDto fromProto(InstitutionReviewResponse proto) {
     return InstitutionReviewResponseDto.builder()
         .id(proto.getId())
         .institutionId(proto.getInstitutionId())
-        .user(InstitutionReviewUserDto.builder()
-            .id(proto.getUser().getId())
-            .name(proto.getUser().getName())
-            .build())
+        .user(
+            InstitutionReviewUserDto.builder()
+                .id(proto.getUser().getId())
+                .name(proto.getUser().getName())
+                .build())
         .rating(proto.getRating())
         .facilityRating(proto.getFacilityRating())
         .locationRating(proto.getLocationRating())
@@ -52,6 +55,7 @@ public class InstitutionReviewResponseDto {
         .socialServicePeopleCountId(proto.getSocialServicePeopleCountId())
         .likeCount(proto.getLikeCount())
         .createdAt(proto.getCreatedAt())
+        .isLiked(false)
         .build();
   }
 }

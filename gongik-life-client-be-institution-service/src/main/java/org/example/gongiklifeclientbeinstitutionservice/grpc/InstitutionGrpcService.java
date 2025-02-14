@@ -8,7 +8,10 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import io.grpc.Status;
@@ -117,6 +120,47 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("deleteInstitutionReview error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void institutionReview(InstitutionReviewRequest request,
+      StreamObserver<InstitutionReviewResponse> responseObserver) {
+    try {
+      InstitutionReviewResponse response = institutionService.institutionReview(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("institutionReview error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void isLikedInstitutionReview(IsLikedInstitutionReviewRequest request,
+      StreamObserver<IsLikedInstitutionReviewResponse> responseObserver) {
+    try {
+      IsLikedInstitutionReviewResponse response = institutionService.isLikedInstitutionReview(
+          request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("isLikedInstitutionReview error : ", e);
 
       responseObserver.onError(
           Status.INTERNAL
