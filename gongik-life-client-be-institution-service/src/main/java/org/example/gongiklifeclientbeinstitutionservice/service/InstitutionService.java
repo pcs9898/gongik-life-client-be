@@ -7,12 +7,16 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
@@ -213,8 +217,9 @@ public class InstitutionService {
 
     // 2. 이미 좋아요를 눌렀는지 확인
     boolean existsByUserIdAndInstitutionReviewId = institutionReviewLikeRepository
-        .existsById_InstitutionReviewIdAndId_UserId(UUID.fromString(requestDto.getUserId()),
-            UUID.fromString(requestDto.getInstitutionReviewId()));
+        .existsByIdInstitutionReviewIdAndIdUserId(
+            UUID.fromString(requestDto.getInstitutionReviewId()),
+            UUID.fromString(requestDto.getUserId()));
 
     if (existsByUserIdAndInstitutionReviewId) {
       throw Status.INVALID_ARGUMENT
@@ -248,7 +253,8 @@ public class InstitutionService {
         .findById(new InstitutionReviewLikeId(institutionReview.getId(),
             UUID.fromString(requestDto.getUserId())))
         .orElseThrow(() -> Status.NOT_FOUND
-            .withDescription("Institution review like not found, wrong institution review id")
+            .withDescription(
+                "Institution review like not found, wrong institution review id or you didn't like this review")
             .asRuntimeException()
         );
 
@@ -256,5 +262,42 @@ public class InstitutionService {
     institutionReviewLikeRepository.delete(like);
 
     institutionReview.setLikeCount(institutionReview.getLikeCount() - 1);
+  }
+
+  public InstitutionReviewResponse institutionReview(InstitutionReviewRequest request) {
+    InstitutionReview institutionReview = institutionReviewRepository.findById(
+            UUID.fromString(request.getInstitutionReviewId()))
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription("Institution review not found, wrong institution review id")
+            .asRuntimeException()
+        );
+
+    String username = userServiceBlockingStub.getUserNameById(
+        GetUserNameByIdRequest.newBuilder().setUserId((institutionReview.getUserId().toString()))
+            .build()
+    ).getUserName();
+
+    return institutionReview.toProto(username);
+  }
+
+  public IsLikedInstitutionReviewResponse isLikedInstitutionReview(
+      IsLikedInstitutionReviewRequest request) {
+
+    try {
+      boolean existsByUserIdAndInstitutionReviewId = institutionReviewLikeRepository
+          .existsByIdInstitutionReviewIdAndIdUserId(
+              UUID.fromString(request.getInstitutionReviewId()),
+              UUID.fromString(request.getUserId()));
+
+      return IsLikedInstitutionReviewResponse.newBuilder()
+          .setIsLiked(existsByUserIdAndInstitutionReviewId)
+          .build();
+    } catch (IllegalArgumentException e) {
+
+      return IsLikedInstitutionReviewResponse.newBuilder()
+          .setIsLiked(false)
+          .build();
+    }
+
   }
 }

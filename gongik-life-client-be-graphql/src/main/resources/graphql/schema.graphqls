@@ -12,7 +12,7 @@ type Query {
 
     institution(institutionId: ID!): InstitutionResponse!
 
-    institutionReview(id: ID!): InstitutionReview
+    institutionReview(institutionReviewInput: InstitutionReviewInput!): InstitutionReview!
 
     myInstitutionReview: [InstitutionReview!]! @authenticate
 
@@ -154,6 +154,7 @@ type InstitutionReview {
     socialServicePeopleCountId: Int!
     likeCount: Int!
     createdAt: String!
+    isLiked: Boolean! # its false if user is not authenticated
 }
 
 input CreateInstitutionReviewInput {
@@ -195,4 +196,8 @@ input UnlikeInstitutionReviewInput{
 
 type UnlikeInstitutionReviewResponse{
     success: Boolean!
+}
+
+input InstitutionReviewInput{
+    institutionReviewId: ID!
 }
