@@ -1,12 +1,13 @@
 package org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+//@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class LikeInstitutionReviewResponseDto {
