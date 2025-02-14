@@ -442,13 +442,27 @@ public class UserSerivce {
     try {
       String email = request.getEmail();
       User user = userRepository.findByEmail(email)
-          .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+          .orElseThrow(() ->
+              Status.NOT_FOUND
+                  .withDescription("User not found with email: " + email)
+                  .asRuntimeException()
+
+          );
 
       UserAuth userAuth = userAuthRepository.findByUser(user)
-          .orElseThrow(() -> new RuntimeException("User auth not found with email: " + email));
+          .orElseThrow(() ->
+              Status.NOT_FOUND
+                  .withDescription("User auth not found with email: " + email)
+                  .asRuntimeException()
+
+          );
 
       UserProfile userProfile = userProfileRepository.findByUser(user)
-          .orElseThrow(() -> new RuntimeException("User profile not found with email: " + email));
+          .orElseThrow(() ->
+              Status.NOT_FOUND
+                  .withDescription("User profile not found with email: " + email)
+                  .asRuntimeException()
+          );
 
       UserServiceOuterClass.FindByEmailForAuthResponse.Builder findByEmailForAuthResponseBuilder = UserServiceOuterClass.FindByEmailForAuthResponse.newBuilder()
           .setId(user.getId().toString())
@@ -490,7 +504,7 @@ public class UserSerivce {
     } catch (Exception e) {
       log.error("Error in findByEmailForAuth: ", e);
       throw Status.INTERNAL
-          .withDescription("Error in findByEmailForAuth: ")
+          .withDescription(e.getMessage())
           .withCause(e)
           .asRuntimeException();
     }

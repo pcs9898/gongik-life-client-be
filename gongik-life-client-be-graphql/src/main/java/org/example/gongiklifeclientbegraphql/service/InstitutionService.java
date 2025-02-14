@@ -3,6 +3,8 @@ package org.example.gongiklifeclientbegraphql.service;
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
+import dto.institution.LikeInstitutionReviewRequestDto;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewRequestDto;
@@ -11,14 +13,18 @@ import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteI
 import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
+import org.example.gongiklifeclientbegraphql.producer.LikeInstitutionReviewProducer;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class InstitutionService {
 
+  private final LikeInstitutionReviewProducer likeInstitutionReviewProducer;
   @GrpcClient("gongik-life-client-be-institution-service")
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
@@ -73,5 +79,15 @@ public class InstitutionService {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
     }
+  }
+
+  public LikeInstitutionReviewResponseDto likeInstitutionReview(
+      LikeInstitutionReviewRequestDto requestDto) {
+
+    likeInstitutionReviewProducer.sendLikeInstitutionReviewRequest(requestDto);
+
+    return LikeInstitutionReviewResponseDto.builder()
+        .success(true)
+        .build();
   }
 }

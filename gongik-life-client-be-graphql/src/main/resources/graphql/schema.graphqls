@@ -17,9 +17,6 @@ type Query {
     myInstitutionReview: [InstitutionReview!]! @authenticate
 
     institutionReviews: [InstitutionReview!]!
-
-
-
 }
 
 type Mutation{
@@ -34,6 +31,8 @@ type Mutation{
     createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): InstitutionReview! @authenticate
 
     deleteInstitutionReview(institutionReviewId: String!): DeleteInstitutionReviewResponse! @authenticate
+
+    likeInstitutionReview(likeInstitutionReviewInput: LikeInstitutionReviewInput!): LikeInstitutionReviewResponse! @authenticate
 }
 
 type SearchInstitutionsResponse {
@@ -177,5 +176,13 @@ type InstitutionReviewUser{
 
 type DeleteInstitutionReviewResponse{
     institutionReviewId: ID!
+    success: Boolean!
+}
+
+input LikeInstitutionReviewInput{
+    institutionReviewId: ID!
+}
+
+type LikeInstitutionReviewResponse{
     success: Boolean!
 }
