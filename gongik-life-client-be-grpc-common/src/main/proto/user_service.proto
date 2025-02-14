@@ -19,6 +19,7 @@ service UserService {
 
   rpc CheckUserInstitution(CheckUserInstitutionRequest) returns (CheckUserInstitutionResponse);
 
+  rpc GetUserNameById(GetUserNameByIdRequest) returns (GetUserNameByIdResponse);
 }
 
 message SendEmailVerificationCodeRequest {
@@ -162,3 +163,10 @@ message CheckUserInstitutionResponse {
   string userName = 1;
 }
 
+message GetUserNameByIdRequest{
+  string userId = 1;
+}
+
+message GetUserNameByIdResponse{
+  string userName = 1;
+}

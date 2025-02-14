@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
@@ -9,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.createInsitutionReview.CreateInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deleteInstitutionReview.DeleteInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
@@ -29,6 +32,7 @@ public class InstitutionService {
 
   private final LikeInstitutionReviewProducer likeInstitutionReviewProducer;
   private final UnlikeInstitutionReviewProducer unlikeInstitutionReviewProducer;
+  private final InstitutionCacheService institutionCacheService;
 
   @GrpcClient("gongik-life-client-be-institution-service")
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
@@ -55,10 +59,10 @@ public class InstitutionService {
     }
   }
 
-  public InstitutionReviewResponseDto createInstitutionReview(
+  public CreateInstitutionReviewResponseDto createInstitutionReview(
       CreateInstitutionReviewRequestDto requestDto) {
     try {
-      return InstitutionReviewResponseDto.fromProto(
+      return CreateInstitutionReviewResponseDto.fromProto(
           institutionBlockingStub.createInstitutionReview(requestDto.toProto()));
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
@@ -104,5 +108,38 @@ public class InstitutionService {
     return UnlikeInstitutionReviewResponseDto.builder()
         .success(true)
         .build();
+  }
+
+
+  public InstitutionReviewResponseDto institutionReview(InstitutionReviewRequestDto requestDto) {
+    InstitutionReviewResponseDto institutionReview = institutionCacheService.getInstitutionReview(
+        requestDto.getInstitutionReviewId());
+
+    if (requestDto.getUserId() != null) {
+
+      boolean isLiked = isLikedInstitutionReview(requestDto.getInstitutionReviewId(),
+          requestDto.getUserId());
+      institutionReview.setIsLiked(isLiked);
+    }
+
+    return institutionReview;
+  }
+
+
+  public Boolean isLikedInstitutionReview(String institutionReviewId, String userId) {
+    try {
+      Boolean response = institutionBlockingStub.isLikedInstitutionReview(
+          IsLikedInstitutionReviewRequest.newBuilder()
+              .setInstitutionReviewId(institutionReviewId)
+              .setUserId(userId)
+              .build()
+      ).getIsLiked();
+
+      log.info("isLikedInstitutionReview response: {}", response);
+      return response;
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
   }
 }
