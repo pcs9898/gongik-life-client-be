@@ -14,6 +14,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
 import dto.institution.LikeInstitutionReviewRequestDto;
+import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
@@ -231,4 +232,29 @@ public class InstitutionService {
     institutionReview.setLikeCount(institutionReview.getLikeCount() + 1);
   }
 
+  @Transactional
+  public void unlikeInstitutionReview(UnlikeInstitutionReviewRequestDto requestDto) {
+
+    // 1. 리뷰가 존재하는지 확인
+    InstitutionReview institutionReview = institutionReviewRepository.findById(
+            UUID.fromString(requestDto.getInstitutionReviewId()))
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription("Institution review not found, wrong institution review id")
+            .asRuntimeException()
+        );
+
+    // 2. 좋아요가 존재하는지 확인
+    InstitutionReviewLike like = institutionReviewLikeRepository
+        .findById(new InstitutionReviewLikeId(institutionReview.getId(),
+            UUID.fromString(requestDto.getUserId())))
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription("Institution review like not found, wrong institution review id")
+            .asRuntimeException()
+        );
+
+    // 3. 좋아요 삭제
+    institutionReviewLikeRepository.delete(like);
+
+    institutionReview.setLikeCount(institutionReview.getLikeCount() - 1);
+  }
 }
