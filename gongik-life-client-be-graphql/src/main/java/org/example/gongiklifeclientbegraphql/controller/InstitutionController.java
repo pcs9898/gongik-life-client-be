@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
 import dto.institution.LikeInstitutionReviewRequestDto;
+import dto.institution.UnlikeInstitutionReviewRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponse
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
+import org.example.gongiklifeclientbegraphql.dto.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.service.InstitutionService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
@@ -97,7 +99,24 @@ public class InstitutionController {
     } catch (Exception e) {
       log.error("likeInstitutionReview error: {}", e);
       throw e;
+    }
+  }
 
+  @MutationMapping
+  public UnlikeInstitutionReviewResponseDto unlikeInstitutionReview(
+      @Argument("unlikeInstitutionReviewInput") UnlikeInstitutionReviewRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return institutionService.unlikeInstitutionReview(requestDto);
+
+    } catch (Exception e) {
+      log.error("unlikeInstitutionReview error: {}", e);
+      throw e;
     }
   }
 
