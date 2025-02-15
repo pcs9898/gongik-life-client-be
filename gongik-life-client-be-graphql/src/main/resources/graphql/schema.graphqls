@@ -1,5 +1,7 @@
 # @authenticate는 사용자가 인증된 경우에만 필드나 객체에 접근할 수 있도록 합니다.
 directive @authenticate on FIELD_DEFINITION | OBJECT
+directive @range(min: Int!, max: Int!)  on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
+
 
 scalar Date
 
@@ -16,7 +18,7 @@ type Query {
 
     myInstitutionReview: [InstitutionReview!]! @authenticate
 
-    institutionReviews: [InstitutionReview!]!
+    institutionReviews(institutionReviewsFilter: InstitutionReviewsFilter!): InstitutionReviewsResponse!
 }
 
 type Mutation{
@@ -159,17 +161,17 @@ type InstitutionReview {
 
 input CreateInstitutionReviewInput {
     institutionId: ID!
-    facilityRating: Int!
-    locationRating: Int!
-    staffRating: Int!
-    visitorRating: Int!
-    vacationFreedomRating: Int!
+    facilityRating: Int = 0 @range(min: 0, max: 5)
+    locationRating: Int = 0 @range(min: 0, max: 5)
+    staffRating: Int = 0 @range(min: 0, max: 5)
+    visitorRating: Int = 0 @range(min: 0, max: 5)
+    vacationFreedomRating: Int = 0 @range(min: 0, max: 5)
     mainTasks: String!
     prosCons: String!
-    averageWorkhours: Int!
-    workTypeRulesId: Int!
-    uniformWearingRulesId: Int!
-    socialServicePeopleCountId: Int!
+    averageWorkhours: Int = 0 @range(min: 0, max: 480)
+    workTypeRulesId: Int = 1 @range(min: 1, max: 6)
+    uniformWearingRulesId: Int = 1 @range(min: 1, max: 3)
+    socialServicePeopleCountId: Int = 1 @range(min: 1, max: 5)
 }
 
 type InstitutionReviewUser{
@@ -200,4 +202,28 @@ type UnlikeInstitutionReviewResponse{
 
 input InstitutionReviewInput{
     institutionReviewId: ID!
+}
+
+input InstitutionReviewsFilter{
+    institutionCategoryId: Int = 1 @range(min: 1, max: 6)
+    cursor: String
+    pageSize: Int = 10
+}
+
+type InstitutionReviewsResponse {
+    listInstitutionReview: [InstitutionReviewForList]!
+    pageInfo: PageInfo!
+}
+
+type InstitutionReviewForList {
+    id: ID!
+    institutionId: ID!
+    user: InstitutionReviewUser!
+    rating: Float!
+    mainTasks: String!
+    prosCons: String!
+    averageWorkhours: Int!
+    likeCount: Int!
+    createdAt: String!
+    isLiked: Boolean! # its false if user is not authenticated
 }

@@ -16,6 +16,8 @@ service InstitutionService {
   rpc InstitutionReview(InstitutionReviewRequest) returns (InstitutionReviewResponse);
 
   rpc IsLikedInstitutionReview(IsLikedInstitutionReviewRequest) returns (IsLikedInstitutionReviewResponse);
+
+  rpc InstitutionReviews(InstitutionReviewsRequest) returns (InstitutionReviewsResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -135,3 +137,30 @@ message IsLikedInstitutionReviewRequest{
 message IsLikedInstitutionReviewResponse{
   bool isLiked = 1;
 }
+
+message InstitutionReviewsRequest{
+  string userId = 1;
+  int32 institutionCategoryId = 2;
+  optional string cursor = 3;
+  int32 pageSize = 4;
+}
+message InstitutionReviewsResponse{
+  repeated InstitutionReviewForList listInstitutionReview = 1;
+  PageInfo pageInfo = 2;
+}
+
+
+
+message InstitutionReviewForList{
+  string id = 1;
+  string institutionId = 2;
+  InstitutionReviewUser user = 3;
+  double rating = 4;
+  string mainTasks = 5;
+  string prosCons = 6;
+  int32 averageWorkhours = 7;
+  int32 likeCount = 8;
+  string createdAt = 9;
+  bool isLiked = 10;
+}
+

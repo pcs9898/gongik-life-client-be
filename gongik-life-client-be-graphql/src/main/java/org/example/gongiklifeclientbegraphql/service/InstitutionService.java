@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import dto.institution.LikeInstitutionReviewRequestDto;
@@ -17,6 +18,8 @@ import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestD
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
@@ -137,6 +140,21 @@ public class InstitutionService {
 
       log.info("isLikedInstitutionReview response: {}", response);
       return response;
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public InstitutionReviewsResponseDto institutionReviews(InstitutionReviewsRequestDto requestDto) {
+    try {
+      InstitutionReviewsResponse response = institutionBlockingStub.institutionReviews(
+          requestDto.toProto());
+
+      log.info("institutionReviews response: {}", response.getListInstitutionReviewList());
+
+      return InstitutionReviewsResponseDto.fromProto(
+          institutionBlockingStub.institutionReviews(requestDto.toProto()));
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;

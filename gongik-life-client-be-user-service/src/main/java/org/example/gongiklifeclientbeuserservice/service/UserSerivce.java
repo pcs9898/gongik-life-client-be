@@ -13,6 +13,8 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailFo
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileInstitution;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
@@ -30,9 +32,12 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCo
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
 import dto.UserToEmail.EmailVerificationRequestDto;
 import io.grpc.Status;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -753,5 +758,30 @@ public class UserSerivce {
         .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
 
     return GetUserNameByIdResponse.newBuilder().setUserName(userProfile.getName()).build();
+  }
+
+  public GetUserNameByIdsResponse getUserNameByIds(GetUserNameByIdsRequest request) {
+    GetUserNameByIdsResponse.Builder responseBuilder = GetUserNameByIdsResponse.newBuilder();
+
+    // 최적화된 버전
+    List<String> userIds = request.getUserIdsList();
+    List<UUID> uuidList = userIds.stream()
+        .map(UUID::fromString)
+        .collect(Collectors.toList());
+
+// 한 번의 쿼리로 모든 사용자 프로필 조회
+    List<UserProfile> userProfiles = userProfileRepository.findByUserIdIn(uuidList);
+
+// Map으로 변환하여 응답 구성
+    Map<String, String> userNamesMap = userProfiles.stream()
+        .collect(Collectors.toMap(
+            profile -> profile.getUser().getId().toString(),
+            UserProfile::getName
+        ));
+
+    return GetUserNameByIdsResponse.newBuilder()
+        .putAllUsers(userNamesMap)
+        .build();
+
   }
 }
