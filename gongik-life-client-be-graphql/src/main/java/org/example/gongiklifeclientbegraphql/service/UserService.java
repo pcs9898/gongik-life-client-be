@@ -23,6 +23,10 @@ import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileResp
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.producer.UserLoginHistoryProducer;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -79,6 +83,7 @@ public class UserService {
     }
   }
 
+  @Cacheable(value = "myProfile", key = "#userId")
   public MyProfileResponseDto myProfile(String userId) {
     try {
       MyProfileResponse response = userBlockingStub.myProfile(
@@ -95,6 +100,7 @@ public class UserService {
     }
   }
 
+  @Cacheable(value = "userProfile", key = "#userId")
   public UserProfileResponseDto userProfile(String userId) {
     try {
       UserProfileResponse response = userBlockingStub.userProfile(
@@ -110,6 +116,14 @@ public class UserService {
     }
   }
 
+  @Caching(
+      evict = {
+          @CacheEvict(value = "myProfile", key = "#requestDto.userId")
+      },
+      put = {
+          @CachePut(value = "userProfile", key = "#requestDto.userId")
+      }
+  )
   public UpdateProfileResponseDto updateProfile(UpdateProfileRequestDto requestDto) {
     try {
       UpdateProfileResponse response = userBlockingStub.updateProfile(

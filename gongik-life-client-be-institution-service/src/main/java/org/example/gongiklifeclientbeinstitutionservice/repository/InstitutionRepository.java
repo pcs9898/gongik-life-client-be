@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbeinstitutionservice.repository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.UUID;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
@@ -18,4 +19,8 @@ public interface InstitutionRepository extends JpaRepository<Institution, UUID> 
       Pageable pageable);
 
   List<Institution> findByNameContainingOrderByIdAsc(String name, Pageable pageable);
+
+  @Query("SELECT i.reviewCount FROM Institution i WHERE i.id = :institutionId AND i.deletedAt IS NULL")
+  int getReviewCount(@Param("institutionId") UUID institutionId);
+
 }

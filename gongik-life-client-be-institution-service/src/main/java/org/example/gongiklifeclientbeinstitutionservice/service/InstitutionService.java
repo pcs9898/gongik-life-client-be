@@ -5,6 +5,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewForList;
@@ -32,6 +34,7 @@ import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -212,7 +215,9 @@ public class InstitutionService {
     institution.setReviewCount(institution.getReviewCount() - 1);
     institutionRepository.save(institution);
 
-    institutionReviewRepository.delete(institutionReview);
+    // 소프트 삭제 처리
+    institutionReview.setDeletedAt(new Date());
+    institutionReviewRepository.save(institutionReview);
 
     return DeleteInstitutionReviewResponse.newBuilder().setSuccess(true).build();
   }
@@ -468,5 +473,15 @@ public class InstitutionService {
             .build())
         .build();
 
+  }
+
+  public GetInstitutionReviewCountResponse getInstitutionReviewCount(
+      GetInstitutionReviewCountRequest request) {
+    int count = institutionRepository.getReviewCount(
+        UUID.fromString(request.getInstitutionId()));
+
+    return GetInstitutionReviewCountResponse.newBuilder()
+        .setReviewCount(count)
+        .build();
   }
 }
