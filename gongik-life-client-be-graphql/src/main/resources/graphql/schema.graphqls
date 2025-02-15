@@ -21,6 +21,8 @@ type Query {
     myInstitutionReviews: MyInstitutionReviewsResponse @authenticate
 
     institutionReviewsByInstitution(institutionReviewsByInstitutionFilter: InstitutionReviewsByInstitutionFilters!): InstitutionReviewsByInstitutionResponse!
+
+    post(postInput: PostInput!): PostResponse!
 }
 
 type Mutation{
@@ -332,4 +334,20 @@ input UnLikePostInput{
 
 type UnLikePostResponse{
     success: Boolean!
+}
+
+input PostInput{
+    postId: ID!
+}
+
+type PostResponse{
+    id: ID!
+    user: PostUser!
+    categoryId: Int!
+    title: String!
+    content: String!
+    likeCount: Int!
+    commentCount: Int!
+    createdAt:String!
+    isLiked:Boolean!
 }
