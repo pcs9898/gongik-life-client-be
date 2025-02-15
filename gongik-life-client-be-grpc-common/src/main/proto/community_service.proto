@@ -14,6 +14,8 @@ service CommunityService{
   rpc GetPost(GetPostRequest) returns (GetPostResponse);
 
   rpc IsLikedPostAndCommentCount(IsLikedPostAndCommentCountRequest) returns (IsLikedPostAndCommentCountResponse);
+
+  rpc Posts(PostsRequest) returns (PostsResponse);
 }
 
 message CreatePostRequest{
@@ -98,4 +100,34 @@ message IsLikedPostAndCommentCountRequest{
 message  IsLikedPostAndCommentCountResponse{
   bool isLiked = 1;
   int32 commentCount = 2;
+}
+
+message PostsRequest{
+  optional string userId = 1;
+  int32 postCategoryId = 2;
+  optional string cursor = 3;
+  int32 pageSize = 4;
+
+}
+
+message PostForList{
+  string id = 1;
+  PostUser user = 2;
+  int32 categoryId = 3;
+  string title = 4;
+  string content = 5;
+  int32 likeCount = 6;
+  int32 commentCount = 7;
+  string createdAt = 8;
+  bool isLiked = 9;
+}
+
+message PostsResponse{
+  repeated PostForList listPost = 1;
+  PageInfo pageInfo = 2;
+}
+
+message PageInfo {
+  string endCursor = 1;
+  bool hasNextPage = 2;
 }

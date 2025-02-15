@@ -11,6 +11,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsL
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
 import io.grpc.stub.StreamObserver;
@@ -141,6 +143,25 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("isLikedPostAndCommentCount error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void posts(PostsRequest request, StreamObserver<PostsResponse> responseObserver) {
+    try {
+      PostsResponse response = postService.posts(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("posts error : ", e);
 
       responseObserver.onError(
           io.grpc.Status.INTERNAL

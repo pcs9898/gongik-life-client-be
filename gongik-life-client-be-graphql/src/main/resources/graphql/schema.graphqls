@@ -23,6 +23,8 @@ type Query {
     institutionReviewsByInstitution(institutionReviewsByInstitutionFilter: InstitutionReviewsByInstitutionFilters!): InstitutionReviewsByInstitutionResponse!
 
     post(postInput: PostInput!): PostResponse!
+
+    posts(postsFilter: PostsFilter!): PostsResponse!
 }
 
 type Mutation{
@@ -350,4 +352,28 @@ type PostResponse{
     commentCount: Int!
     createdAt:String!
     isLiked:Boolean!
+}
+
+input PostsFilter{
+    postCategoryId: Int = 7 @range(min: 1, max: 7)
+    cursor: String
+    pageSize: Int = 10
+}
+
+type PostForList{
+    id: ID!
+    user: PostUser!
+    categoryId: Int!
+    title: String!
+    content: String!
+    likeCount: Int!
+    commentCount: Int!
+    createdAt:String!
+    isLiked:Boolean!
+}
+
+type PostsResponse{
+    listPost: [PostForList]!
+    pageInfo: PageInfo!
+
 }
