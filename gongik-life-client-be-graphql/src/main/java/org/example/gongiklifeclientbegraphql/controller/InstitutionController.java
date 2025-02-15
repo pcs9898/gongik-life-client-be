@@ -16,6 +16,7 @@ import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionRe
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.myInstitutionReviews.MyInstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
 import org.example.gongiklifeclientbegraphql.dto.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
@@ -157,6 +158,21 @@ public class InstitutionController {
 
     } catch (Exception e) {
       log.error("institutionReviews error: {}", e);
+      throw e;
+    }
+  }
+
+  @QueryMapping
+  public MyInstitutionReviewsResponseDto myInstitutionReviews(
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      return institutionService.myInstitutionReviews(userId);
+
+    } catch (Exception e) {
+      log.error("myInstitutionReview error: {}", e);
       throw e;
     }
   }

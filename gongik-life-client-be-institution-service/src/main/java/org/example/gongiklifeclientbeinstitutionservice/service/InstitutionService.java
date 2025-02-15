@@ -8,6 +8,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewForList;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewInstitution;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewUser;
@@ -15,6 +16,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
@@ -338,7 +341,11 @@ public class InstitutionService {
 
           return InstitutionReviewForList.newBuilder()
               .setId(review.getId().toString())
-              .setInstitutionId(review.getInstitutionId().toString())
+              .setInstitution(InstitutionReviewInstitution.newBuilder()
+                  .setInstitutionId(review.getInstitutionId().toString())
+                  .setInstitutionName(review.getInstitutionName())
+                  .setInstitutionCategoryId(review.getInstitutionCategoryId())
+                  .build())
               .setUser(user)
               .setRating(review.getRating())
               .setMainTasks(review.getMainTasks())
@@ -360,5 +367,43 @@ public class InstitutionService {
             .build())
         .build();
 
+  }
+
+  public MyInstitutionReviewsResponse myInstitutionReviews(MyInstitutionReviewsRequest request) {
+    String username = userServiceBlockingStub.getUserNameById(
+        GetUserNameByIdRequest.newBuilder().setUserId(request.getUserId()).build()
+    ).getUserName();
+
+    List<InstitutionReviewProjection> reviews = institutionReviewRepository
+        .findMyInstitutionReviews(UUID.fromString(request.getUserId()));
+
+    List<InstitutionReviewForList> listInstitutionReview = reviews.stream()
+        .map(review -> {
+          InstitutionReviewUser user = InstitutionReviewUser.newBuilder()
+              .setId(request.getUserId())
+              .setName(username)
+              .build();
+
+          return InstitutionReviewForList.newBuilder()
+              .setId(review.getId().toString())
+              .setInstitution(InstitutionReviewInstitution.newBuilder()
+                  .setInstitutionId(review.getInstitutionId().toString())
+                  .setInstitutionName(review.getInstitutionName())
+                  .setInstitutionCategoryId(review.getInstitutionCategoryId())
+                  .build())
+              .setUser(user)
+              .setRating(review.getRating())
+              .setMainTasks(review.getMainTasks())
+              .setProsCons(review.getProsCons())
+              .setAverageWorkhours(review.getAverageWorkhours())
+              .setLikeCount(review.getLikeCount())
+              .setCreatedAt(review.getCreatedAt().toString())
+              .setIsLiked(review.getIsLiked())
+              .build();
+        }).toList();
+
+    return MyInstitutionReviewsResponse.newBuilder()
+        .addAllListMyInstitutionReview(listInstitutionReview)
+        .build();
   }
 }
