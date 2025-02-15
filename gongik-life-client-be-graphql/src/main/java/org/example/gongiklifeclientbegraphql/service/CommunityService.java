@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.communityService.domain.service.CommunityServiceGrpc;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import dto.community.LikePostRequestDto;
 import dto.community.UnLikePostRequestDto;
@@ -10,6 +11,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.community.LikePostProducer;
 import org.example.gongiklifeclientbegraphql.producer.community.UnLikePostProducer;
@@ -75,5 +77,10 @@ public class CommunityService {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
     }
+  }
+
+  public IsLikedPostAndCommentCountResponse isLikedPostAndCommentCount(PostRequestDto requestDto) {
+
+    return communityServiceBlockingStub.isLikedPostAndCommentCount(requestDto.toProto());
   }
 }

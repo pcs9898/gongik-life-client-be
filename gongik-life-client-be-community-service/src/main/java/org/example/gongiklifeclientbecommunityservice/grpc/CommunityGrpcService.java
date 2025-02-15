@@ -5,6 +5,10 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Cre
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
@@ -108,5 +112,42 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
     }
   }
 
+  @Override
+  public void getPost(GetPostRequest request, StreamObserver<GetPostResponse> responseObserver) {
+    try {
+      GetPostResponse response = postService.getPost(request);
 
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("getPost error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void isLikedPostAndCommentCount(IsLikedPostAndCommentCountRequest request,
+      StreamObserver<IsLikedPostAndCommentCountResponse> responseObserver) {
+    try {
+      IsLikedPostAndCommentCountResponse response = postService.isLikedPostAndCommentCount(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("isLikedPostAndCommentCount error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
 }
