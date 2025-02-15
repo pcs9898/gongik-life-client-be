@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import dto.community.LikePostRequestDto;
 import dto.community.UnLikePostRequestDto;
 import graphql.schema.DataFetchingEnvironment;
@@ -10,12 +11,14 @@ import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
 import org.example.gongiklifeclientbegraphql.service.CommunityService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -115,6 +118,34 @@ public class CommunityController {
       return communityService.unLikePost(requestDto);
     } catch (Exception e) {
       log.error("Failed to unLike post", e);
+      throw e;
+    }
+  }
+
+  @QueryMapping
+  public PostResponseDto post(
+      @Argument("postInput") PostRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      if (!"-1".equals(userId)) {
+        requestDto.setUserId(userId);
+      }
+
+      PostResponseDto postResponse = communityCacheService.getPost(requestDto.getPostId());
+
+      IsLikedPostAndCommentCountResponse isLikedPostAndCommentCountResponse = communityService.isLikedPostAndCommentCount(
+          requestDto);
+
+      postResponse.setIsLiked(isLikedPostAndCommentCountResponse.getIsLiked());
+
+      postResponse.setCommentCount(isLikedPostAndCommentCountResponse.getCommentCount());
+
+      return postResponse;
+    } catch (Exception e) {
+      log.error("Failed to get post", e);
       throw e;
     }
   }

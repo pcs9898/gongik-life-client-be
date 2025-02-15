@@ -10,6 +10,10 @@ service CommunityService{
   rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
 
   rpc IsLikedPost(IsLikedPostRequest) returns (IsLikedPostResponse);
+
+  rpc GetPost(GetPostRequest) returns (GetPostResponse);
+
+  rpc IsLikedPostAndCommentCount(IsLikedPostAndCommentCountRequest) returns (IsLikedPostAndCommentCountResponse);
 }
 
 message CreatePostRequest{
@@ -69,4 +73,29 @@ message IsLikedPostRequest{
 
 message IsLikedPostResponse{
   bool isLiked = 1;
+}
+
+message GetPostRequest{
+  string postId = 1;
+}
+
+message GetPostResponse{
+  string id = 1;
+  PostUser user = 2;
+  int32 categoryId = 3;
+  string title = 4;
+  string content = 5;
+  int32 likeCount = 6;
+  int32 commentCount = 7;
+  string createdAt = 8;
+}
+
+message IsLikedPostAndCommentCountRequest{
+  optional string userId = 1;
+  string postId = 2;
+}
+
+message  IsLikedPostAndCommentCountResponse{
+  bool isLiked = 1;
+  int32 commentCount = 2;
 }
