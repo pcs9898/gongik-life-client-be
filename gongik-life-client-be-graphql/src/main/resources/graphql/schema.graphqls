@@ -53,6 +53,8 @@ type Mutation{
     likePost(likePostInput: LikePostInput!): LikePostResponse! @authenticate
 
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
+
+    createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
 }
 
 "search result"
@@ -376,4 +378,19 @@ type PostsResponse{
     listPost: [PostForList]!
     pageInfo: PageInfo!
 
+}
+
+input CreateCommentInput{
+    postId: ID!
+    parentCommentId: ID
+    content: String!
+}
+
+type CreateCommentResponse{
+    id: ID!
+    user: PostUser!
+    postId: ID!
+    parentCommentId: ID
+    content: String!
+    createdAt: String!
 }

@@ -1,6 +1,8 @@
 package org.example.gongiklifeclientbecommunityservice.grpc;
 
 import com.gongik.communityService.domain.service.CommunityServiceGrpc;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbecommunityservice.producer.DeleteAllCommentsByPostProducer;
+import org.example.gongiklifeclientbecommunityservice.service.CommentService;
 import org.example.gongiklifeclientbecommunityservice.service.PostService;
 
 @GrpcService
@@ -29,6 +32,7 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
 
   private final DeleteAllCommentsByPostProducer deleteAllCommentsByPostProducer;
   private final PostService postService;
+  private final CommentService commentService;
 
   @Override
   public void createPost(CreatePostRequest request,
@@ -162,6 +166,26 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("posts error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void createComment(CreateCommentRequest request,
+      StreamObserver<CreateCommentResponse> responseObserver) {
+    try {
+      CreateCommentResponse response = commentService.createComment(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("createComment error : ", e);
 
       responseObserver.onError(
           io.grpc.Status.INTERNAL

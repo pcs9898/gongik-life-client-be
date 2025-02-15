@@ -219,6 +219,15 @@ public class PostService {
             .build())
         .build();
   }
+
+  public Post findPostById(String postId) {
+    return postRepository.findById(UUID.fromString(postId))
+        .orElseThrow(() -> Status.NOT_FOUND.withDescription("Post not found").asRuntimeException());
+  }
+
+  public void updateCommentCount(UUID postId) {
+    postRepository.updateCommentCountById(postId);
+  }
 }
 
 

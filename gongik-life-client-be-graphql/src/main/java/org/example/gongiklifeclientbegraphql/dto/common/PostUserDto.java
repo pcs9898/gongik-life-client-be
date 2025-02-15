@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbegraphql.dto.common;
 
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,11 @@ public class PostUserDto {
 
   private String userId;
   private String userName;
+
+  public static PostUserDto fromProto(PostUser user) {
+    return PostUserDto.builder()
+        .userId(user.getUserId())
+        .userName(user.getUserName())
+        .build();
+  }
 }

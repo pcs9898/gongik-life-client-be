@@ -7,6 +7,8 @@ import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
@@ -170,6 +172,22 @@ public class CommunityController {
       throw e;
     }
   }
-  
+
+  @MutationMapping
+  public CreateCommentResponseDto createComment(
+      @Argument("createCommentInput") CreateCommentRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.createComment(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to create comment", e);
+      throw e;
+    }
+  }
 
 }
