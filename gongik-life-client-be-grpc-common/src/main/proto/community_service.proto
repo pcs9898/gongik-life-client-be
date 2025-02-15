@@ -18,8 +18,16 @@ service CommunityService{
   rpc Posts(PostsRequest) returns (PostsResponse);
 
   rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse);
+<<<<<<< Updated upstream
 
   rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse);
+=======
+<<<<<<< HEAD
+=======
+
+  rpc UpdateComment(UpdateCommentRequest) returns (UpdateCommentResponse);
+>>>>>>> feature/29updateComment
+>>>>>>> Stashed changes
 }
 
 message CreatePostRequest{
@@ -150,6 +158,11 @@ message CreateCommentResponse{
   optional string parentCommentId = 4;
   string content = 5;
   string createdAt = 6;
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
 }
 
 message UpdateCommentRequest{
@@ -161,4 +174,8 @@ message UpdateCommentRequest{
 message UpdateCommentResponse{
   string id = 1;
   bool success = 2;
+<<<<<<< Updated upstream
+=======
+>>>>>>> feature/29updateComment
+>>>>>>> Stashed changes
 }

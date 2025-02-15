@@ -55,8 +55,16 @@ type Mutation{
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 
     createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
+<<<<<<< Updated upstream
 
     updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
+=======
+<<<<<<< HEAD
+=======
+
+    updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
+>>>>>>> feature/29updateComment
+>>>>>>> Stashed changes
 }
 
 "search result"
@@ -395,6 +403,11 @@ type CreateCommentResponse{
     parentCommentId: ID
     content: String!
     createdAt: String!
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
 }
 
 input UpdateCommentInput{
@@ -405,4 +418,8 @@ input UpdateCommentInput{
 type UpdateCommentResponse{
     id: ID!
     success: Boolean!
+<<<<<<< Updated upstream
+=======
+>>>>>>> feature/29updateComment
+>>>>>>> Stashed changes
 }

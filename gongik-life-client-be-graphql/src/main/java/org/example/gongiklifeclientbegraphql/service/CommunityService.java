@@ -108,6 +108,11 @@ public class CommunityService {
       throw e;
     }
   }
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
 
   public UpdateCommentResponseDto updateComment(UpdateCommentRequestDto requestDto) {
     try {
@@ -118,4 +123,8 @@ public class CommunityService {
       throw e;
     }
   }
+<<<<<<< Updated upstream
+=======
+>>>>>>> feature/29updateComment
+>>>>>>> Stashed changes
 }
