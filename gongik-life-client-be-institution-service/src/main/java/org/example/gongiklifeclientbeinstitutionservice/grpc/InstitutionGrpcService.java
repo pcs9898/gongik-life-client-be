@@ -14,6 +14,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import io.grpc.Status;
@@ -183,6 +185,26 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("institutionReviews error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void myInstitutionReviews(MyInstitutionReviewsRequest request,
+      StreamObserver<MyInstitutionReviewsResponse> responseObserver) {
+    try {
+      MyInstitutionReviewsResponse response = institutionService.myInstitutionReviews(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("myInstitutionReviews error : ", e);
 
       responseObserver.onError(
           Status.INTERNAL

@@ -18,6 +18,8 @@ service InstitutionService {
   rpc IsLikedInstitutionReview(IsLikedInstitutionReviewRequest) returns (IsLikedInstitutionReviewResponse);
 
   rpc InstitutionReviews(InstitutionReviewsRequest) returns (InstitutionReviewsResponse);
+
+  rpc MyInstitutionReviews(MyInstitutionReviewsRequest) returns (MyInstitutionReviewsResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -153,7 +155,7 @@ message InstitutionReviewsResponse{
 
 message InstitutionReviewForList{
   string id = 1;
-  string institutionId = 2;
+  InstitutionReviewInstitution institution = 2;
   InstitutionReviewUser user = 3;
   double rating = 4;
   string mainTasks = 5;
@@ -164,3 +166,17 @@ message InstitutionReviewForList{
   bool isLiked = 10;
 }
 
+message InstitutionReviewInstitution{
+  string institutionId = 1;
+  string institutionName = 2;
+  int32 institutionCategoryId = 3;
+}
+
+message MyInstitutionReviewsRequest{
+  string userId = 1;
+}
+
+
+message MyInstitutionReviewsResponse{
+  repeated InstitutionReviewForList listMyInstitutionReview = 1;
+}
