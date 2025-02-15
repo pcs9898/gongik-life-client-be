@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package com.gongik.communityService.domain.service;
+
+service CommunityService{
+  rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
+}
+
+message CreatePostRequest{
+  string userId = 1;
+  int32 categoryId = 2;
+  string title = 3;
+  string content = 4;
+}
+
+message CreatePostResponse{
+  string id = 1;
+  PostUser user = 2;
+  int32 categoryId = 3;
+  string title = 4;
+  string content = 5;
+  int32 likeCount = 6;
+  int32 commentCount = 7;
+  string createdAt = 8;
+}
+
+message PostUser{
+  string userId = 1;
+  string userName = 2;
+}
