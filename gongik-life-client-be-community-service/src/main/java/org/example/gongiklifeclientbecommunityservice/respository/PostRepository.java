@@ -1,8 +1,10 @@
 package org.example.gongiklifeclientbecommunityservice.respository;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.example.gongiklifeclientbecommunityservice.dto.PostProjection;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,5 +26,47 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
   @Query("SELECT p.commentCount FROM Post p WHERE p.id = :postId AND p.deletedAt IS NULL")
   Integer findCommentCountById(@Param("postId") UUID postId);
 
+  @Query(value = """
+      SELECT 
+          p.id,
+          p.user_id as userId,
+          p.category_id as categoryId,
+          p.title,
+          p.content,
+          p.like_count as likeCount,
+          p.comment_count as commentCount,
+          p.created_at as createdAt,
+          CASE 
+              WHEN :userId IS NULL THEN false
+              ELSE EXISTS (
+                  SELECT 1 
+                  FROM post_likes pl 
+                  WHERE pl.post_id = p.id 
+                  AND pl.user_id = :userId
+              )
+          END as isLiked
+      FROM posts p
+      WHERE 
+          p.deleted_at IS NULL
+          AND (CAST(:categoryId AS integer) > 6 OR p.category_id = :categoryId)
+          AND (
+              CAST(:cursor AS uuid) IS NULL 
+              OR 
+              (p.created_at, p.id) < (
+                  SELECT created_at, id 
+                  FROM posts 
+                  WHERE id = :cursor
+              )
+          )
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT :limit
+      """,
+      nativeQuery = true)
+  List<PostProjection> findPostsWithCursor(
+      @Param("userId") UUID userId,
+      @Param("categoryId") Integer categoryId,
+      @Param("cursor") UUID cursor,
+      @Param("limit") int limit
+  );
 
 }
