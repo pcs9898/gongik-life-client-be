@@ -7,8 +7,12 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewForList;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewUser;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
@@ -17,18 +21,21 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
+import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReviewLike;
@@ -298,6 +305,60 @@ public class InstitutionService {
           .setIsLiked(false)
           .build();
     }
+
+  }
+
+  public InstitutionReviewsResponse institutionReviews(InstitutionReviewsRequest request) {
+
+    List<InstitutionReviewProjection> reviews = institutionReviewRepository.findReviewsWithCursor(
+        "-1".equals(request.getUserId()) ? null : UUID.fromString(request.getUserId()),
+        request.getInstitutionCategoryId(),
+        request.getCursor().isEmpty() ? null : UUID.fromString(request.getCursor()),
+        request.getPageSize()
+    );
+
+    List<String> userIds = reviews.stream()
+        .map(InstitutionReviewProjection::getUserId)
+        .map(UUID::toString)
+        .collect(Collectors.toList());
+
+    Map<String, String> userNameMap = userServiceBlockingStub.getUserNameByIds(
+        GetUserNameByIdsRequest.newBuilder().addAllUserIds(userIds).build()
+    ).getUsersMap();
+
+    List<InstitutionReviewForList> listInstitutionReview = reviews.stream()
+        .map(review -> {
+          String userId = review.getUserId().toString();
+          String userName = userNameMap.get(userId);
+
+          InstitutionReviewUser user = InstitutionReviewUser.newBuilder()
+              .setId(userId)
+              .setName(userName)
+              .build();
+
+          return InstitutionReviewForList.newBuilder()
+              .setId(review.getId().toString())
+              .setInstitutionId(review.getInstitutionId().toString())
+              .setUser(user)
+              .setRating(review.getRating())
+              .setMainTasks(review.getMainTasks())
+              .setProsCons(review.getProsCons())
+              .setAverageWorkhours(review.getAverageWorkhours())
+              .setLikeCount(review.getLikeCount())
+              .setCreatedAt(review.getCreatedAt().toString())
+              .setIsLiked(review.getIsLiked())
+              .build();
+        })
+        .collect(Collectors.toList());
+
+    return InstitutionReviewsResponse.newBuilder()
+        .addAllListInstitutionReview(listInstitutionReview)
+        .setPageInfo(PageInfo.newBuilder()
+            .setEndCursor(
+                reviews.isEmpty() ? "" : reviews.get(reviews.size() - 1).getId().toString())
+            .setHasNextPage(reviews.size() == request.getPageSize())
+            .build())
+        .build();
 
   }
 }

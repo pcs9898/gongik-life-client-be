@@ -7,6 +7,8 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailFo
 import com.gongik.userService.domain.service.UserServiceOuterClass.FindByEmailForAuthResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeRequest;
@@ -217,6 +219,28 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.error("getUserNameById error: {} - {}",
+          e.getMessage(), e.getLocalizedMessage());
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void getUserNameByIds(GetUserNameByIdsRequest request,
+      StreamObserver<GetUserNameByIdsResponse> responseObserver) {
+
+    try {
+      GetUserNameByIdsResponse response = userService.getUserNameByIds(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("getUserNameByIds error: {} - {}",
           e.getMessage(), e.getLocalizedMessage());
 
       responseObserver.onError(

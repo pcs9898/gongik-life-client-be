@@ -366,6 +366,9 @@ CREATE INDEX idx_institutions_active_by_category
 CREATE INDEX idx_institution_reviews_active_by_institution_id
     ON institution_reviews (institution_id) WHERE deleted_at IS NULL;
 
+CREATE INDEX idx_institution_reviews_created_at
+    ON institution_reviews (created_at DESC);
+
 
 \c gongik_life_client_community_db;
 
