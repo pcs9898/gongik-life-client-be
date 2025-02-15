@@ -3,6 +3,7 @@ package org.example.gongiklifeclientbeinstitutionservice.entity;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewUser;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionShortInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -107,7 +108,10 @@ public class InstitutionReview extends Auditable {
   public InstitutionReviewResponse toProto(String username) {
     return InstitutionReviewResponse.newBuilder()
         .setId(id.toString())
-        .setInstitutionId(institution.getId().toString())
+        .setInstitution(InstitutionShortInfo.newBuilder()
+            .setInstitutionId(institution.getId().toString())
+            .setInstitutionName(institution.getName())
+            .build())
         .setUser(InstitutionReviewUser.newBuilder()
             .setId(userId.toString())
             .setName(username)

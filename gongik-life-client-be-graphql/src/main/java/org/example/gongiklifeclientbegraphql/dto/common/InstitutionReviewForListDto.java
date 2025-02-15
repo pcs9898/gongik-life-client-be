@@ -1,4 +1,4 @@
-package org.example.gongiklifeclientbegraphql.dto.institutionReviews;
+package org.example.gongiklifeclientbegraphql.dto.common;
 
 
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewForList;
@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gongiklifeclientbegraphql.dto.common.InstitutionReviewInstitutionDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewUserDto;
 
 @Data

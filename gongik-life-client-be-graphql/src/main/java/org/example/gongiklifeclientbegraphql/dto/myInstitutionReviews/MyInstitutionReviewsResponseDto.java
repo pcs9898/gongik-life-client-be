@@ -4,7 +4,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
-import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewForListDto;
+import org.example.gongiklifeclientbegraphql.dto.common.InstitutionReviewForListDto;
 
 @Data
 public class MyInstitutionReviewsResponseDto {
