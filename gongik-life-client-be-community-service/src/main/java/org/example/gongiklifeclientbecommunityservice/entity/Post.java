@@ -3,6 +3,8 @@ package org.example.gongiklifeclientbecommunityservice.entity;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,8 +21,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbecommunityservice.respository.Auditable;
 
+@Slf4j
 @Entity
 @Getter
 @Setter
@@ -59,7 +63,7 @@ public class Post extends Auditable {
   private List<Comment> comments = new ArrayList<>();
 
 
-  public static Post fromProto(CreatePostRequest request) {
+  public static Post fromCreatePostRequestProto(CreatePostRequest request) {
     return Post.builder()
         .userId(UUID.fromString(request.getUserId()))
         .categoryId(request.getCategoryId())
@@ -70,7 +74,7 @@ public class Post extends Auditable {
         .build();
   }
 
-  public CreatePostResponse toProto(String userName) {
+  public CreatePostResponse toCreatePostResponseProto(String userName) {
     return CreatePostResponse.newBuilder()
         .setId(id.toString())
         .setUser(PostUser.newBuilder()
@@ -85,5 +89,32 @@ public class Post extends Auditable {
         .setCreatedAt(getCreatedAt().toString())
         .build();
 
+  }
+
+  public void fromUpdatePostRequestProto(UpdatePostRequest request) {
+    if (!request.getTitle().trim().isEmpty()) {
+      this.title = request.getTitle();
+    }
+    
+    if (!request.getContent().trim().isEmpty()) {
+      this.content = request.getContent();
+    }
+
+  }
+
+  public UpdatePostResponse toUpdatePostResponseProto(String userName) {
+    return UpdatePostResponse.newBuilder()
+        .setId(id.toString())
+        .setUser(PostUser.newBuilder()
+            .setUserId(userId.toString())
+            .setUserName(userName)
+            .build())
+        .setCategoryId(categoryId)
+        .setTitle(title)
+        .setContent(content)
+        .setLikeCount(likeCount)
+        .setCommentCount(commentCount)
+        .setCreatedAt(getCreatedAt().toString())
+        .build();
   }
 }

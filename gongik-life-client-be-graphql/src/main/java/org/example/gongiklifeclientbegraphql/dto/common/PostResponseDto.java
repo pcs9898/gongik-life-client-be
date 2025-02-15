@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.dto.common;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @NoArgsConstructor
 @Slf4j
-public class PostDto {
+public class PostResponseDto {
 
   private String id;
   private PostUserDto user;
@@ -22,10 +23,11 @@ public class PostDto {
   private Integer likeCount;
   private Integer commentCount;
   private String createdAt;
+  private Boolean isLiked;
 
-  public static PostDto fromProto(CreatePostResponse post) {
+  public static PostResponseDto fromCreatePostResponseProto(CreatePostResponse post) {
 
-    return PostDto.builder()
+    return PostResponseDto.builder()
         .id(post.getId())
         .user(PostUserDto.builder()
             .userId(post.getUser().getUserId())
@@ -37,6 +39,23 @@ public class PostDto {
         .likeCount(post.getLikeCount())
         .commentCount(post.getCommentCount())
         .createdAt(post.getCreatedAt())
+        .build();
+  }
+
+  public static PostResponseDto fromUpdatePostResponseProto(UpdatePostResponse updatePostResponse) {
+
+    return PostResponseDto.builder()
+        .id(updatePostResponse.getId())
+        .user(PostUserDto.builder()
+            .userId(updatePostResponse.getUser().getUserId())
+            .userName(updatePostResponse.getUser().getUserName())
+            .build())
+        .categoryId(updatePostResponse.getCategoryId())
+        .title(updatePostResponse.getTitle())
+        .content(updatePostResponse.getContent())
+        .likeCount(updatePostResponse.getLikeCount())
+        .commentCount(updatePostResponse.getCommentCount())
+        .createdAt(updatePostResponse.getCreatedAt())
         .build();
   }
 }
