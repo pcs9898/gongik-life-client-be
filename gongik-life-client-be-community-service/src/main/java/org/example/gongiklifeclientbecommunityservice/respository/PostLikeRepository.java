@@ -1,6 +1,5 @@
 package org.example.gongiklifeclientbecommunityservice.respository;
 
-import java.util.Optional;
 import java.util.UUID;
 import org.example.gongiklifeclientbecommunityservice.entity.PostLike;
 import org.example.gongiklifeclientbecommunityservice.entity.PostLikeId;
@@ -13,7 +12,5 @@ public interface PostLikeRepository extends JpaRepository<PostLike, PostLikeId> 
   // userId와 postId로 존재 여부 확인
   boolean existsByIdPostIdAndIdUserId(UUID postId, UUID userId);
 
-
-  // 또는 Optional로 반환받기
-  Optional<PostLike> findById_UserIdAndId_PostId(UUID userId, UUID postId);
+//
 }

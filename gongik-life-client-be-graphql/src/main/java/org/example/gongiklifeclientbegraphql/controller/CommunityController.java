@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
 import dto.community.LikePostRequestDto;
+import dto.community.UnLikePostRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
 import org.example.gongiklifeclientbegraphql.service.CommunityService;
@@ -96,6 +98,23 @@ public class CommunityController {
       return communityService.likePost(requestDto);
     } catch (Exception e) {
       log.error("Failed to like post", e);
+      throw e;
+    }
+  }
+
+  @MutationMapping
+  public UnLikePostResponseDto unLikePost(
+      @Argument("unLikePostInput") UnLikePostRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.unLikePost(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to unLike post", e);
       throw e;
     }
   }
