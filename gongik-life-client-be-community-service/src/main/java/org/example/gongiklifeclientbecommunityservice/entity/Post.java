@@ -23,15 +23,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbecommunityservice.respository.Auditable;
+import org.hibernate.annotations.SQLRestriction;
 
 @Slf4j
-@Entity
 @Getter
 @Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 @Table(name = "posts")
+@SQLRestriction("deleted_at is null")
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Post extends Auditable {
 
   @Id
@@ -95,7 +97,7 @@ public class Post extends Auditable {
     if (!request.getTitle().trim().isEmpty()) {
       this.title = request.getTitle();
     }
-    
+
     if (!request.getContent().trim().isEmpty()) {
       this.content = request.getContent();
     }
