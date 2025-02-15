@@ -3,6 +3,8 @@ package org.example.gongiklifeclientbecommunityservice.service;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import io.grpc.Status;
@@ -83,5 +85,23 @@ public class CommentService {
         .setCreatedAt(savedComment.getCreatedAt().toString())
         .build();
 
+  }
+
+  public UpdateCommentResponse updateComment(UpdateCommentRequest request) {
+    Comment comment = commentRepository.findById(UUID.fromString(request.getCommentId()))
+        .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+    if (!comment.getUserId().equals(UUID.fromString(request.getUserId()))) {
+      throw Status.PERMISSION_DENIED.withDescription(
+          "Permission denied, You can update only your comment.").asRuntimeException();
+    }
+
+    comment.setContent(request.getContent());
+    commentRepository.save(comment);
+
+    return UpdateCommentResponse.newBuilder()
+        .setId(request.getCommentId())
+        .setSuccess(true)
+        .build();
   }
 }

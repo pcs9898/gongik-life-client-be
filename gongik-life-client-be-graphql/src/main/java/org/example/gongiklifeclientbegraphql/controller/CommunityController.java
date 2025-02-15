@@ -17,6 +17,8 @@ import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.posts.PostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.posts.PostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.updateComment.UpdateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.updateComment.UpdateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
 import org.example.gongiklifeclientbegraphql.service.CommunityService;
@@ -189,5 +191,23 @@ public class CommunityController {
       throw e;
     }
   }
+
+  @MutationMapping
+  public UpdateCommentResponseDto updateComment(
+      @Argument("updateCommentInput") UpdateCommentRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.updateComment(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to update comment", e);
+      throw e;
+    }
+  }
+
 
 }
