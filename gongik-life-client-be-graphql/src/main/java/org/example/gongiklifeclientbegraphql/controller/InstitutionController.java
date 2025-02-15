@@ -13,6 +13,8 @@ import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionRequestD
 import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
@@ -138,10 +140,26 @@ public class InstitutionController {
       log.error("institutionReview error: {}", e);
       throw e;
     }
-
-
   }
 
+  @QueryMapping
+  public InstitutionReviewsResponseDto institutionReviews(
+      @Argument("institutionReviewsFilter") InstitutionReviewsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      log.info("institutionReviews requestDto: {}", requestDto);
+      return institutionService.institutionReviews(requestDto);
+
+    } catch (Exception e) {
+      log.error("institutionReviews error: {}", e);
+      throw e;
+    }
+  }
 
 }
 
