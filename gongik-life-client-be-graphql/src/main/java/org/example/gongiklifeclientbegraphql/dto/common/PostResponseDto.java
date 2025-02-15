@@ -2,7 +2,9 @@ package org.example.gongiklifeclientbegraphql.dto.common;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostForList;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -75,5 +77,25 @@ public class PostResponseDto {
         .commentCount(post.getCommentCount())
         .createdAt(post.getCreatedAt())
         .build();
+  }
+
+
+  public static List<PostResponseDto> fromPostsResponseProto(List<PostForList> listPostList) {
+    return listPostList.stream()
+        .map(post -> PostResponseDto.builder()
+            .id(post.getId())
+            .user(PostUserDto.builder()
+                .userId(post.getUser().getUserId())
+                .userName(post.getUser().getUserName())
+                .build())
+            .categoryId(post.getCategoryId())
+            .title(post.getTitle())
+            .content(post.getContent())
+            .likeCount(post.getLikeCount())
+            .commentCount(post.getCommentCount())
+            .createdAt(post.getCreatedAt())
+            .isLiked(post.getIsLiked())
+            .build())
+        .toList();
   }
 }
