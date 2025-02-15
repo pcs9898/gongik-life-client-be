@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.transaction.annotation.Transactional;
 
 @Data
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Table(name = "institutions")
 @Slf4j
 @ToString(exclude = "diseaseRestrictions")
+@SQLRestriction("deleted_at is null")
 public class Institution {
 
   @Id

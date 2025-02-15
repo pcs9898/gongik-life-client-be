@@ -13,21 +13,23 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.example.gongiklifeclientbecommunityservice.service.CommunityService;
+import org.example.gongiklifeclientbecommunityservice.producer.DeleteAllCommentsByPostProducer;
+import org.example.gongiklifeclientbecommunityservice.service.PostService;
 
 @GrpcService
 @Slf4j
 @RequiredArgsConstructor
 public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceImplBase {
 
-  private final CommunityService communityService;
+  private final DeleteAllCommentsByPostProducer deleteAllCommentsByPostProducer;
+  private final PostService postService;
 
   @Override
   public void createPost(CreatePostRequest request,
       StreamObserver<CreatePostResponse> responseObserver) {
 
     try {
-      CreatePostResponse response = communityService.createPost(request);
+      CreatePostResponse response = postService.createPost(request);
 
       responseObserver.onNext(response);
       responseObserver.onCompleted();
@@ -47,7 +49,7 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
   public void updatePost(UpdatePostRequest request,
       StreamObserver<UpdatePostResponse> responseObserver) {
     try {
-      UpdatePostResponse response = communityService.updatePost(request);
+      UpdatePostResponse response = postService.updatePost(request);
 
       responseObserver.onNext(response);
       responseObserver.onCompleted();
@@ -68,7 +70,7 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       StreamObserver<IsLikedPostResponse> responseObserver) {
 
     try {
-      IsLikedPostResponse response = communityService.isLikedPost(request);
+      IsLikedPostResponse response = postService.isLikedPost(request);
 
       responseObserver.onNext(response);
       responseObserver.onCompleted();
@@ -87,7 +89,23 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
   @Override
   public void deletePost(DeletePostRequest request,
       StreamObserver<DeletePostResponse> responseObserver) {
-    super.deletePost(request, responseObserver);
+    try {
+      DeletePostResponse response = postService.deletePost(request);
+
+      deleteAllCommentsByPostProducer.sendDeleteAllCommentsByPostRequest(request.getPostId());
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("deletePost error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
   }
 
 

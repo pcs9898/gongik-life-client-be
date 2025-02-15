@@ -2,6 +2,8 @@ package org.example.gongiklifeclientbecommunityservice.service;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
@@ -9,6 +11,7 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Upd
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import io.grpc.Status;
+import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class CommunityService {
+public class PostService {
 
   private final PostRepository postRepository;
   private final PostLikeRepository postLikeRepository;
@@ -61,6 +64,21 @@ public class CommunityService {
 
     return IsLikedPostResponse.newBuilder().setIsLiked(isLiked).build();
 
+  }
+
+  @Transactional
+  public DeletePostResponse deletePost(DeletePostRequest request) {
+    Post post = postRepository.findByIdAndUserId(
+            UUID.fromString(request.getPostId()), UUID.fromString(request.getUserId()))
+        .orElseThrow(
+            () -> Status.NOT_FOUND.withDescription("Post not found, or maybe already deleted")
+                .asRuntimeException());
+
+    post.setDeletedAt(new Date());
+
+    postRepository.save(post);
+
+    return DeletePostResponse.newBuilder().setSuccess(true).build();
   }
 }
 
