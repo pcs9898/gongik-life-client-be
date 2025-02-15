@@ -7,6 +7,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,9 +16,11 @@ import org.springframework.data.annotation.CreatedDate;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "post_likes")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostLike {
 
   @EmbeddedId

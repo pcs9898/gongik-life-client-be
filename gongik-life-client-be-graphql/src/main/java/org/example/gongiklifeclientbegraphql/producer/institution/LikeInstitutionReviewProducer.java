@@ -1,6 +1,6 @@
-package org.example.gongiklifeclientbegraphql.producer;
+package org.example.gongiklifeclientbegraphql.producer.institution;
 
-import dto.institution.UnlikeInstitutionReviewRequestDto;
+import dto.institution.LikeInstitutionReviewRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class UnlikeInstitutionReviewProducer {
+public class LikeInstitutionReviewProducer {
 
-  private static final String TOPIC = "unlike-institution-review-topic";
+  private static final String TOPIC = "like-institution-review-topic";
   private final KafkaTemplate<String, Object> kafkaTemplate;
 
-  public void sendUnlikeInstitutionReviewRequest(UnlikeInstitutionReviewRequestDto request) {
+  public void sendLikeInstitutionReviewRequest(LikeInstitutionReviewRequestDto request) {
 
     kafkaTemplate.send(TOPIC, request);
   }

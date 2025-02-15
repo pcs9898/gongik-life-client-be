@@ -10,6 +10,7 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Upd
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
+import dto.community.LikePostRequestDto;
 import io.grpc.Status;
 import java.util.Date;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
+import org.example.gongiklifeclientbecommunityservice.entity.PostLike;
+import org.example.gongiklifeclientbecommunityservice.entity.PostLikeId;
 import org.example.gongiklifeclientbecommunityservice.respository.PostLikeRepository;
 import org.example.gongiklifeclientbecommunityservice.respository.PostRepository;
 import org.springframework.stereotype.Service;
@@ -79,6 +82,30 @@ public class PostService {
     postRepository.save(post);
 
     return DeletePostResponse.newBuilder().setSuccess(true).build();
+  }
+
+  @Transactional
+  public void likePost(LikePostRequestDto requestDto) {
+    // 1. check post exist
+    Post post = postRepository.findById(UUID.fromString(requestDto.getPostId()))
+        .orElseThrow(() -> Status.NOT_FOUND.withDescription("Post not found").asRuntimeException());
+
+    // 2. check already liked
+    if (postLikeRepository.existsByIdPostIdAndIdUserId(
+        UUID.fromString(requestDto.getPostId()), UUID.fromString(requestDto.getUserId()))) {
+      throw Status.ALREADY_EXISTS.withDescription("Already liked").asRuntimeException();
+    }
+
+    // 3. like post
+    PostLike newLike = new PostLike(
+        new PostLikeId(UUID.fromString(requestDto.getPostId()),
+            UUID.fromString(requestDto.getUserId())),
+        new Date()
+    );
+
+    postLikeRepository.save(newLike);
+
+    post.setLikeCount(post.getLikeCount() + 1);
   }
 }
 
