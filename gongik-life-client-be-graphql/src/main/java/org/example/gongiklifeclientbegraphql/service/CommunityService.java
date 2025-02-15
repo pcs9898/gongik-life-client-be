@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
@@ -89,6 +91,16 @@ public class CommunityService {
   public PostsResponseDto posts(PostsRequestDto requestDto) {
     try {
       return PostsResponseDto.fromProto(communityServiceBlockingStub.posts(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public CreateCommentResponseDto createComment(CreateCommentRequestDto requestDto) {
+    try {
+      return CreateCommentResponseDto.fromProto(
+          communityServiceBlockingStub.createComment(requestDto.toProto()));
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;

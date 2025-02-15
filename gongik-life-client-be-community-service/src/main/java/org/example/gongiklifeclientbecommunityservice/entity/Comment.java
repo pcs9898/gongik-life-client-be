@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,6 +30,8 @@ import org.example.gongiklifeclientbecommunityservice.respository.Auditable;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class Comment extends Auditable {
 
   @Id
@@ -63,13 +67,13 @@ public class Comment extends Auditable {
     }
     return content;
   }
-  
+
 
   // 대댓글 작성 시 검증
   @PrePersist
   @PreUpdate
   private void validateCommentDepth() {
-    if (parentComment != null) {
+    if (parentComment != null && parentComment.getParentComment() != null) {
       throw new IllegalArgumentException("reply depth is only 1");
     }
   }

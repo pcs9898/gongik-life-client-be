@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.example.gongiklifeclientbecommunityservice.dto.PostProjection;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -68,5 +69,10 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
       @Param("cursor") UUID cursor,
       @Param("limit") int limit
   );
+
+  @Modifying
+  @Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.id = :postId")
+  void updateCommentCountById(@Param("postId") UUID postId);
+
 
 }
