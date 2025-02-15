@@ -22,7 +22,7 @@ import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileRequ
 import org.example.gongiklifeclientbegraphql.dto.updateProfile.UpdateProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.verifyEmailCode.VerifyEmailCodeRequestDto;
-import org.example.gongiklifeclientbegraphql.producer.UserLoginHistoryProducer;
+import org.example.gongiklifeclientbegraphql.producer.user.UserLoginHistoryProducer;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

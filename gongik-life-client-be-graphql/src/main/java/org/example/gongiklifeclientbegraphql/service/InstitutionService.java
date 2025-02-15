@@ -29,8 +29,8 @@ import org.example.gongiklifeclientbegraphql.dto.myInstitutionReviews.MyInstitut
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
 import org.example.gongiklifeclientbegraphql.dto.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
-import org.example.gongiklifeclientbegraphql.producer.LikeInstitutionReviewProducer;
-import org.example.gongiklifeclientbegraphql.producer.UnlikeInstitutionReviewProducer;
+import org.example.gongiklifeclientbegraphql.producer.institution.LikeInstitutionReviewProducer;
+import org.example.gongiklifeclientbegraphql.producer.institution.UnlikeInstitutionReviewProducer;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
