@@ -3,16 +3,8 @@ package org.example.gongiklifeclientbecommunityservice.service;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
-<<<<<<< Updated upstream
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
-=======
-<<<<<<< HEAD
-=======
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
->>>>>>> feature/29updateComment
->>>>>>> Stashed changes
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import io.grpc.Status;
@@ -94,11 +86,7 @@ public class CommentService {
         .build();
 
   }
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
+
 
   public UpdateCommentResponse updateComment(UpdateCommentRequest request) {
     Comment comment = commentRepository.findById(UUID.fromString(request.getCommentId()))
@@ -117,8 +105,5 @@ public class CommentService {
         .setSuccess(true)
         .build();
   }
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/29updateComment
->>>>>>> Stashed changes
+
 }

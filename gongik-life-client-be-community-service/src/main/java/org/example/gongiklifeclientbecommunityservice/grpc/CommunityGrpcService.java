@@ -197,11 +197,7 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       );
     }
   }
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
+
 
   @Override
   public void updateComment(UpdateCommentRequest request,
@@ -222,8 +218,5 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       );
     }
   }
-<<<<<<< Updated upstream
-=======
->>>>>>> feature/29updateComment
->>>>>>> Stashed changes
+
 }

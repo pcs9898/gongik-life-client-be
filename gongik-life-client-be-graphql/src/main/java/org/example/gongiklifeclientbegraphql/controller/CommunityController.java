@@ -191,27 +191,7 @@ public class CommunityController {
       throw e;
     }
   }
-<<<<<<< HEAD
-=======
 
-  @MutationMapping
-  public UpdateCommentResponseDto updateComment(
-      @Argument("updateCommentInput") UpdateCommentRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
-
-      requestDto.setUserId(userId);
-
-      return communityService.updateComment(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to update comment", e);
-      throw e;
-    }
-  }
-
->>>>>>> feature/29updateComment
 
   @MutationMapping
   public UpdateCommentResponseDto updateComment(
