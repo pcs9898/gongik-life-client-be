@@ -55,6 +55,8 @@ type Mutation{
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 
     createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
+
+    updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
 }
 
 "search result"
@@ -393,4 +395,14 @@ type CreateCommentResponse{
     parentCommentId: ID
     content: String!
     createdAt: String!
+}
+
+input UpdateCommentInput{
+    commentId: ID!
+    content: String!
+}
+
+type UpdateCommentResponse{
+    id: ID!
+    success: Boolean!
 }
