@@ -4,6 +4,12 @@ package com.gongik.communityService.domain.service;
 
 service CommunityService{
   rpc CreatePost(CreatePostRequest) returns (CreatePostResponse);
+
+  rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse);
+
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+
+  rpc IsLikedPost(IsLikedPostRequest) returns (IsLikedPostResponse);
 }
 
 message CreatePostRequest{
@@ -17,8 +23,8 @@ message CreatePostResponse{
   string id = 1;
   PostUser user = 2;
   int32 categoryId = 3;
-  string title = 4;
-  string content = 5;
+  optional string title = 4;
+  optional string content = 5;
   int32 likeCount = 6;
   int32 commentCount = 7;
   string createdAt = 8;
@@ -27,4 +33,40 @@ message CreatePostResponse{
 message PostUser{
   string userId = 1;
   string userName = 2;
+}
+
+message UpdatePostRequest{
+  string userId = 1;
+  string postId = 2;
+  optional string title = 3;
+  optional string content = 4;
+}
+
+message UpdatePostResponse{
+  string id = 1;
+  PostUser user = 2;
+  int32 categoryId = 3;
+  string title = 4;
+  string content = 5;
+  int32 likeCount = 6;
+  int32 commentCount = 7;
+  string createdAt = 8;
+}
+
+message DeletePostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message DeletePostResponse{
+  bool success = 2;
+}
+
+message IsLikedPostRequest{
+  string userId = 1;
+  string postId = 2;
+}
+
+message IsLikedPostResponse{
+  bool isLiked = 1;
 }

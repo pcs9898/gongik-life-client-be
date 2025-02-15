@@ -45,6 +45,7 @@ public class RedisConfig {
     configurations.put("userProfile", defaultConfig.entryTtl(Duration.ofDays(1)));
     configurations.put("institution", defaultConfig.entryTtl(Duration.ofDays(5)));
     configurations.put("institutionReview", defaultConfig.entryTtl(Duration.ofMinutes(5)));
+    configurations.put("post", defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
     // TTL 없는 캐시들은 기본 설정 사용
 

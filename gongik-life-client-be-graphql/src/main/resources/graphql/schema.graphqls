@@ -41,6 +41,10 @@ type Mutation{
     unlikeInstitutionReview(unlikeInstitutionReviewInput: UnlikeInstitutionReviewInput!): UnlikeInstitutionReviewResponse! @authenticate
 
     createPost(createPostInput: CreatePostInput!): CreatePostResponse! @authenticate
+
+    updatePost(updatePostInput: UpdatePostInput!): UpdatePostResponse! @authenticate
+
+    deletePost(deletePostInput: DeletePostInput!): DeletePostResponse! @authenticate
 }
 
 "search result"
@@ -281,4 +285,31 @@ type CreatePostResponse{
 type PostUser{
     userId: ID!
     userName: String!
+}
+
+input UpdatePostInput{
+    postId: ID!
+    title: String
+    content: String
+}
+
+type UpdatePostResponse{
+    id: ID!
+    user: PostUser!
+    categoryId: Int!
+    title: String!
+    content: String!
+    likeCount: Int!
+    commentCount: Int!
+    createdAt:String!
+    isLiked:Boolean!
+}
+
+input DeletePostInput{
+    postId: ID!
+}
+
+type DeletePostResponse{
+    postId: ID!
+    success: Boolean!
 }
