@@ -15,6 +15,8 @@ import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionRe
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviewsByInstitution.InstitutionReviewsByInstitutionRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviewsByInstitution.InstitutionReviewsByInstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.myInstitutionReviews.MyInstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
@@ -153,7 +155,6 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      log.info("institutionReviews requestDto: {}", requestDto);
       return institutionService.institutionReviews(requestDto);
 
     } catch (Exception e) {
@@ -176,6 +177,27 @@ public class InstitutionController {
       throw e;
     }
   }
+
+  @QueryMapping
+  public InstitutionReviewsByInstitutionResponseDto institutionReviewsByInstitution(
+      @Argument("institutionReviewsByInstitutionFilter") InstitutionReviewsByInstitutionRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      if (!"-1".equals(userId)) {
+        requestDto.setUserId(userId);
+      }
+
+      return institutionService.institutionReviewsByInstitution(requestDto);
+
+    } catch (Exception e) {
+      log.error("institutionReviews error: {}", e);
+      throw e;
+    }
+  }
+
 
 }
 

@@ -21,6 +21,8 @@ import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionRe
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviewsByInstitution.InstitutionReviewsByInstitutionRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.institutionReviewsByInstitution.InstitutionReviewsByInstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.myInstitutionReviews.MyInstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
@@ -176,6 +178,18 @@ public class InstitutionService {
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
+    }
+  }
+
+  public InstitutionReviewsByInstitutionResponseDto institutionReviewsByInstitution(
+      InstitutionReviewsByInstitutionRequestDto requestDto) {
+    try {
+      return InstitutionReviewsByInstitutionResponseDto.fromProto(
+          institutionBlockingStub.institutionReviewsByInstitution(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+
     }
   }
 }

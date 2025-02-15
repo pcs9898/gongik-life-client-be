@@ -10,6 +10,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsByInstitutionRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsByInstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
@@ -195,6 +197,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
     }
   }
 
+
   @Override
   public void myInstitutionReviews(MyInstitutionReviewsRequest request,
       StreamObserver<MyInstitutionReviewsResponse> responseObserver) {
@@ -205,6 +208,27 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("myInstitutionReviews error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void institutionReviewsByInstitution(InstitutionReviewsByInstitutionRequest request,
+      StreamObserver<InstitutionReviewsByInstitutionResponse> responseObserver) {
+    try {
+      InstitutionReviewsByInstitutionResponse response = institutionService
+          .institutionReviewsByInstitution(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("institutionReviewsByInstitution error : ", e);
 
       responseObserver.onError(
           Status.INTERNAL

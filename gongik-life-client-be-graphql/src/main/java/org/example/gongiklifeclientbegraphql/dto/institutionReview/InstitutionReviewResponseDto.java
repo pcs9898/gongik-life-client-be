@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.gongiklifeclientbegraphql.dto.common.InstitutionShortInfoDto;
 
 
 @Data
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class InstitutionReviewResponseDto {
 
   private String id;
-  private String institutionId;
+  private InstitutionShortInfoDto institution;
   private InstitutionReviewUserDto user;
   private double rating;
   private int facilityRating;
@@ -35,7 +36,7 @@ public class InstitutionReviewResponseDto {
   public static InstitutionReviewResponseDto fromProto(InstitutionReviewResponse proto) {
     return InstitutionReviewResponseDto.builder()
         .id(proto.getId())
-        .institutionId(proto.getInstitutionId())
+        .institution(InstitutionShortInfoDto.fromProto(proto.getInstitution()))
         .user(
             InstitutionReviewUserDto.builder()
                 .id(proto.getUser().getId())
