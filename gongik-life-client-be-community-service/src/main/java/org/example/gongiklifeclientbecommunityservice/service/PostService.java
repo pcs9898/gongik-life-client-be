@@ -11,6 +11,7 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Upd
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import dto.community.LikePostRequestDto;
+import dto.community.UnLikePostRequestDto;
 import io.grpc.Status;
 import java.util.Date;
 import java.util.UUID;
@@ -106,6 +107,24 @@ public class PostService {
     postLikeRepository.save(newLike);
 
     post.setLikeCount(post.getLikeCount() + 1);
+  }
+
+  @Transactional
+  public void unLikePost(UnLikePostRequestDto requestDto) {
+    // 1. check post exist
+    Post post = postRepository.findById(UUID.fromString(requestDto.getPostId()))
+        .orElseThrow(() -> Status.NOT_FOUND.withDescription("Post not found").asRuntimeException());
+
+    // 2. check already liked
+    PostLike like = postLikeRepository.findById(
+        new PostLikeId(UUID.fromString(requestDto.getPostId()),
+            UUID.fromString(requestDto.getUserId()))
+    ).orElseThrow(() -> Status.NOT_FOUND.withDescription("Not liked yet").asRuntimeException());
+
+    // 3. unlike post
+    postLikeRepository.delete(like);
+
+    post.setLikeCount(post.getLikeCount() - 1);
   }
 }
 
