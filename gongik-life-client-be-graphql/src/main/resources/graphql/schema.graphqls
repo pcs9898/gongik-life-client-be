@@ -48,7 +48,7 @@ type Mutation{
 
     likePost(likePostInput: LikePostInput!): LikePostResponse! @authenticate
 
-    unlikePost(unlikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
+    unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 }
 
 "search result"
