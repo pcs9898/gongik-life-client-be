@@ -4,6 +4,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
@@ -21,6 +22,7 @@ import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionRe
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReviews.InstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likeInstitutionReview.LikeInstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.myInstitutionReviews.MyInstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstitutionsResultsDto;
 import org.example.gongiklifeclientbegraphql.dto.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
@@ -155,6 +157,22 @@ public class InstitutionService {
 
       return InstitutionReviewsResponseDto.fromProto(
           institutionBlockingStub.institutionReviews(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public MyInstitutionReviewsResponseDto myInstitutionReviews(String userId) {
+
+    try {
+      return MyInstitutionReviewsResponseDto.fromProto(
+          institutionBlockingStub.myInstitutionReviews(
+              MyInstitutionReviewsRequest.newBuilder()
+                  .setUserId(userId)
+                  .build()
+          )
+      );
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
