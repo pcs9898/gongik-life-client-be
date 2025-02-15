@@ -12,6 +12,8 @@ import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.posts.PostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.posts.PostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
@@ -150,5 +152,24 @@ public class CommunityController {
     }
   }
 
+  @QueryMapping
+  public PostsResponseDto posts(
+      @Argument("postsFilter") PostsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      if (!"-1".equals(userId)) {
+        requestDto.setUserId(userId);
+      }
+
+      return communityService.posts(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to get posts", e);
+      throw e;
+    }
+  }
+  
 
 }

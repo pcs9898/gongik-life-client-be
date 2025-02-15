@@ -10,18 +10,27 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsL
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PageInfo;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostForList;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
 import dto.community.LikePostRequestDto;
 import dto.community.UnLikePostRequestDto;
 import io.grpc.Status;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbecommunityservice.dto.PostProjection;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
 import org.example.gongiklifeclientbecommunityservice.entity.PostLike;
 import org.example.gongiklifeclientbecommunityservice.entity.PostLikeId;
@@ -156,6 +165,58 @@ public class PostService {
     return IsLikedPostAndCommentCountResponse.newBuilder()
         .setIsLiked(isLiked)
         .setCommentCount(commentCount)
+        .build();
+  }
+
+  public PostsResponse posts(PostsRequest request) {
+
+    List<PostProjection> posts = postRepository.findPostsWithCursor(
+        request.hasUserId() ? UUID.fromString(request.getUserId()) : null,
+        request.getPostCategoryId(),
+        request.hasCursor() ? UUID.fromString(request.getCursor()) : null,
+        request.getPageSize()
+    );
+
+    List<String> userIds = posts.stream()
+        .map(PostProjection::getUserId)
+        .map(UUID::toString)
+        .toList();
+
+    Map<String, String> userNameMap = userServiceBlockingStub.getUserNameByIds(
+        GetUserNameByIdsRequest.newBuilder().addAllUserIds(userIds).build()
+    ).getUsersMap();
+
+    List<PostForList> listPosts = posts.stream()
+        .map(post -> {
+          String userId = post.getUserId().toString();
+          String userName = userNameMap.get(userId);
+
+          PostUser user = PostUser.newBuilder()
+              .setUserId(userId)
+              .setUserName(userName)
+              .build();
+
+          return PostForList.newBuilder()
+              .setId(post.getId().toString())
+              .setUser(user)
+              .setCategoryId(post.getCategoryId())
+              .setTitle(post.getTitle())
+              .setContent(post.getContent())
+              .setLikeCount(post.getLikeCount())
+              .setCommentCount(post.getCommentCount())
+              .setCreatedAt(post.getCreatedAt().toString())
+              .setIsLiked(post.getIsLiked())
+              .build();
+        }).toList();
+
+    return PostsResponse.newBuilder()
+        .addAllListPost(listPosts)
+        .setPageInfo(PageInfo.newBuilder()
+            .setEndCursor(
+                posts.isEmpty() ? null : posts.get(posts.size() - 1).getId().toString()
+            )
+            .setHasNextPage(posts.size() == request.getPageSize())
+            .build())
         .build();
   }
 }
