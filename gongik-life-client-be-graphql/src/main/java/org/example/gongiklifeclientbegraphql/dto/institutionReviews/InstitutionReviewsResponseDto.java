@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.common.InstitutionReviewForListDto;
 import org.example.gongiklifeclientbegraphql.dto.common.PageInfoDto;
 
 @Data

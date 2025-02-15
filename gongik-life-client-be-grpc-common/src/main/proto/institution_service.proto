@@ -20,6 +20,8 @@ service InstitutionService {
   rpc InstitutionReviews(InstitutionReviewsRequest) returns (InstitutionReviewsResponse);
 
   rpc MyInstitutionReviews(MyInstitutionReviewsRequest) returns (MyInstitutionReviewsResponse);
+
+  rpc InstitutionReviewsByInstitution(InstitutionReviewsByInstitutionRequest) returns (InstitutionReviewsByInstitutionResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -79,7 +81,7 @@ message InstitutionResponse {
 
 message InstitutionReviewResponse {
   string id = 1;
-  string institutionId = 2;
+  InstitutionShortInfo institution = 2;
   InstitutionReviewUser user = 3;
   float rating = 4;
   int32 facilityRating = 5;
@@ -95,6 +97,11 @@ message InstitutionReviewResponse {
   int32 socialServicePeopleCountId = 15;
   int32 likeCount = 16;
   string createdAt = 17;
+}
+
+message InstitutionShortInfo{
+  string institutionId = 1;
+  string institutionName = 2;
 }
 
 message CreateInstitutionReviewRequest {
@@ -179,4 +186,16 @@ message MyInstitutionReviewsRequest{
 
 message MyInstitutionReviewsResponse{
   repeated InstitutionReviewForList listMyInstitutionReview = 1;
+}
+
+message InstitutionReviewsByInstitutionRequest{
+  optional string userId = 1;
+  string institutionId = 2;
+  optional string cursor = 3;
+  int32 pageSize = 4;
+}
+
+message InstitutionReviewsByInstitutionResponse{
+  repeated InstitutionReviewForList listInstitutionReviewByInstitution = 1;
+  PageInfo pageInfo = 2;
 }

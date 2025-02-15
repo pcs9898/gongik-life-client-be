@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbeinstitutionservice.repository;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
@@ -97,6 +98,7 @@ public interface InstitutionReviewRepository extends JpaRepository<InstitutionRe
       nativeQuery = true)
   List<InstitutionReviewProjection> findMyInstitutionReviews(@Param("userId") UUID userId);
 
+
   @Query(value = """
       SELECT 
           ir.id,
@@ -110,7 +112,15 @@ public interface InstitutionReviewRepository extends JpaRepository<InstitutionRe
           ir.average_workhours as averageWorkhours,
           ir.like_count as likeCount,
           ir.created_at as createdAt,
-          false as isLiked
+          CASE 
+              WHEN :userId IS NULL THEN false
+              ELSE EXISTS (
+                  SELECT 1 
+                  FROM institution_review_likes irl 
+                  WHERE irl.institution_review_id = ir.id 
+                  AND irl.user_id = :userId
+              )
+          END as isLiked
       FROM institution_reviews ir
       INNER JOIN institutions i ON ir.institution_id = i.id
       WHERE 
@@ -130,10 +140,20 @@ public interface InstitutionReviewRepository extends JpaRepository<InstitutionRe
       """,
       nativeQuery = true)
   List<InstitutionReviewProjection> findInstitutionReviewsByInstitutionIdWithCursor(
+      @Param("userId") UUID userId,
       @Param("institutionId") UUID institutionId,
       @Param("cursor") UUID cursor,
       @Param("limit") int limit
   );
+
+  @Query("""
+          SELECT ir 
+          FROM InstitutionReview ir 
+          JOIN FETCH ir.institution i 
+          WHERE ir.id = :reviewId 
+          AND ir.deletedAt IS NULL
+      """)
+  Optional<InstitutionReview> findByIdWithInstitution(@Param("reviewId") UUID reviewId);
 
 
 }
