@@ -39,8 +39,11 @@ type Mutation{
     likeInstitutionReview(likeInstitutionReviewInput: LikeInstitutionReviewInput!): LikeInstitutionReviewResponse! @authenticate
 
     unlikeInstitutionReview(unlikeInstitutionReviewInput: UnlikeInstitutionReviewInput!): UnlikeInstitutionReviewResponse! @authenticate
+
+    createPost(createPostInput: CreatePostInput!): CreatePostResponse! @authenticate
 }
 
+"search result"
 type SearchInstitutionsResponse {
     listSearchInstitution: [SearchInstitution]
     pageInfo: PageInfo
@@ -256,4 +259,26 @@ input InstitutionReviewsByInstitutionFilters{
 type InstitutionReviewsByInstitutionResponse{
     listInstitutionReviewByInstitution: [InstitutionReviewForList]!
     pageInfo: PageInfo!
+}
+
+input CreatePostInput{
+    categoryId: Int!=1 @range(min: 1, max: 6)
+    title: String!
+    content: String!
+}
+
+type CreatePostResponse{
+    id: ID!
+    user: PostUser!
+    categoryId: Int!
+    title: String!
+    content: String!
+    likeCount: Int!
+    commentCount: Int!
+    createdAt:String!
+}
+
+type PostUser{
+    userId: ID!
+    userName: String!
 }

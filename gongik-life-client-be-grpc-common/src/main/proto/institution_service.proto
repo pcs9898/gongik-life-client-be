@@ -9,6 +9,8 @@ service InstitutionService {
 
   rpc Institution(InstitutionRequest) returns (InstitutionResponse);
 
+  rpc GetInstitutionReviewCount(GetInstitutionReviewCountRequest) returns (GetInstitutionReviewCountResponse);
+
   rpc CreateInstitutionReview(CreateInstitutionReviewRequest) returns (InstitutionReviewResponse);
 
   rpc DeleteInstitutionReview(DeleteInstitutionReviewRequest) returns (DeleteInstitutionReviewResponse);
@@ -198,4 +200,12 @@ message InstitutionReviewsByInstitutionRequest{
 message InstitutionReviewsByInstitutionResponse{
   repeated InstitutionReviewForList listInstitutionReviewByInstitution = 1;
   PageInfo pageInfo = 2;
+}
+
+message GetInstitutionReviewCountRequest{
+  string institutionId = 1;
+}
+
+message GetInstitutionReviewCountResponse{
+  int32 reviewCount = 1;
 }

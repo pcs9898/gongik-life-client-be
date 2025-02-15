@@ -1,10 +1,12 @@
 package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,20 @@ public class InstitutionCacheService {
       return InstitutionReviewResponseDto.fromProto(
           institutionBlockingStub.institutionReview(
               InstitutionReviewRequest.newBuilder().setInstitutionReviewId(institutionReviewId)
+                  .build()
+          ));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  @Cacheable(value = "institution", key = "#institutionId")
+  public InstitutionResponseDto getInstitution(String institutionId) {
+    try {
+      return InstitutionResponseDto.fromProto(
+          institutionBlockingStub.institution(
+              InstitutionRequest.newBuilder().setInstitutionId(institutionId)
                   .build()
           ));
     } catch (Exception e) {

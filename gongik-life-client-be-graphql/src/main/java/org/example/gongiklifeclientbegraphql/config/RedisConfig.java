@@ -41,10 +41,14 @@ public class RedisConfig {
     Map<String, RedisCacheConfiguration> configurations = new HashMap<>();
 
     // TTL 있는 캐시들
+    configurations.put("myProfile", defaultConfig.entryTtl(Duration.ofDays(1)));
+    configurations.put("userProfile", defaultConfig.entryTtl(Duration.ofDays(1)));
+    configurations.put("institution", defaultConfig.entryTtl(Duration.ofDays(5)));
     configurations.put("institutionReview", defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
     // TTL 없는 캐시들은 기본 설정 사용
-    configurations.put("staticData", defaultConfig);
+
+//    configurations.put("staticData", defaultConfig);
 
     return RedisCacheManager.builder(connectionFactory)
         .cacheDefaults(defaultConfig)

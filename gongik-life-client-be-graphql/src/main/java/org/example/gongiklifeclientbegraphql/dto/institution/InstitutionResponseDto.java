@@ -3,11 +3,15 @@ package org.example.gongiklifeclientbegraphql.dto.institution;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class InstitutionResponseDto {
 
   private String id;
