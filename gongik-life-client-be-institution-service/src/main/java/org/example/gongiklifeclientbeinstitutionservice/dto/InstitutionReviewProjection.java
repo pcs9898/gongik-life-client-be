@@ -9,12 +9,15 @@ public interface InstitutionReviewProjection {
 
   UUID getInstitutionId();
 
+  String getInstitutionName();
+
+  int getInstitutionCategoryId();
+
   UUID getUserId();
 
   //  UUID getUserId();
   double getRating();
-
-
+  
   String getMainTasks();
 
   String getProsCons();
