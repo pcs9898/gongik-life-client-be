@@ -21,12 +21,13 @@ public class GraphqlConfig {
   @Bean
   public RuntimeWiringConfigurer runtimeWiringConfigurer(
       AuthenticationDirective authenticationDirective
+//      IntRangeDirective intRangeDirective
   ) {
     return wiringBuilder -> wiringBuilder
         .scalar(ExtendedScalars.Date)
         .scalar(ExtendedScalars.DateTime)
         .scalar(ExtendedScalars.GraphQLLong)
-
+//        .directive("range", intRangeDirective)
         .directive("authenticate", authenticationDirective);
   }
 
