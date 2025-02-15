@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "user_auths", uniqueConstraints = {
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLRestriction("deleted_at is null")
 public class UserAuth extends Auditable {
 
   @Id
@@ -37,7 +39,7 @@ public class UserAuth extends Auditable {
 
   @Column(name = "auth_type_id", nullable = false)
   private int authTypeId;
-  
+
 
   @Column(name = "password_hash", length = 255)
   private String passwordHash;

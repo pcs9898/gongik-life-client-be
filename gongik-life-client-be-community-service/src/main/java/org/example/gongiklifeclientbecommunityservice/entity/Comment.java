@@ -20,12 +20,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.gongiklifeclientbecommunityservice.respository.Auditable;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "comments")
 @Getter
 @Setter
 @NoArgsConstructor
+@SQLRestriction("deleted_at is null")
 public class Comment extends Auditable {
 
   @Id
