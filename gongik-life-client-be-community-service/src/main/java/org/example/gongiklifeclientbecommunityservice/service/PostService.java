@@ -4,6 +4,10 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Cre
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
@@ -125,6 +129,34 @@ public class PostService {
     postLikeRepository.delete(like);
 
     post.setLikeCount(post.getLikeCount() - 1);
+  }
+
+  public GetPostResponse getPost(GetPostRequest request) {
+    Post post = postRepository.findById(UUID.fromString(request.getPostId()))
+        .orElseThrow(() -> Status.NOT_FOUND.withDescription("Post not found").asRuntimeException());
+
+    String userName = getUserNameById(post.getUserId().toString());
+
+    return post.toGetPostResponseProto(userName);
+  }
+
+
+  public IsLikedPostAndCommentCountResponse isLikedPostAndCommentCount(
+      IsLikedPostAndCommentCountRequest request) {
+
+    Integer commentCount = postRepository.findCommentCountById(
+        UUID.fromString(request.getPostId()));
+
+    boolean isLiked = false;
+    if (request.hasUserId()) {
+      isLiked = postLikeRepository.existsByIdPostIdAndIdUserId(
+          UUID.fromString(request.getPostId()), UUID.fromString(request.getUserId()));
+    }
+
+    return IsLikedPostAndCommentCountResponse.newBuilder()
+        .setIsLiked(isLiked)
+        .setCommentCount(commentCount)
+        .build();
   }
 }
 

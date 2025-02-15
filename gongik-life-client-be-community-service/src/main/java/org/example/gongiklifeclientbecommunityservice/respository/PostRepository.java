@@ -1,9 +1,11 @@
 package org.example.gongiklifeclientbecommunityservice.respository;
 
+import io.lettuce.core.dynamic.annotation.Param;
 import java.util.Optional;
 import java.util.UUID;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -18,4 +20,9 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 //  int softDeleteByIdAndUserId(@Param("id") UUID id, @Param("userId") UUID userId);
 
   Optional<Post> findByIdAndUserId(UUID id, UUID userId);
+
+  @Query("SELECT p.commentCount FROM Post p WHERE p.id = :postId AND p.deletedAt IS NULL")
+  Integer findCommentCountById(@Param("postId") UUID postId);
+
+
 }

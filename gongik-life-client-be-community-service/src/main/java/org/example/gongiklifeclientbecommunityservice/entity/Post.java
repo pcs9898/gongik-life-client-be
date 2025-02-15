@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbecommunityservice.entity;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
@@ -106,6 +107,22 @@ public class Post extends Auditable {
 
   public UpdatePostResponse toUpdatePostResponseProto(String userName) {
     return UpdatePostResponse.newBuilder()
+        .setId(id.toString())
+        .setUser(PostUser.newBuilder()
+            .setUserId(userId.toString())
+            .setUserName(userName)
+            .build())
+        .setCategoryId(categoryId)
+        .setTitle(title)
+        .setContent(content)
+        .setLikeCount(likeCount)
+        .setCommentCount(commentCount)
+        .setCreatedAt(getCreatedAt().toString())
+        .build();
+  }
+
+  public GetPostResponse toGetPostResponseProto(String userName) {
+    return GetPostResponse.newBuilder()
         .setId(id.toString())
         .setUser(PostUser.newBuilder()
             .setUserId(userId.toString())
