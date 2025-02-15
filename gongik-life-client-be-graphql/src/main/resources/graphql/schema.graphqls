@@ -19,6 +19,8 @@ type Query {
     institutionReviews(institutionReviewsFilter: InstitutionReviewsFilter!): InstitutionReviewsResponse!
 
     myInstitutionReviews: MyInstitutionReviewsResponse @authenticate
+
+    institutionReviewsByInstitution(institutionReviewsByInstitutionFilter: InstitutionReviewsByInstitutionFilters!): InstitutionReviewsByInstitutionResponse!
 }
 
 type Mutation{
@@ -140,7 +142,7 @@ type InstitutionResponse{
 
 type InstitutionReview {
     id: ID!
-    institutionId: ID!
+    institution: InstitutionShortInfo!
     user: InstitutionReviewUser!
     rating: Float!
     facilityRating: Int!
@@ -158,6 +160,12 @@ type InstitutionReview {
     createdAt: String!
     isLiked: Boolean! # its false if user is not authenticated
 }
+
+type InstitutionShortInfo{
+    institutionId:ID!
+    institutionName:String!
+}
+
 
 input CreateInstitutionReviewInput {
     institutionId: ID!
@@ -236,4 +244,16 @@ type InstitutionReviewInstitution{
 
 type MyInstitutionReviewsResponse{
     listMyInstitutionReview: [InstitutionReviewForList]!
+
+}
+
+input InstitutionReviewsByInstitutionFilters{
+    institutionId: ID!
+    cursor: String
+    pageSize: Int = 10
+}
+
+type InstitutionReviewsByInstitutionResponse{
+    listInstitutionReviewByInstitution: [InstitutionReviewForList]!
+    pageInfo: PageInfo!
 }
