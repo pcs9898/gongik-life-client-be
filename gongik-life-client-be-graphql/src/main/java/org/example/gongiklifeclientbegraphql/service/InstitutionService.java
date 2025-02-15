@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
@@ -30,6 +31,7 @@ import org.example.gongiklifeclientbegraphql.dto.searchInstitutions.SearchInstit
 import org.example.gongiklifeclientbegraphql.dto.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.LikeInstitutionReviewProducer;
 import org.example.gongiklifeclientbegraphql.producer.UnlikeInstitutionReviewProducer;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -58,8 +60,17 @@ public class InstitutionService {
 
   public InstitutionResponseDto institution(InstitutionRequestDto requestDto) {
     try {
-      return InstitutionResponseDto.fromProto(
-          institutionBlockingStub.institution(requestDto.toProto()));
+      InstitutionResponseDto institutionResponseDto = institutionCacheService.getInstitution(
+          requestDto.getInstitutionId());
+
+      Integer reviewCount = institutionBlockingStub.getInstitutionReviewCount(
+          GetInstitutionReviewCountRequest.newBuilder()
+              .setInstitutionId(requestDto.getInstitutionId()).build()
+      ).getReviewCount();
+
+      institutionResponseDto.setReviewCount(reviewCount);
+
+      return institutionResponseDto;
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
@@ -77,6 +88,7 @@ public class InstitutionService {
     }
   }
 
+  @CacheEvict(value = "institutionReview", key = "#requestDto.getInstitutionReviewId()")
   public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
       DeleteInstitutionReviewRequestDto requestDto) {
     try {

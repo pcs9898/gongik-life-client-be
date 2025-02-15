@@ -74,13 +74,15 @@ public class InstitutionController {
 
   @MutationMapping
   public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
-      @Argument DeleteInstitutionReviewRequestDto requestDto,
+      @Arguments DeleteInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
     try {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
+
+      log.info("deleteInstitutionReview requestDto: {}", requestDto);
 
       return institutionService.deleteInstitutionReview(requestDto);
 
