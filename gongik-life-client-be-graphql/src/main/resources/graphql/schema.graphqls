@@ -45,6 +45,10 @@ type Mutation{
     updatePost(updatePostInput: UpdatePostInput!): UpdatePostResponse! @authenticate
 
     deletePost(deletePostInput: DeletePostInput!): DeletePostResponse! @authenticate
+
+    likePost(likePostInput: LikePostInput!): LikePostResponse! @authenticate
+
+    unlikePost(unlikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 }
 
 "search result"
@@ -311,5 +315,21 @@ input DeletePostInput{
 
 type DeletePostResponse{
     postId: ID!
+    success: Boolean!
+}
+
+input LikePostInput{
+    postId: ID!
+}
+
+type LikePostResponse{
+    success: Boolean!
+}
+
+input UnLikePostInput{
+    postId: ID!
+}
+
+type UnLikePostResponse{
     success: Boolean!
 }

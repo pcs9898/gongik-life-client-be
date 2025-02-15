@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import dto.community.LikePostRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
 import org.example.gongiklifeclientbegraphql.service.CommunityService;
@@ -80,6 +82,23 @@ public class CommunityController {
       throw e;
     }
   }
-  
+
+  @MutationMapping()
+  public LikePostResponseDto likePost(
+      @Argument("likePostInput") LikePostRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.likePost(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to like post", e);
+      throw e;
+    }
+  }
+
 
 }

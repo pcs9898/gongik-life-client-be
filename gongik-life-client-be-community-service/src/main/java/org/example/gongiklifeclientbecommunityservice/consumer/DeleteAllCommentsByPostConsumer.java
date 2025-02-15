@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbecommunityservice.service.CommentService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -15,7 +14,6 @@ public class DeleteAllCommentsByPostConsumer {
   private final CommentService commentService;
 
   @KafkaListener(topics = "delete-all-comments-by-post-topic")
-  @Transactional
   public void consume(String postId) {
     try {
       log.info("Received postId: {}", postId);
