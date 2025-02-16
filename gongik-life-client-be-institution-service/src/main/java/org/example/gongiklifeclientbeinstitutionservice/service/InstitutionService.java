@@ -23,6 +23,7 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitution;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
@@ -34,6 +35,7 @@ import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
+import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionSimpleProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReviewLike;
@@ -73,23 +76,51 @@ public class InstitutionService {
 
   public SearchInstitutionsResponse searchInstitutions(
       SearchInstitutionsRequest request) {
-    List<InstitutionDocument> institutions;
-    if (request.getCursor().isEmpty()) {
-      institutions = institutionSearchRepository.findByNameContainingOrderByIdAsc(
-          request.getSearchKeyword(), Pageable.ofSize(request.getPageSize()));
-    } else {
-      institutions = institutionSearchRepository.findByNameContainingAndIdGreaterThanOrderByIdAsc(
-          request.getSearchKeyword(), request.getCursor(),
-          Pageable.ofSize(request.getPageSize()));
-    }
 
-    SearchInstitutionsResponse.Builder responseBuilder = SearchInstitutionsResponse.newBuilder();
-    for (InstitutionDocument institution : institutions) {
-      responseBuilder.addListSearchInstitution(institution.toProto());
+    if (request.getSearchKeyword().isEmpty()) {
+
+      return SearchInstitutionsResponse.newBuilder()
+          .addAllListSearchInstitution(Collections.emptyList())
+          .setPageInfo(PageInfo.newBuilder()
+              .setEndCursor("")
+              .setHasNextPage(false)
+              .build())
+          .build();
     }
+//    List<InstitutionDocument> institutions;
+//    if (request.getCursor().isEmpty()) {
+//      institutions = institutionSearchRepository.findByNameContainingOrderByIdAsc(
+//          request.getSearchKeyword(), Pageable.ofSize(request.getPageSize()));
+//    } else {
+//      institutions = institutionSearchRepository.findByNameContainingAndIdGreaterThanOrderByIdAsc(
+//          request.getSearchKeyword(), request.getCursor(),
+//          Pageable.ofSize(request.getPageSize()));
+//    }
+
+    List<InstitutionSimpleProjection> institutions = institutionRepository.searchInstitutions(
+        request.getSearchKeyword(),
+        request.getCursor().isEmpty() ? null : UUID.fromString(request.getCursor()),
+        request.getPageSize()
+    );
+
+    List<SearchInstitution> listSearchInstitution = institutions.stream()
+        .map(institution -> {
+          return SearchInstitution.newBuilder()
+              .setId(institution.getId().toString())
+              .setName(institution.getName())
+              .setAddress(institution.getAddress())
+              .setAverageRating(
+                  institution.getAverageRating() != null ? institution.getAverageRating()
+                      .floatValue() : 0.0f)
+              .build();
+        })
+        .toList();
+
+    SearchInstitutionsResponse.Builder responseBuilder = SearchInstitutionsResponse.newBuilder()
+        .addAllListSearchInstitution(listSearchInstitution);
 
     String endCursor =
-        institutions.isEmpty() ? "" : institutions.get(institutions.size() - 1).getId();
+        institutions.isEmpty() ? "" : institutions.get(institutions.size() - 1).getId().toString();
     boolean hasNextPage = institutions.size() == request.getPageSize();
 
     responseBuilder.setPageInfo(PageInfo.newBuilder()

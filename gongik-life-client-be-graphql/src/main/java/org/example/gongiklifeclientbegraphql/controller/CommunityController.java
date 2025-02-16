@@ -26,6 +26,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsRespon
 import org.example.gongiklifeclientbegraphql.dto.community.post.PostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.searchPosts.SearchPostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.searchPosts.SearchPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.unLikePost.UnLikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentResponseDto;
@@ -317,6 +319,25 @@ public class CommunityController {
       return communityService.myComments(requestDto);
     } catch (Exception e) {
       log.error("Failed to get my comments", e);
+      throw e;
+    }
+  }
+
+  @QueryMapping
+  public SearchPostsResponseDto searchPosts(
+      @Argument("searchPostsFilter") SearchPostsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      if (!"-1".equals(userId)) {
+        requestDto.setUserId(userId);
+      }
+
+      return communityService.searchPosts(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to search posts", e);
       throw e;
     }
   }
