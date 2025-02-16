@@ -4,9 +4,11 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.common.PageInfoDto;
 
 @Data
+@Slf4j
 public class SearchInstitutionsResultsDto {
 
   private List<SearchInstitutionDto> listSearchInstitution;
@@ -18,6 +20,7 @@ public class SearchInstitutionsResultsDto {
         .map(SearchInstitutionDto::fromProto)
         .collect(Collectors.toList()));
     dto.setPageInfo(PageInfoDto.fromProto(proto.getPageInfo()));
+
     return dto;
   }
 }

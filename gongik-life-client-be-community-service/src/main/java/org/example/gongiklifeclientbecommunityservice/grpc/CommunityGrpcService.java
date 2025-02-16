@@ -25,6 +25,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyP
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.SearchPostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.SearchPostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
@@ -339,6 +341,28 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("myComments error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void searchPosts(SearchPostsRequest request,
+      StreamObserver<SearchPostsResponse> responseObserver) {
+    try {
+      SearchPostsResponse response = postService.searchPosts(request);
+
+      log.info("searchPosts response : {}", response);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("searchPosts error : ", e);
 
       responseObserver.onError(
           io.grpc.Status.INTERNAL
