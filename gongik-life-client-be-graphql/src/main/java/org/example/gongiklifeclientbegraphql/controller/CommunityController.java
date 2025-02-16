@@ -17,6 +17,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteC
 import org.example.gongiklifeclientbegraphql.dto.community.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.deletePost.DeletePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myLikedPosts.MyLikedPostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myLikedPosts.MyLikedPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.post.PostRequestDto;
@@ -279,6 +281,23 @@ public class CommunityController {
       return communityService.userPosts(requestDto);
     } catch (Exception e) {
       log.error("Failed to get user posts", e);
+      throw e;
+    }
+  }
+
+  @QueryMapping
+  public MyLikedPostsResponseDto myLikedPosts(
+      @Argument("myLikedPostsFilter") MyLikedPostsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.myLikedPosts(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to get my liked posts", e);
       throw e;
     }
   }

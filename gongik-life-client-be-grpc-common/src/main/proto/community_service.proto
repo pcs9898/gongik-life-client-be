@@ -23,11 +23,13 @@ service CommunityService{
 
   rpc deleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
 
-  rpc comments(CommentsRequest) returns (CommentsResponse);
+  rpc Comments(CommentsRequest) returns (CommentsResponse);
 
-  rpc myPosts(MyPostsRequest) returns (MyPostsResponse);
+  rpc MyPosts(MyPostsRequest) returns (MyPostsResponse);
 
-  rpc userPosts(UserPostsRequest) returns (UserPostsResponse);
+  rpc UserPosts(UserPostsRequest) returns (UserPostsResponse);
+
+  rpc MyLikedPosts(MyLikedPostsRequest) returns (MyLikedPostsResponse);
 }
 
 message CreatePostRequest{
@@ -220,6 +222,17 @@ message UserPostsRequest{
 }
 
 message  UserPostsResponse{
+  repeated PostForList listPost = 1;
+  PageInfo pageInfo = 2;
+}
+
+message MyLikedPostsRequest{
+  string userId = 1;
+  optional string cursor = 2;
+  int32 pageSize = 3;
+}
+
+message  MyLikedPostsResponse{
   repeated PostForList listPost = 1;
   PageInfo pageInfo = 2;
 }
