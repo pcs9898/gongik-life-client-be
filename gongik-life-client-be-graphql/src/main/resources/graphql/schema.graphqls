@@ -31,6 +31,8 @@ type Query {
     myPosts(myPostsFilter: MyPostsFilter!): MyPostsResponse! @authenticate
 
     userPosts(userPostsFilter: UserPostsFilter!): UserPostsResponse!
+
+    myLikedPosts(myLikedPostsFilter: MyLikedPostsFilter!): MyLikedPostsResponse! @authenticate
 }
 
 type Mutation{
@@ -464,6 +466,16 @@ input UserPostsFilter{
 }
 
 type UserPostsResponse{
+    listPost: [PostForList]!
+    pageInfo: PageInfo!
+}
+
+input MyLikedPostsFilter{
+    cursor: String
+    pageSize: Int = 10
+}
+
+type MyLikedPostsResponse{
     listPost: [PostForList]!
     pageInfo: PageInfo!
 }

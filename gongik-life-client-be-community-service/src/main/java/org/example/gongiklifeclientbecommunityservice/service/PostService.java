@@ -10,6 +10,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsL
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyLikedPostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyLikedPostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PageInfo;
@@ -321,6 +323,59 @@ public class PostService {
     }
 
     return UserPostsResponse.newBuilder()
+        .addAllListPost(listPosts)
+        .setPageInfo(pageInfoBuilder.build())
+        .build();
+  }
+
+  public MyLikedPostsResponse myLikedPosts(MyLikedPostsRequest request) {
+
+    List<PostProjection> posts = postRepository.findMyLikedPostsWithCursor(
+        UUID.fromString(request.getUserId()),
+        request.hasCursor() ? UUID.fromString(request.getCursor()) : null,
+        request.getPageSize()
+    );
+
+    List<String> userIds = posts.stream()
+        .map(PostProjection::getUserId)
+        .map(UUID::toString)
+        .toList();
+
+    Map<String, String> userNameMap = userServiceBlockingStub.getUserNameByIds(
+        GetUserNameByIdsRequest.newBuilder().addAllUserIds(userIds).build()
+    ).getUsersMap();
+
+    List<PostForList> listPosts = posts.stream()
+        .map(post -> {
+          String userId = post.getUserId().toString();
+          String userName = userNameMap.get(userId);
+
+          PostUser user = PostUser.newBuilder()
+              .setUserId(userId)
+              .setUserName(userName)
+              .build();
+
+          return PostForList.newBuilder()
+              .setId(post.getId().toString())
+              .setUser(user)
+              .setCategoryId(post.getCategoryId())
+              .setTitle(post.getTitle())
+              .setContent(post.getContent())
+              .setLikeCount(post.getLikeCount())
+              .setCommentCount(post.getCommentCount())
+              .setCreatedAt(post.getCreatedAt().toString())
+              .setIsLiked(post.getIsLiked())
+              .build();
+        }).toList();
+
+    PageInfo.Builder pageInfoBuilder = PageInfo.newBuilder()
+        .setHasNextPage(posts.size() == request.getPageSize());
+
+    if (!posts.isEmpty()) {
+      pageInfoBuilder.setEndCursor(posts.get(posts.size() - 1).getId().toString());
+    }
+
+    return MyLikedPostsResponse.newBuilder()
         .addAllListPost(listPosts)
         .setPageInfo(pageInfoBuilder.build())
         .build();
