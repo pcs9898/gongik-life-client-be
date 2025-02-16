@@ -25,6 +25,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Upd
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsResponse;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -273,6 +275,26 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("myPosts error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void userPosts(UserPostsRequest request,
+      StreamObserver<UserPostsResponse> responseObserver) {
+    try {
+      UserPostsResponse response = postService.userPosts(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("userPosts error : ", e);
 
       responseObserver.onError(
           io.grpc.Status.INTERNAL

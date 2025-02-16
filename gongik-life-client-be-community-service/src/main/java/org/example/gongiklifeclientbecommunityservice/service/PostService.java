@@ -19,6 +19,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Pos
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
@@ -279,6 +281,49 @@ public class PostService {
         .setPageInfo(pageInfoBuilder.build())
         .build();
 
+  }
+
+  public UserPostsResponse userPosts(UserPostsRequest request) {
+    String username = getUserNameById(request.getUserId());
+
+    List<PostProjection> posts = postRepository.findPostsByUserWithCursor(
+        UUID.fromString(request.getUserId()),
+        request.hasMyUserId() ? UUID.fromString(request.getMyUserId()) : null,
+        request.hasCursor() ? UUID.fromString(request.getCursor()) : null,
+        request.getPageSize()
+    );
+
+    List<PostForList> listPosts = posts.stream()
+        .map(post -> {
+          PostUser user = PostUser.newBuilder()
+              .setUserId(post.getUserId().toString())
+              .setUserName(username)
+              .build();
+
+          return PostForList.newBuilder()
+              .setId(post.getId().toString())
+              .setUser(user)
+              .setCategoryId(post.getCategoryId())
+              .setTitle(post.getTitle())
+              .setContent(post.getContent())
+              .setLikeCount(post.getLikeCount())
+              .setCommentCount(post.getCommentCount())
+              .setCreatedAt(post.getCreatedAt().toString())
+              .setIsLiked(post.getIsLiked())
+              .build();
+        }).toList();
+
+    PageInfo.Builder pageInfoBuilder = PageInfo.newBuilder()
+        .setHasNextPage(posts.size() == request.getPageSize());
+
+    if (!posts.isEmpty()) {
+      pageInfoBuilder.setEndCursor(posts.get(posts.size() - 1).getId().toString());
+    }
+
+    return UserPostsResponse.newBuilder()
+        .addAllListPost(listPosts)
+        .setPageInfo(pageInfoBuilder.build())
+        .build();
   }
 }
 
