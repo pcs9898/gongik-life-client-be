@@ -24,6 +24,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.createPost.CreatePost
 import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myComments.MyCommentsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myComments.MyCommentsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myLikedPosts.MyLikedPostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myLikedPosts.MyLikedPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsRequestDto;
@@ -223,6 +225,16 @@ public class CommunityService {
     try {
       return MyLikedPostsResponseDto.fromProto(
           communityServiceBlockingStub.myLikedPosts(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  public MyCommentsResponseDto myComments(MyCommentsRequestDto requestDto) {
+    try {
+      return MyCommentsResponseDto.fromProto(
+          communityServiceBlockingStub.myComments(requestDto.toProto()));
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
