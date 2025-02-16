@@ -10,6 +10,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsL
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PageInfo;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostForList;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
@@ -209,14 +211,16 @@ public class PostService {
               .build();
         }).toList();
 
+    PageInfo.Builder pageInfoBuilder = PageInfo.newBuilder()
+        .setHasNextPage(posts.size() == request.getPageSize());
+
+    if (!posts.isEmpty()) {
+      pageInfoBuilder.setEndCursor(posts.get(posts.size() - 1).getId().toString());
+    }
+
     return PostsResponse.newBuilder()
         .addAllListPost(listPosts)
-        .setPageInfo(PageInfo.newBuilder()
-            .setEndCursor(
-                posts.isEmpty() ? null : posts.get(posts.size() - 1).getId().toString()
-            )
-            .setHasNextPage(posts.size() == request.getPageSize())
-            .build())
+        .setPageInfo(pageInfoBuilder.build())
         .build();
   }
 
@@ -231,6 +235,50 @@ public class PostService {
 
   public void minusCommentCountById(UUID postId) {
     postRepository.minusCommentCountById(postId);
+  }
+
+  public MyPostsResponse myPosts(MyPostsRequest request) {
+
+    String username = getUserNameById(request.getUserId());
+
+    List<PostProjection> posts = postRepository.findMyPostsWithCursor(
+        UUID.fromString(request.getUserId()),
+        request.hasCursor() ? UUID.fromString(request.getCursor()) : null,
+        request.getPageSize()
+    );
+
+    List<PostForList> listPosts = posts.stream()
+        .map(post -> {
+          PostUser user = PostUser.newBuilder()
+              .setUserId(post.getUserId().toString())
+              .setUserName(username)
+              .build();
+
+          return PostForList.newBuilder()
+              .setId(post.getId().toString())
+              .setUser(user)
+              .setCategoryId(post.getCategoryId())
+              .setTitle(post.getTitle())
+              .setContent(post.getContent())
+              .setLikeCount(post.getLikeCount())
+              .setCommentCount(post.getCommentCount())
+              .setCreatedAt(post.getCreatedAt().toString())
+              .setIsLiked(post.getIsLiked())
+              .build();
+        }).toList();
+
+    PageInfo.Builder pageInfoBuilder = PageInfo.newBuilder()
+        .setHasNextPage(posts.size() == request.getPageSize());
+
+    if (!posts.isEmpty()) {
+      pageInfoBuilder.setEndCursor(posts.get(posts.size() - 1).getId().toString());
+    }
+
+    return MyPostsResponse.newBuilder()
+        .addAllListPost(listPosts)
+        .setPageInfo(pageInfoBuilder.build())
+        .build();
+
   }
 }
 

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewUserDto;
 
+
 @Data
 @Builder
 @AllArgsConstructor

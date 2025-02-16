@@ -13,23 +13,25 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.example.gongiklifeclientbegraphql.dto.comments.CommentsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.comments.CommentsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.common.PostUserDto;
-import org.example.gongiklifeclientbegraphql.dto.createComment.CommentForListDto;
-import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.deleteComment.DeleteCommentRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.deleteComment.DeleteCommentResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.posts.PostsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.posts.PostsResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.updateComment.UpdateCommentRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.updateComment.UpdateCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.comments.CommentsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.comments.CommentsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createComment.CommentForListDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createComment.CreateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createComment.CreateCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createPost.CreatePostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.post.PostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.unLikePost.UnLikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.community.LikePostProducer;
 import org.example.gongiklifeclientbegraphql.producer.community.UnLikePostProducer;
 import org.springframework.stereotype.Service;
@@ -146,14 +148,14 @@ public class CommunityService {
 
       CommentsResponse grpcResponse = communityServiceBlockingStub.comments(requestDto.toProto());
 
-      return convertGrpcResponse(grpcResponse);
+      return convertCommentsGrpcResponse(grpcResponse);
     } catch (Exception e) {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
     }
   }
 
-  private CommentsResponseDto convertGrpcResponse(CommentsResponse grpcResponse) {
+  private CommentsResponseDto convertCommentsGrpcResponse(CommentsResponse grpcResponse) {
     CommentsResponseDto responseDto = new CommentsResponseDto();
     List<CommentForListDto> listComment = grpcResponse.getListCommentList()
         .stream()
@@ -190,5 +192,16 @@ public class CommunityService {
     dto.setChildComments(childComments);
 
     return dto;
+  }
+
+  public MyPostsResponseDto myPosts(MyPostsRequestDto requestDto) {
+    try {
+      return MyPostsResponseDto.fromProto(
+          communityServiceBlockingStub.myPosts(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+
+    }
   }
 }

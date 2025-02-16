@@ -79,4 +79,46 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
   void minusCommentCountById(@Param("postId") UUID postId);
 
 
+  @Query(value = """
+      SELECT 
+          p.id,
+          p.user_id as userId,
+          p.category_id as categoryId,
+          p.title,
+          p.content,
+          p.like_count as likeCount,
+          p.comment_count as commentCount,
+          p.created_at as createdAt,
+          CASE 
+              WHEN :userId IS NULL THEN false
+              ELSE EXISTS (
+                  SELECT 1 
+                  FROM post_likes pl 
+                  WHERE pl.post_id = p.id 
+                  AND pl.user_id = :userId
+              )
+          END as isLiked
+      FROM posts p
+      WHERE 
+          p.deleted_at IS NULL
+          AND p.user_id = :userId
+          AND (
+              CAST(:cursor AS uuid) IS NULL 
+              OR 
+              (p.created_at, p.id) < (
+                  SELECT created_at, id
+                  FROM posts 
+                  WHERE id = :cursor
+              )
+          )
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT :limit
+      """, nativeQuery = true)
+  List<PostProjection> findMyPostsWithCursor(
+      @Param("userId") UUID userId,
+      @Param("cursor") UUID cursor,
+      @Param("limit") int limit
+  );
+
+
 }

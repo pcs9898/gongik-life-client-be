@@ -6,24 +6,26 @@ import dto.community.UnLikePostRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gongiklifeclientbegraphql.dto.comments.CommentsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.comments.CommentsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.deleteComment.DeleteCommentRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.deleteComment.DeleteCommentResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.post.PostRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.posts.PostsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.posts.PostsResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.unLikePost.UnLikePostResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.updateComment.UpdateCommentRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.updateComment.UpdateCommentResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.updatepost.UpdatePostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.comments.CommentsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.comments.CommentsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createComment.CreateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createComment.CreateCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.createPost.CreatePostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.deletePost.DeletePostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.deletePost.DeletePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.post.PostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.unLikePost.UnLikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
 import org.example.gongiklifeclientbegraphql.service.CommunityService;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -245,5 +247,21 @@ public class CommunityController {
     }
   }
 
+  @QueryMapping
+  public MyPostsResponseDto myPosts(
+      @Argument("myPostsFilter") MyPostsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.myPosts(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to get my posts", e);
+      throw e;
+    }
+  }
 
 }
