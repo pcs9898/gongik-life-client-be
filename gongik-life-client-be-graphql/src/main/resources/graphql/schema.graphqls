@@ -438,3 +438,7 @@ type CommentForList{
 type CommentsResponse{
     listComment: [CommentForList]
 }
+
+type Hi{
+    hello:String
+}
