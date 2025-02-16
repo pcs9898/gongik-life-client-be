@@ -2,12 +2,15 @@ package org.example.gongiklifeclientbecommunityservice.service;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import io.grpc.Status;
+import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +70,7 @@ public class CommentService {
     Comment savedComment = commentRepository.save(comment.build());
 
     // 3. update comment count
-    postService.updateCommentCount(post.getId());
+    postService.plusCommentCountById(post.getId());
 
     // 4. get username by user id
     String username = userServiceBlockingStub.getUserNameById(
@@ -89,7 +92,8 @@ public class CommentService {
 
 
   public UpdateCommentResponse updateComment(UpdateCommentRequest request) {
-    Comment comment = commentRepository.findById(UUID.fromString(request.getCommentId()))
+    Comment comment = commentRepository.findByIdAndDeletedAtIsNull(
+            UUID.fromString(request.getCommentId()))
         .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
 
     if (!comment.getUserId().equals(UUID.fromString(request.getUserId()))) {
@@ -106,4 +110,28 @@ public class CommentService {
         .build();
   }
 
+  @Transactional
+  public DeleteCommentResponse deleteComment(DeleteCommentRequest request) {
+    Comment comment = commentRepository.findByIdAndDeletedAtIsNull(
+            UUID.fromString(request.getCommentId()))
+        .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
+
+    if (!comment.getUserId().equals(UUID.fromString(request.getUserId()))) {
+      throw Status.PERMISSION_DENIED.withDescription(
+          "Permission denied, You can delete only your comment.").asRuntimeException();
+    }
+
+    comment.setDeletedAt(new Date());
+
+    commentRepository.save(comment);
+
+    // update comment count
+    postService.minusCommentCountById(comment.getPost().getId());
+
+    return DeleteCommentResponse.newBuilder()
+        .setCommentId(comment.getId().toString())
+        .setSuccess(true)
+        .build();
+
+  }
 }

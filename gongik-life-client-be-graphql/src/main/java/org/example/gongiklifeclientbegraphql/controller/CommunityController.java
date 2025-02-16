@@ -10,6 +10,8 @@ import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.deleteComment.DeleteCommentRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.deleteComment.DeleteCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.deletePost.DeletePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.likePost.LikePostResponseDto;
@@ -206,6 +208,23 @@ public class CommunityController {
       return communityService.updateComment(requestDto);
     } catch (Exception e) {
       log.error("Failed to update comment", e);
+      throw e;
+    }
+  }
+
+  @MutationMapping
+  public DeleteCommentResponseDto deleteComment(
+      @Argument("deleteCommentInput") DeleteCommentRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.deleteComment(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to delete comment", e);
       throw e;
     }
   }

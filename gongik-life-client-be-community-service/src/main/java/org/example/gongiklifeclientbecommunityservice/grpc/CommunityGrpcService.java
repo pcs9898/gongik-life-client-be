@@ -5,6 +5,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Cre
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostRequest;
@@ -219,4 +221,23 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
     }
   }
 
+  @Override
+  public void deleteComment(DeleteCommentRequest request,
+      StreamObserver<DeleteCommentResponse> responseObserver) {
+    try {
+      DeleteCommentResponse response = commentService.deleteComment(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("deleteComment error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
 }

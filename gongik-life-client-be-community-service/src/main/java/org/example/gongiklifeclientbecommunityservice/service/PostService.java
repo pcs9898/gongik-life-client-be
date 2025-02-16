@@ -225,8 +225,12 @@ public class PostService {
         .orElseThrow(() -> Status.NOT_FOUND.withDescription("Post not found").asRuntimeException());
   }
 
-  public void updateCommentCount(UUID postId) {
-    postRepository.updateCommentCountById(postId);
+  public void plusCommentCountById(UUID postId) {
+    postRepository.plusCommentCountById(postId);
+  }
+
+  public void minusCommentCountById(UUID postId) {
+    postRepository.minusCommentCountById(postId);
   }
 }
 

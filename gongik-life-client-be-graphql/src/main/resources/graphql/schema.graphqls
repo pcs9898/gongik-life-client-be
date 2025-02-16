@@ -55,10 +55,10 @@ type Mutation{
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 
     createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
-    
+
     updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
 
-
+    deleteComment(deleteCommentInput: DeleteCommentInput!): DeleteCommentResponse! @authenticate
 }
 
 "search result"
@@ -407,5 +407,14 @@ input UpdateCommentInput{
 
 type UpdateCommentResponse{
     id: ID!
+    success: Boolean!
+}
+
+input DeleteCommentInput{
+    commentId: ID!
+}
+
+type DeleteCommentResponse{
+    commentId: ID!
     success: Boolean!
 }
