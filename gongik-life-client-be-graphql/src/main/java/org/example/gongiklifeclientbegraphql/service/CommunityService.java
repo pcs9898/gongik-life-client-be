@@ -32,6 +32,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.posts.PostsResponseDt
 import org.example.gongiklifeclientbegraphql.dto.community.unLikePost.UnLikePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.community.LikePostProducer;
 import org.example.gongiklifeclientbegraphql.producer.community.UnLikePostProducer;
 import org.springframework.stereotype.Service;
@@ -204,4 +206,15 @@ public class CommunityService {
 
     }
   }
+
+  public UserPostsResponseDto userPosts(UserPostsRequestDto requestDto) {
+    try {
+      return UserPostsResponseDto.fromProto(
+          communityServiceBlockingStub.userPosts(requestDto.toProto()));
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
 }
