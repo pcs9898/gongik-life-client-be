@@ -6,8 +6,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.example.gongiklifeclientbegraphql.dto.institution.InstitutionResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.institutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.institution.institutionReview.InstitutionReviewResponseDto;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
