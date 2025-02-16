@@ -27,7 +27,7 @@ service CommunityService{
 
   rpc myPosts(MyPostsRequest) returns (MyPostsResponse);
 
-  rpc userPosts()
+  rpc userPosts(UserPostsRequest) returns (UserPostsResponse);
 }
 
 message CreatePostRequest{
@@ -201,12 +201,25 @@ message CommentForList{
 }
 
 message MyPostsRequest{
+
   string userId = 1;
   optional string cursor = 2;
   int32 pageSize = 3;
 }
 
 message MyPostsResponse{
+  repeated PostForList listPost = 1;
+  PageInfo pageInfo = 2;
+}
+
+message UserPostsRequest{
+  optional string myUserId = 1;
+  string userId = 2;
+  optional string cursor = 3;
+  int32 pageSize = 4;
+}
+
+message  UserPostsResponse{
   repeated PostForList listPost = 1;
   PageInfo pageInfo = 2;
 }
