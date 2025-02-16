@@ -6,6 +6,8 @@ import dto.community.UnLikePostRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.comments.CommentsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.comments.CommentsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
@@ -225,6 +227,20 @@ public class CommunityController {
       return communityService.deleteComment(requestDto);
     } catch (Exception e) {
       log.error("Failed to delete comment", e);
+      throw e;
+    }
+  }
+
+
+  @QueryMapping
+  public CommentsResponseDto comments(
+      @Argument("commentsInput") CommentsRequestDto requestDto
+  ) {
+    try {
+
+      return communityService.comments(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to get comments", e);
       throw e;
     }
   }

@@ -25,6 +25,8 @@ type Query {
     post(postInput: PostInput!): PostResponse!
 
     posts(postsFilter: PostsFilter!): PostsResponse!
+    #
+    comments(commentsInput: CommentsInput!): CommentsResponse!
 }
 
 type Mutation{
@@ -417,4 +419,22 @@ input DeleteCommentInput{
 type DeleteCommentResponse{
     commentId: ID!
     success: Boolean!
+}
+
+input CommentsInput{
+    postId:ID!
+}
+
+type CommentForList{
+    id: ID!
+    user: PostUser
+    postId: ID!
+    parentCommentId: ID
+    content: String
+    createdAt: String!
+    childComments: [CommentForList]
+}
+
+type CommentsResponse{
+    listComment: [CommentForList]
 }

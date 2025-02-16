@@ -1,5 +1,8 @@
 package org.example.gongiklifeclientbecommunityservice.service;
 
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentForList;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentRequest;
@@ -9,9 +12,13 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Upd
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
 import io.grpc.Status;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -134,4 +141,79 @@ public class CommentService {
         .build();
 
   }
+
+  public CommentsResponse comments(CommentsRequest request) {
+    UUID postId = UUID.fromString(request.getPostId());
+    // native query를 통해 평탄한(flat) 리스트 조회
+    List<Comment> allComments = commentRepository.findCommentTreeByPostId(postId);
+
+    List<String> userIds = allComments.stream()
+        .map(comment -> comment.getUserId().toString())
+        .toList();
+
+    Map<String, String> userNameMap = userServiceBlockingStub.getUserNameByIds(
+        GetUserNameByIdsRequest.newBuilder().addAllUserIds(userIds).build()
+    ).getUsersMap();
+
+    // 부모가 있는 댓글들에 대해, 부모 ID별 그룹핑 (재귀 쿼리로 조회해도 부모/자식 관계가 미리 채워져 있지 않을 수 있으므로 직접 그룹핑)
+    Map<UUID, List<Comment>> childrenMap = allComments.stream()
+        .filter(comment -> comment.getParentComment() != null)
+        .collect(Collectors.groupingBy(comment -> comment.getParentComment().getId()));
+
+    // 루트 댓글 필터 (부모가 없는 경우)
+    List<Comment> rootComments = allComments.stream()
+        .filter(comment -> comment.getParentComment() == null)
+        .collect(Collectors.toList());
+
+    CommentsResponse.Builder responseBuilder = CommentsResponse.newBuilder();
+    for (Comment root : rootComments) {
+      responseBuilder.addListComment(buildCommentForList(root, childrenMap, userNameMap));
+    }
+
+    return responseBuilder.build();
+  }
+
+  // 재귀적으로 Comment 엔티티를 gRPC CommentForList 메시지로 변환하는 함수
+  private CommentForList buildCommentForList(Comment comment,
+      Map<UUID, List<Comment>> childrenMap, Map<String, String> userNameMap) {
+    
+// 기본적으로 필수값들 설정 (id, postId, createdAt 등)
+    CommentForList.Builder builder = CommentForList.newBuilder()
+        .setId(comment.getId().toString())
+        .setPostId(comment.getPost().getId().toString())
+        .setCreatedAt(comment.getCreatedAt().toString());
+
+// 삭제되지 않은 댓글이라면 content와 user 값을 설정합니다.
+    if (comment.getDeletedAt() == null) {
+      // content가 null이 아닌 경우에만 설정
+      if (comment.getContent() != null) {
+        builder.setContent(comment.getContent());
+      }
+      // user 정보도 설정 (userNameMap에서 null이 반환되지 않도록 확인)
+      String userIdStr = comment.getUserId().toString();
+      String userName = userNameMap.get(userIdStr);
+      if (userName != null) {
+        builder.setUser(
+            PostUser.newBuilder()
+                .setUserId(userIdStr)
+                .setUserName(userName)
+                .build()
+        );
+      }
+    }
+// parentComment가 존재하면 parentCommentId 설정
+    if (comment.getParentComment() != null) {
+      builder.setParentCommentId(comment.getParentComment().getId().toString());
+    }
+// 자식 댓글(대댓글)이 있다면 재귀 호출하여 추가
+    List<Comment> children = childrenMap.get(comment.getId());
+    if (children != null && !children.isEmpty()) {
+      for (Comment child : children) {
+        builder.addChildComments(buildCommentForList(child, childrenMap, userNameMap));
+      }
+    }
+    return builder.build();
+  }
+
+
 }
