@@ -4,10 +4,12 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class SearchInstitutionDto {
 
   private String id;
@@ -16,6 +18,7 @@ public class SearchInstitutionDto {
   private Float averageRating;
 
   public static SearchInstitutionDto fromProto(SearchInstitution proto) {
+    log.info("fromProto: {}", proto.getAverageRating());
     SearchInstitutionDto dto = new SearchInstitutionDto();
     dto.setId(proto.getId());
     dto.setName(proto.getName());

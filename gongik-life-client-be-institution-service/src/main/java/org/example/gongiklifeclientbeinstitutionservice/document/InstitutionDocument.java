@@ -27,15 +27,15 @@ public class InstitutionDocument {
   @Field(type = FieldType.Text)
   private String address;
 
-  @Field(type = FieldType.Double)
-  private Double averageRating;
+  @Field(name = "average_rating", type = FieldType.Float)
+  private Float averageRating;
 
   public SearchInstitution toProto() {
     return SearchInstitution.newBuilder()
         .setId(this.id)
         .setName(this.name)
         .setAddress(this.address)
-        .setAverageRating(this.averageRating != null ? this.averageRating.floatValue() : 0.0f)
+        .setAverageRating(this.averageRating != null ? this.averageRating : 0.0f)
         .build();
   }
 }
