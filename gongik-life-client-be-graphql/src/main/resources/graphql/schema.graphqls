@@ -25,8 +25,12 @@ type Query {
     post(postInput: PostInput!): PostResponse!
 
     posts(postsFilter: PostsFilter!): PostsResponse!
-    #
+
     comments(commentsInput: CommentsInput!): CommentsResponse!
+
+    myPosts(myPostsFilter: MyPostsFilter!): MyPostsResponse! @authenticate
+
+    userPosts(userPostsFilter: UserPostsFilter!): UserPostsResponse!
 }
 
 type Mutation{
@@ -441,4 +445,25 @@ type CommentsResponse{
 
 type Hi{
     hello:String
+}
+
+input MyPostsFilter{
+    cursor: String
+    pageSize: Int = 10
+}
+
+type MyPostsResponse{
+    listPost: [PostForList]!
+    pageInfo: PageInfo!
+}
+
+input UserPostsFilter{
+    userId: ID!
+    cursor: String
+    pageSize: Int = 10
+}
+
+type UserPostsResponse{
+    listPost: [PostForList]!
+    pageInfo: PageInfo!
 }
