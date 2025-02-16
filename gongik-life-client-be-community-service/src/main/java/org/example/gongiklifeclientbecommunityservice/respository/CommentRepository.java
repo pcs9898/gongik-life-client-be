@@ -5,6 +5,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.example.gongiklifeclientbecommunityservice.dto.MyCommentProjection;
 import org.example.gongiklifeclientbecommunityservice.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -44,6 +45,38 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
       nativeQuery = true
   )
   List<Comment> findCommentTreeByPostId(@Param("postId") UUID postId);
+
+  @Query(value = """
+      SELECT 
+          c.id,
+          c.content,
+          c.created_at as createdAt,
+          p.id as postId,
+          p.title as postTitle
+      FROM comments c
+      JOIN posts p ON c.post_id = p.id
+      WHERE 
+          c.user_id = :userId
+          AND c.deleted_at IS NULL
+          AND p.deleted_at IS NULL
+          AND (
+              CAST(:cursor AS uuid) IS NULL
+              OR (c.created_at, c.id) < (
+                  SELECT created_at, id
+                  FROM comments
+                  WHERE id = :cursor
+                  AND deleted_at IS NULL
+              )
+          )
+      ORDER BY c.created_at DESC, c.id DESC
+      LIMIT :limit
+      """, nativeQuery = true)
+  List<MyCommentProjection> findMyCommentsWithCursor(
+      @Param("userId") UUID userId,
+      @Param("cursor") UUID cursor,
+      @Param("limit") int limit
+  );
+
 }
 
 
