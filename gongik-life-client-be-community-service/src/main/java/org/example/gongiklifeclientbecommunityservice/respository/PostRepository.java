@@ -197,4 +197,48 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
       @Param("cursor") UUID cursor,
       @Param("limit") int limit
   );
+
+  @Query(value = """
+      SELECT 
+          p.id,
+          p.user_id as "userId",
+          p.category_id as "categoryId",
+          p.title,
+          p.content,
+          p.like_count as "likeCount",
+          p.comment_count as "commentCount",
+          p.created_at as "createdAt",
+          CASE 
+              WHEN :userId IS NULL THEN false
+              ELSE EXISTS (
+                  SELECT 1 
+                  FROM post_likes pl 
+                  WHERE pl.post_id = p.id 
+                    AND pl.user_id = :userId
+              )
+          END as "isLiked"
+      FROM posts p
+      WHERE 
+          p.deleted_at IS NULL
+          -- 제목에 검색어가 포함되어 있는지 확인 (대소문자 구분 여부는 DB 설정에 따름)
+          AND p.title LIKE CONCAT('%', :searchKeyword, '%')
+          -- postCategoryId가 7이면 전체 검색, 아니면 특정 카테고리만 검색
+          AND (:postCategoryId = 7 OR p.category_id = :postCategoryId)
+          -- 커서 페이징: cursor 값이 존재하면 cursor를 기준으로 최근(created_at, id)의 복합 정렬 조건 적용
+          AND (:cursor IS NULL OR (p.created_at, p.id) < (
+              SELECT p2.created_at, p2.id
+              FROM posts p2
+              WHERE p2.id = :cursor
+          ))
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT :pageSize
+      """, nativeQuery = true)
+  List<PostProjection> searchPosts(
+      @Param("searchKeyword") String searchKeyword,
+      @Param("postCategoryId") int postCategoryId,
+      @Param("cursor") UUID cursor,
+      @Param("pageSize") int pageSize,
+      @Param("userId") UUID userId
+  );
+
 }

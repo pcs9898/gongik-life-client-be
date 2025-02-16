@@ -19,6 +19,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Pos
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.SearchPostsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.SearchPostsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsRequest;
@@ -376,6 +378,65 @@ public class PostService {
     }
 
     return MyLikedPostsResponse.newBuilder()
+        .addAllListPost(listPosts)
+        .setPageInfo(pageInfoBuilder.build())
+        .build();
+  }
+
+  public SearchPostsResponse searchPosts(SearchPostsRequest request) {
+
+    List<PostProjection> posts = postRepository.searchPosts(
+        request.getSearchKeyword(),
+        request.getPostCategoryId(),
+        request.hasCursor() ? UUID.fromString(request.getCursor()) : null,
+        request.getPageSize(),
+        request.hasUserId() ? UUID.fromString(request.getUserId()) : null
+    );
+
+    log.info("request.getSearchKeyword(): {}", request.getSearchKeyword());
+
+    List<String> userIds = posts.stream()
+        .map(PostProjection::getUserId)
+        .map(UUID::toString)
+        .toList();
+
+    Map<String, String> userNameMap = userServiceBlockingStub.getUserNameByIds(
+        GetUserNameByIdsRequest.newBuilder().addAllUserIds(userIds).build()
+    ).getUsersMap();
+
+    List<PostForList> listPosts = posts.stream()
+        .map(post -> {
+          String userId = post.getUserId().toString();
+          String userName = userNameMap.get(userId);
+
+          PostUser user = PostUser.newBuilder()
+              .setUserId(userId)
+              .setUserName(userName)
+              .build();
+
+          return PostForList.newBuilder()
+              .setId(post.getId().toString())
+              .setUser(user)
+              .setCategoryId(post.getCategoryId())
+              .setTitle(post.getTitle())
+              .setContent(post.getContent())
+              .setLikeCount(post.getLikeCount())
+              .setCommentCount(post.getCommentCount())
+              .setCreatedAt(post.getCreatedAt().toString())
+              .setIsLiked(post.getIsLiked())
+              .build();
+        }).toList();
+
+    PageInfo.Builder pageInfoBuilder = PageInfo.newBuilder()
+        .setHasNextPage(posts.size() == request.getPageSize());
+
+    if (!posts.isEmpty()) {
+      pageInfoBuilder.setEndCursor(posts.get(posts.size() - 1).getId().toString());
+    }
+
+    log.info("listPosts: {}", listPosts);
+
+    return SearchPostsResponse.newBuilder()
         .addAllListPost(listPosts)
         .setPageInfo(pageInfoBuilder.build())
         .build();

@@ -35,6 +35,8 @@ type Query {
     myLikedPosts(myLikedPostsFilter: MyLikedPostsFilter!): MyLikedPostsResponse! @authenticate
 
     myComments(myCommentsFilter: MyCommentsFilter!): MyCommentsResponse! @authenticate
+
+    searchPosts(searchPostsFilter: SearchPostsFilter!): SearchPostsResponse!
 }
 
 type Mutation{
@@ -87,7 +89,7 @@ type SearchInstitution {
     id: ID!
     name: String!
     address: String!
-    average_rating: Float
+    averageRating: Float
 }
 
 type SignUpResponse{
@@ -502,5 +504,17 @@ type MyCommentForList{
 
 type MyCommentsResponse{
     listComment: [MyCommentForList]
+    pageInfo: PageInfo!
+}
+
+input SearchPostsFilter{
+    searchKeyword: String!
+    postCategoryId: Int = 7 @range(min: 1, max: 7)
+    cursor: String
+    pageSize: Int = 10
+}
+
+type SearchPostsResponse{
+    listPost: [PostForList]!
     pageInfo: PageInfo!
 }
