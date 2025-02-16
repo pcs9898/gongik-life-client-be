@@ -23,6 +23,8 @@ service CommunityService{
 
   rpc deleteComment(DeleteCommentRequest) returns (DeleteCommentResponse);
 
+  rpc comments(CommentsRequest) returns (CommentsResponse);
+
 }
 
 message CreatePostRequest{
@@ -175,4 +177,22 @@ message DeleteCommentRequest{
 message DeleteCommentResponse{
   string commentId = 1;
   bool success = 2;
+}
+
+message CommentsRequest{
+  string postId = 1;
+}
+
+message  CommentsResponse{
+  repeated CommentForList listComment = 1;
+}
+
+message CommentForList{
+  string id = 1;
+  optional PostUser user = 2;
+  string postId = 3;
+  optional string parentCommentId = 4;
+  optional string content = 5;
+  string createdAt = 6;
+  repeated CommentForList childComments = 7;
 }

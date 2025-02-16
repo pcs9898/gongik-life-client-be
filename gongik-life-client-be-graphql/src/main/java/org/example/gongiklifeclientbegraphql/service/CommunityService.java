@@ -1,14 +1,23 @@
 package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.communityService.domain.service.CommunityServiceGrpc;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentForList;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentsResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
 import dto.community.LikePostRequestDto;
 import dto.community.UnLikePostRequestDto;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbegraphql.dto.comments.CommentsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.comments.CommentsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.common.PostUserDto;
+import org.example.gongiklifeclientbegraphql.dto.createComment.CommentForListDto;
 import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.createComment.CreateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.createPost.CreatePostRequestDto;
@@ -130,5 +139,56 @@ public class CommunityService {
       log.error("gRPC 호출 중 오류 발생: ", e);
       throw e;
     }
+  }
+
+  public CommentsResponseDto comments(CommentsRequestDto requestDto) {
+    try {
+
+      CommentsResponse grpcResponse = communityServiceBlockingStub.comments(requestDto.toProto());
+
+      return convertGrpcResponse(grpcResponse);
+    } catch (Exception e) {
+      log.error("gRPC 호출 중 오류 발생: ", e);
+      throw e;
+    }
+  }
+
+  private CommentsResponseDto convertGrpcResponse(CommentsResponse grpcResponse) {
+    CommentsResponseDto responseDto = new CommentsResponseDto();
+    List<CommentForListDto> listComment = grpcResponse.getListCommentList()
+        .stream()
+        .map(this::convertCommentForList)
+        .collect(Collectors.toList());
+    responseDto.setListComment(listComment);
+    return responseDto;
+  }
+
+  private CommentForListDto convertCommentForList(CommentForList grpcComment) {
+    CommentForListDto dto = new CommentForListDto();
+    dto.setId(grpcComment.getId());
+    dto.setPostId(grpcComment.getPostId());
+    dto.setContent(grpcComment.getContent());
+    dto.setCreatedAt(grpcComment.getCreatedAt());
+
+    // parentCommentId 필드는 optional이므로 값이 존재할 때만 설정
+    if (grpcComment.getParentCommentId() != null && !grpcComment.getParentCommentId().isEmpty()) {
+      dto.setParentCommentId(grpcComment.getParentCommentId());
+    }
+
+    // 작성자 정보 매핑
+    PostUser grpcUser = grpcComment.getUser();
+    PostUserDto userDto = new PostUserDto();
+    userDto.setUserId(grpcUser.getUserId());
+    userDto.setUserName(grpcUser.getUserName());
+    dto.setUser(userDto);
+
+    // 재귀적으로 childComments 변환
+    List<CommentForListDto> childComments = grpcComment.getChildCommentsList()
+        .stream()
+        .map(this::convertCommentForList)
+        .collect(Collectors.toList());
+    dto.setChildComments(childComments);
+
+    return dto;
   }
 }
