@@ -24,6 +24,7 @@ service InstitutionService {
   rpc MyInstitutionReviews(MyInstitutionReviewsRequest) returns (MyInstitutionReviewsResponse);
 
   rpc InstitutionReviewsByInstitution(InstitutionReviewsByInstitutionRequest) returns (InstitutionReviewsByInstitutionResponse);
+
 }
 
 message SearchInstitutionsRequest {
