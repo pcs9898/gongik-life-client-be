@@ -30,6 +30,8 @@ service CommunityService{
   rpc UserPosts(UserPostsRequest) returns (UserPostsResponse);
 
   rpc MyLikedPosts(MyLikedPostsRequest) returns (MyLikedPostsResponse);
+
+  rpc myComments(MyCommentsRequest) returns (MyCommentsResponse);
 }
 
 message CreatePostRequest{
@@ -234,5 +236,29 @@ message MyLikedPostsRequest{
 
 message  MyLikedPostsResponse{
   repeated PostForList listPost = 1;
+  PageInfo pageInfo = 2;
+}
+
+
+message MyCommentsRequest{
+  string userId = 1;
+  optional string cursor = 2;
+  int32 pageSize = 3;
+}
+
+message PostShortInfo{
+  string postId = 1;
+  string postTitle = 2;
+}
+
+message MyCommentForList{
+  string id = 1;
+  PostShortInfo post = 2;
+  string content = 3;
+  string createdAt = 4;
+}
+
+message MyCommentsResponse{
+  repeated MyCommentForList listComment = 1;
   PageInfo pageInfo = 2;
 }

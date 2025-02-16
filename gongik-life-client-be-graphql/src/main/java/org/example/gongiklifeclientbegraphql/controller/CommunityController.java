@@ -17,6 +17,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.deleteComment.DeleteC
 import org.example.gongiklifeclientbegraphql.dto.community.deletePost.DeletePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.deletePost.DeletePostResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.likePost.LikePostResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myComments.MyCommentsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.myComments.MyCommentsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myLikedPosts.MyLikedPostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myLikedPosts.MyLikedPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.myPosts.MyPostsRequestDto;
@@ -302,5 +304,21 @@ public class CommunityController {
     }
   }
 
+  @QueryMapping
+  public MyCommentsResponseDto myComments(
+      @Argument("myCommentsFilter") MyCommentsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return communityService.myComments(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to get my comments", e);
+      throw e;
+    }
+  }
 
 }
