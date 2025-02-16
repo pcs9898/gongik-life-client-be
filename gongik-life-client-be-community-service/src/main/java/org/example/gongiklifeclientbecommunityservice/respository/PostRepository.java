@@ -120,5 +120,45 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
       @Param("limit") int limit
   );
 
+  @Query(value = """
+      SELECT
+      p.id,
+      p.user_id AS userId,
+      p.category_id AS categoryId,
+      p.title,
+      p.content,
+      p.like_count AS likeCount,
+      p.comment_count AS commentCount,
+      p.created_at AS createdAt,
+      CASE
+      WHEN :myUserId IS NULL THEN false
+      ELSE EXISTS (
+      SELECT 1
+      FROM post_likes pl
+      WHERE pl.post_id = p.id
+      AND pl.user_id = :myUserId
+      )
+      END AS isLiked
+      FROM posts p
+      WHERE
+      p.deleted_at IS NULL
+      AND p.user_id = :userId
+      AND (
+      CAST(:cursor AS uuid) IS NULL
+      OR (p.created_at, p.id) < (
+      SELECT created_at, id
+      FROM posts
+      WHERE id = :cursor
+      )
+      )
+      ORDER BY p.created_at DESC, p.id DESC
+      LIMIT :limit
+      """, nativeQuery = true)
+  List<PostProjection> findPostsByUserWithCursor(
+      @Param("userId") UUID userId,
+      @Param("myUserId") UUID myUserId,
+      @Param("cursor") UUID cursor,
+      @Param("limit") int limit
+  );
 
 }

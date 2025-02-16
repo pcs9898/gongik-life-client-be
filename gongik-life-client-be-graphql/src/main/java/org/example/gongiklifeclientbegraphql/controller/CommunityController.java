@@ -26,6 +26,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.unLikePost.UnLikePost
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.updatepost.UpdatePostRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsResponseDto;
 import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
 import org.example.gongiklifeclientbegraphql.service.CommunityService;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -263,5 +265,23 @@ public class CommunityController {
       throw e;
     }
   }
+
+  @QueryMapping
+  public UserPostsResponseDto userPosts(
+      @Argument("userPostsFilter") UserPostsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String myUserId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setMyUserId(myUserId);
+
+      return communityService.userPosts(requestDto);
+    } catch (Exception e) {
+      log.error("Failed to get user posts", e);
+      throw e;
+    }
+  }
+
 
 }
