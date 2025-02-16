@@ -7,6 +7,11 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Cre
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentForList;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentsRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentsResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PageInfo;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostShortInfo;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostUser;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
@@ -22,6 +27,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbecommunityservice.dto.MyCommentProjection;
 import org.example.gongiklifeclientbecommunityservice.entity.Comment;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
 import org.example.gongiklifeclientbecommunityservice.respository.CommentRepository;
@@ -176,7 +182,7 @@ public class CommentService {
   // 재귀적으로 Comment 엔티티를 gRPC CommentForList 메시지로 변환하는 함수
   private CommentForList buildCommentForList(Comment comment,
       Map<UUID, List<Comment>> childrenMap, Map<String, String> userNameMap) {
-    
+
 // 기본적으로 필수값들 설정 (id, postId, createdAt 등)
     CommentForList.Builder builder = CommentForList.newBuilder()
         .setId(comment.getId().toString())
@@ -213,6 +219,43 @@ public class CommentService {
       }
     }
     return builder.build();
+  }
+
+
+  public MyCommentsResponse myComments(MyCommentsRequest request) {
+
+    List<MyCommentProjection> comments = commentRepository.findMyCommentsWithCursor(
+        UUID.fromString(request.getUserId()),
+        request.hasCursor() ? UUID.fromString(request.getCursor()) : null,
+        request.getPageSize()
+    );
+
+    List<MyCommentForList> myCommentForLists = comments.stream()
+        .map(projection -> {
+          return MyCommentForList.newBuilder()
+              .setId(projection.getId().toString())
+              .setPost(PostShortInfo.newBuilder()
+                  .setPostId(projection.getPostId().toString())
+                  .setPostTitle(projection.getPostTitle())
+                  .build())
+              .setContent(projection.getContent())
+              .setCreatedAt(projection.getCreatedAt().toString())
+              .build();
+        }).toList();
+
+    PageInfo.Builder pageInfoBuilder = PageInfo.newBuilder()
+        .setHasNextPage(comments.size() == request.getPageSize());
+
+    if (!comments.isEmpty()) {
+      pageInfoBuilder.setEndCursor(comments.get(comments.size() - 1).getId().toString());
+    }
+
+    return MyCommentsResponse.newBuilder()
+        .addAllListComment(myCommentForLists)
+        .setPageInfo(pageInfoBuilder.build())
+        .build();
+
+
   }
 
 

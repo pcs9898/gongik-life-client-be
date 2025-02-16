@@ -33,6 +33,8 @@ type Query {
     userPosts(userPostsFilter: UserPostsFilter!): UserPostsResponse!
 
     myLikedPosts(myLikedPostsFilter: MyLikedPostsFilter!): MyLikedPostsResponse! @authenticate
+
+    myComments(myCommentsFilter: MyCommentsFilter!): MyCommentsResponse! @authenticate
 }
 
 type Mutation{
@@ -67,6 +69,7 @@ type Mutation{
     updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
 
     deleteComment(deleteCommentInput: DeleteCommentInput!): DeleteCommentResponse! @authenticate
+
 }
 
 "search result"
@@ -477,5 +480,27 @@ input MyLikedPostsFilter{
 
 type MyLikedPostsResponse{
     listPost: [PostForList]!
+    pageInfo: PageInfo!
+}
+
+input MyCommentsFilter{
+    cursor: String
+    pageSize: Int = 10
+}
+
+type PostShortInfo{
+    postId: ID!
+    postTitle: String!
+}
+
+type MyCommentForList{
+    id: ID!
+    post: PostShortInfo
+    content: String
+    createdAt: String!
+}
+
+type MyCommentsResponse{
+    listComment: [MyCommentForList]
     pageInfo: PageInfo!
 }
