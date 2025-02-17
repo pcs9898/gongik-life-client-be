@@ -81,15 +81,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-#grpc:
-#  client:
-#    gongik-life-client-be-auth-service:
-#      address: 'discovery:///gongik-life-client-be-auth-service'
-#      enableKeepAlive: true
-#      keepAliveWithoutCalls: true
-#      negotiationType: plaintext
-#
-##TODO client들 추가하기
+
+
 
 eureka:
   client:

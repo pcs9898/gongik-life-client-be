@@ -11,6 +11,10 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Del
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsCommentRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsCommentResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsPostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountRequest;
@@ -363,6 +367,46 @@ public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceI
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("searchPosts error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void existsPost(ExistsPostRequest request,
+      StreamObserver<ExistsPostResponse> responseObserver) {
+    try {
+      ExistsPostResponse response = postService.existsPost(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("existsPost error : ", e);
+
+      responseObserver.onError(
+          io.grpc.Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void existsComment(ExistsCommentRequest request,
+      StreamObserver<ExistsCommentResponse> responseObserver) {
+    try {
+      ExistsCommentResponse response = commentService.existsComment(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("existsComment error : ", e);
 
       responseObserver.onError(
           io.grpc.Status.INTERNAL

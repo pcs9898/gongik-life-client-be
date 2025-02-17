@@ -3,6 +3,10 @@ package org.example.gongiklifeclientbeinstitutionservice.service;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountRequest;
@@ -44,7 +48,6 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.example.gongiklifeclientbeinstitutionservice.document.InstitutionDocument;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionSimpleProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
@@ -56,7 +59,6 @@ import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRe
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionReviewLikeRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionReviewRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.elasticsearch.InstitutionSearchRepository;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -513,6 +515,26 @@ public class InstitutionService {
 
     return GetInstitutionReviewCountResponse.newBuilder()
         .setReviewCount(count)
+        .build();
+  }
+
+  public ExistsInstitutionResponse existsInstitution(ExistsInstitutionRequest request) {
+
+    boolean exists = institutionRepository.existsById(UUID.fromString(request.getInstitutionId()));
+
+    return ExistsInstitutionResponse.newBuilder()
+        .setExists(exists)
+        .build();
+  }
+
+  public ExistsInstitutionReviewResponse existsInstitutionReview(
+      ExistsInstitutionReviewRequest request) {
+    
+    boolean exists = institutionReviewRepository.existsById(
+        UUID.fromString(request.getInstitutionReviewId()));
+
+    return ExistsInstitutionReviewResponse.newBuilder()
+        .setExists(exists)
         .build();
   }
 }

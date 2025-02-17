@@ -4,6 +4,10 @@ import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.CreateInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionReviewRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.ExistsInstitutionReviewResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountRequest;
@@ -252,6 +256,47 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.info("getInstitutionReviewCount error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void existsInstitution(ExistsInstitutionRequest request,
+      StreamObserver<ExistsInstitutionResponse> responseObserver) {
+    try {
+      ExistsInstitutionResponse response = institutionService.existsInstitution(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("existsInstitution error : ", e);
+
+      responseObserver.onError(
+          Status.INTERNAL
+              .withDescription(e.getMessage())
+              .withCause(e)  // 원인 예외 포함
+              .asRuntimeException()
+      );
+    }
+  }
+
+  @Override
+  public void existsInstitutionReview(ExistsInstitutionReviewRequest request,
+      StreamObserver<ExistsInstitutionReviewResponse> responseObserver) {
+    try {
+      ExistsInstitutionReviewResponse response = institutionService.existsInstitutionReview(
+          request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.info("existsInstitutionReview error : ", e);
 
       responseObserver.onError(
           Status.INTERNAL

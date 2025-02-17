@@ -77,6 +77,8 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
       @Param("limit") int limit
   );
 
+  boolean existsByIdAndDeletedAtIsNull(UUID uuid);
+  
 }
 
 
