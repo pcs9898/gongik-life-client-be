@@ -72,6 +72,8 @@ type Mutation{
 
     deleteComment(deleteCommentInput: DeleteCommentInput!): DeleteCommentResponse! @authenticate
 
+    createSystemReport(createSystemReportInput: CreateSystemReportInput!): CreateSystemReportResponse! @authenticate
+
 }
 
 "search result"
@@ -517,4 +519,15 @@ input SearchPostsFilter{
 type SearchPostsResponse{
     listPost: [PostForList]!
     pageInfo: PageInfo!
+}
+
+
+input CreateSystemReportInput{
+    title:String!
+    content:String!
+    systemCategoryId: Int! @range(min: 1, max: 5)
+}
+
+type CreateSystemReportResponse{
+    success:Boolean!
 }
