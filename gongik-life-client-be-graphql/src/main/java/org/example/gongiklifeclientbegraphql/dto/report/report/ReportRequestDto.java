@@ -1,6 +1,6 @@
-package org.example.gongiklifeclientbegraphql.dto.report.deleteReport;
+package org.example.gongiklifeclientbegraphql.dto.report.report;
 
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,19 +12,19 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteReportRequestDto {
+public class ReportRequestDto {
+
 
   private String userId;
-
+  
   @NotNull
   @NotBlank
   private String reportId;
 
-  public DeleteReportRequest toProto() {
-    return DeleteReportRequest.newBuilder()
+  public ReportRequest toProto() {
+    return ReportRequest.newBuilder()
         .setUserId(userId)
         .setReportId(reportId)
         .build();
   }
-
 }

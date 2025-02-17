@@ -12,6 +12,8 @@ import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSys
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportResponse;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportRequest;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportResponse;
 import io.grpc.Status;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -169,6 +171,36 @@ public class ReportService {
         return; // 예외를 던지지 않음
     }
     throw Status.FAILED_PRECONDITION.withDescription(message).asRuntimeException();
+  }
+
+  public ReportResponse report(ReportRequest request) {
+    Report report = reportRepository.findById(UUID.fromString(request.getReportId()))
+        .orElseThrow(
+            () -> Status.NOT_FOUND.withDescription("Report not found").asRuntimeException());
+
+    if (!report.getUserId().equals(UUID.fromString(request.getUserId()))) {
+      throw Status.PERMISSION_DENIED.withDescription("You can not look at other user's report")
+          .asRuntimeException();
+    }
+
+    ReportResponse.Builder response = ReportResponse.newBuilder()
+        .setId(report.getId().toString())
+        .setTypeId(report.getTypeId())
+        .setStatusId(report.getStatusId())
+        .setTitle(report.getTitle())
+        .setContent(report.getContent())
+        .setCreatedAt(report.getCreatedAt().toString());
+
+    if (report.getSystemCategoryId() != null) {
+      response.setSystemCategoryId(report.getSystemCategoryId());
+    }
+
+    if (report.getTargetId() != null) {
+      response.setTargetId(report.getTargetId().toString());
+    }
+
+    return response.build();
+
   }
 }
 
