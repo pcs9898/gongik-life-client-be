@@ -2,13 +2,16 @@ package org.example.gongiklifeclientbegraphql.dto.common;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Slf4j
 public class PageInfoDto {
 
   private String endCursor;
@@ -28,4 +31,12 @@ public class PageInfoDto {
     return dto;
   }
 
+  public static PageInfoDto fromReportServiceProto(ReportServiceOuterClass.PageInfo pageInfo) {
+    PageInfoDto dto = new PageInfoDto();
+
+    dto.setEndCursor(pageInfo.getEndCursor());
+
+    dto.setHasNextPage(pageInfo.getHasNextPage());
+    return dto;
+  }
 }

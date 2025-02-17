@@ -39,6 +39,8 @@ type Query {
     searchPosts(searchPostsFilter: SearchPostsFilter!): SearchPostsResponse!
 
     report(reportInput: ReportInput!): ReportResponse! @authenticate
+
+    myReports(myReportsFilter: MyReportsFilter!): MyReportsResponse! @authenticate
 }
 
 type Mutation{
@@ -570,4 +572,24 @@ type ReportResponse{
     title:String!
     content:String!
     createdAt:String!
+}
+
+input MyReportsFilter{
+    cursor: String
+    pageSize: Int = 10
+}
+
+type ReportForList{
+    id:ID!
+    typeId:Int!
+    systemCategoryId:Int
+    targetId:ID
+    statusId:Int!
+    title:String!
+    createdAt:String!
+}
+
+type MyReportsResponse{
+    listReport: [ReportForList]
+    pageInfo: PageInfo!
 }
