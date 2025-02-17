@@ -7,6 +7,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Cre
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsCommentRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsCommentResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentForList;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentsRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentsResponse;
@@ -259,4 +261,12 @@ public class CommentService {
   }
 
 
+  public ExistsCommentResponse existsComment(ExistsCommentRequest request) {
+    boolean exists = commentRepository.existsByIdAndDeletedAtIsNull(
+        UUID.fromString(request.getCommentId()));
+
+    return ExistsCommentResponse.newBuilder()
+        .setExists(exists)
+        .build();
+  }
 }

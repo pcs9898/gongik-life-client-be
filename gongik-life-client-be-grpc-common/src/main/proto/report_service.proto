@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package com.gongik.reportService.domain.service;
+
+service ReportService{
+  rpc CreateSystemReport(CreateSystemReportRequest) returns (CreateSystemReportResponse);
+
+  rpc CreateReport(CreateReportRequest) returns (CreateReportResponse);
+}
+
+message CreateSystemReportRequest{
+  string userId = 1;
+  int32 systemCategoryId = 2;
+  string title = 3;
+  string content = 4;
+}
+
+message CreateSystemReportResponse{
+  string reportId = 1;
+}
+
+message CreateReportRequest{
+  string userId = 1;
+  int32 reportTypeId = 2;
+  string  title = 3;
+  string content = 4;
+  string targetId = 5;
+}
+
+message CreateReportResponse{
+  string reportId = 1;
+}
