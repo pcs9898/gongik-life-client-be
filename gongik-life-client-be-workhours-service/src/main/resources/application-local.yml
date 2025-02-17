@@ -51,6 +51,13 @@ spring:
     username: postgres
     password: postgres
 
+  batch:
+    job:
+      enabled: false  # batch job auto start 방지, using trigger at this module
+    jdbc:
+      initialize-schema: always
+
+
   jpa:
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect

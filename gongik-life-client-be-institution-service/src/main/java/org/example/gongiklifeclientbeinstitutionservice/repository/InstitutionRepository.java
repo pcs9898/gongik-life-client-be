@@ -3,6 +3,7 @@ package org.example.gongiklifeclientbeinstitutionservice.repository;
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
 import java.util.UUID;
+import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionForWorkHoursStatisticsProjection;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionSimpleProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,12 @@ public interface InstitutionRepository extends JpaRepository<Institution, UUID> 
       @Param("searchKeyword") String searchKeyword,
       @Param("cursor") UUID cursor,
       @Param("limit") int limit);
+
+  @Query("select i.id as id, i.institutionCategory.id as institutionCategoryId, " +
+      "i.averageWorkhours as averageWorkhours, i.reviewCount as reviewCount " +
+      "from Institution i " +
+      "where i.averageWorkhours is not null")
+  List<InstitutionForWorkHoursStatisticsProjection> findAllInstitutionsForWorkHoursStatistics();
 
 
 }
