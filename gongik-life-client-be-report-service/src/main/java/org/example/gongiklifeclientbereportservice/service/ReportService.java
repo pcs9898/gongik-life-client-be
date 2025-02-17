@@ -12,15 +12,23 @@ import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSys
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportResponse;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.MyReportsRequest;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.MyReportsResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.PageInfo;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportForList;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportResponse;
 import io.grpc.Status;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbereportservice.dto.ReportProjection;
 import org.example.gongiklifeclientbereportservice.entity.Report;
 import org.example.gongiklifeclientbereportservice.repository.ReportRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -135,6 +143,7 @@ public class ReportService {
   }
 
 
+  @Transactional
   public DeleteReportResponse deleteReport(DeleteReportRequest request) {
     Report report = reportRepository.findById(UUID.fromString(request.getReportId()))
         .orElseThrow(
@@ -147,7 +156,7 @@ public class ReportService {
 
     throwDeleteReportException(report.getStatusId());
 
-    reportRepository.delete(report);
+    report.setDeletedAt(new Date());
 
     return DeleteReportResponse.newBuilder()
         .setReportId(request.getReportId())
@@ -201,6 +210,49 @@ public class ReportService {
 
     return response.build();
 
+  }
+
+  public MyReportsResponse myReports(MyReportsRequest request) {
+
+    List<ReportProjection> reports = reportRepository.myReportsWithCursor(
+        request.getUserId(),
+        request.hasCursor() ? request.getCursor() : null,
+        request.getPageSize()
+    );
+
+    List<ReportForList> listReport = reports.stream()
+        .map(report -> {
+          ReportForList.Builder response = ReportForList.newBuilder()
+              .setId(report.getId())
+              .setTypeId(report.getTypeId())
+              .setStatusId(report.getStatusId())
+              .setTitle(report.getTitle())
+              .setCreatedAt(report.getCreatedAt());
+
+          if (report.getTargetId() != null) {
+            response.setTargetId(report.getTargetId());
+          }
+
+          if (report.getSystemCategoryId() != null) {
+            response.setSystemCategoryId(report.getSystemCategoryId());
+          }
+
+          return response.build();
+
+        })
+        .toList();
+
+    PageInfo.Builder pageInfo = PageInfo.newBuilder()
+        .setHasNextPage(reports.size() == request.getPageSize());
+
+    if (!reports.isEmpty()) {
+      pageInfo.setEndCursor(reports.get(reports.size() - 1).getId());
+    }
+
+    return MyReportsResponse.newBuilder()
+        .addAllListReport(listReport)
+        .setPageInfo(pageInfo.build())
+        .build();
   }
 }
 

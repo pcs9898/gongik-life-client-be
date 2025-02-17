@@ -7,6 +7,8 @@ import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSys
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportResponse;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.MyReportsRequest;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.MyReportsResponse;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportResponse;
 import io.grpc.stub.StreamObserver;
@@ -72,6 +74,20 @@ public class ReportGrpcService extends ReportServiceGrpc.ReportServiceImplBase {
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.error("Error occurred while reporting", e);
+      responseObserver.onError(e);
+    }
+  }
+
+  @Override
+  public void myReports(MyReportsRequest request,
+      StreamObserver<MyReportsResponse> responseObserver) {
+    try {
+      MyReportsResponse response = reportService.myReports(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("Error occurred while getting my reports", e);
       responseObserver.onError(e);
     }
   }
