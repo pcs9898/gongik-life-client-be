@@ -29,6 +29,9 @@ service InstitutionService {
 
   rpc ExistsInstitutionReview(ExistsInstitutionReviewRequest) returns (ExistsInstitutionReviewResponse);
 
+  rpc GetInstitutionsForWorkHourStatistics(Empty) returns (stream InstitutionForWorkHourStatistics);
+
+  rpc GetMyAverageWorkhours(GetMyAverageWorkhoursRequest) returns (GetMyAverageWorkhoursResponse);
 }
 
 message SearchInstitutionsRequest {
@@ -229,4 +232,22 @@ message ExistsInstitutionReviewRequest{
 
 message ExistsInstitutionReviewResponse{
   bool exists = 1;
+}
+
+message Empty{}
+
+message InstitutionForWorkHourStatistics{
+  string id = 1;
+  int32 institutionCategoryId = 2; // 1: SOCIAL_WELFARE, 2: PUBLIC_ORGANIZATION, ...
+  int32 averageWorkhours = 3;      // 0 ~ 480
+  int32 reviewCount = 4;
+}
+
+message GetMyAverageWorkhoursRequest{
+  string userId = 1;
+  string institutionId = 2;
+}
+
+message GetMyAverageWorkhoursResponse{
+  int32 myAverageWorkhours = 1;
 }

@@ -22,6 +22,8 @@ service UserService {
   rpc GetUserNameById(GetUserNameByIdRequest) returns (GetUserNameByIdResponse);
 
   rpc GetUserNameByIds(GetUserNameByIdsRequest) returns (GetUserNameByIdsResponse);
+
+  rpc HasInstitution(HasInstitutionRequest) returns (HasInstitutionResponse);
 }
 
 message SendEmailVerificationCodeRequest {
@@ -181,4 +183,11 @@ message GetUserNameByIdsResponse{
   map<string, string> users = 1; // key: userId, value: name
 }
 
+message HasInstitutionRequest{
+  string userId = 1;
+}
+
+message HasInstitutionResponse{
+  string institutionId = 2;
+}
 

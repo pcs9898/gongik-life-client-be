@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.userService.domain.service.UserServiceGrpc;
+import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.SendEmailVerificationCodeResponse;
@@ -140,4 +141,18 @@ public class UserService {
   public void sendUserLoginHistoryRequest(UserLoginHistoryRequestDto userLoginHistoryRequestDto) {
     userLoginHistoryProducer.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
   }
+
+  public String hasInstitution(String userId) {
+    try {
+      return userBlockingStub.hasInstitution(
+          HasInstitutionRequest.newBuilder().setUserId(userId).buildPartial()
+      ).getInstitutionId();
+
+
+    } catch (Exception e) {
+      log.error("graphql -> userService -> hasInstitution error: ", e);
+      throw e;
+    }
+  }
+
 }

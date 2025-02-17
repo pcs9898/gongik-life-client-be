@@ -61,6 +61,7 @@ dependencies {
 
     implementation 'org.springframework.kafka:spring-kafka'
     implementation project(':gongik-life-client-be-kafka-common-dto')
+    implementation project(':gongik-life-client-be-common-dto')
 }
 
 dependencyManagement {
