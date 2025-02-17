@@ -25,6 +25,10 @@ service InstitutionService {
 
   rpc InstitutionReviewsByInstitution(InstitutionReviewsByInstitutionRequest) returns (InstitutionReviewsByInstitutionResponse);
 
+  rpc ExistsInstitution(ExistsInstitutionRequest) returns (ExistsInstitutionResponse);
+
+  rpc ExistsInstitutionReview(ExistsInstitutionReviewRequest) returns (ExistsInstitutionReviewResponse);
+
 }
 
 message SearchInstitutionsRequest {
@@ -209,4 +213,20 @@ message GetInstitutionReviewCountRequest{
 
 message GetInstitutionReviewCountResponse{
   int32 reviewCount = 1;
+}
+
+message ExistsInstitutionRequest{
+  string institutionId = 1;
+}
+
+message ExistsInstitutionResponse{
+  bool exists = 1;
+}
+
+message ExistsInstitutionReviewRequest{
+  string institutionReviewId = 1;
+}
+
+message ExistsInstitutionReviewResponse{
+  bool exists = 1;
 }
