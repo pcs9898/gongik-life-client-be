@@ -37,6 +37,8 @@ type Query {
     myComments(myCommentsFilter: MyCommentsFilter!): MyCommentsResponse! @authenticate
 
     searchPosts(searchPostsFilter: SearchPostsFilter!): SearchPostsResponse!
+
+    report(reportInput: ReportInput!): ReportResponse! @authenticate
 }
 
 type Mutation{
@@ -553,4 +555,19 @@ input DeleteReportInput{
 type DeleteReportResponse{
     reportId: ID!
     success: Boolean!
+}
+
+input ReportInput{
+    reportId: ID!
+}
+
+type ReportResponse{
+    id:ID!
+    typeId:Int!
+    systemCategoryId:Int
+    targetId:ID
+    statusId:Int!
+    title:String!
+    content:String!
+    createdAt:String!
 }
