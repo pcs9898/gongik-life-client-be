@@ -11,4 +11,5 @@ public interface ReportRepository extends JpaRepository<Report, UUID> {
   boolean existsByUserIdAndTypeIdAndSystemCategoryId(UUID userId, int typeId, int systemCategoryId);
 
   boolean existsByUserIdAndTargetId(UUID userId, UUID targetId);
+
 }

@@ -2,13 +2,14 @@ package org.example.gongiklifeclientbegraphql.controller;
 
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.report.createReport.CreateReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.createReport.CreateReportResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.CreateSystemReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.CreateSystemReportResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.report.deleteReport.DeleteReportRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.report.deleteReport.DeleteReportResponseDto;
 import org.example.gongiklifeclientbegraphql.service.ReportService;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -47,7 +48,7 @@ public class ReportController {
     try {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      requestDto.setUserId(UUID.fromString(userId));
+      requestDto.setUserId(userId);
 
       return reportService.createReport(requestDto);
 
@@ -57,5 +58,22 @@ public class ReportController {
     }
   }
 
+  @MutationMapping
+  public DeleteReportResponseDto deleteReport(
+      @Argument("deleteReportInput") @Valid DeleteReportRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return reportService.deleteReport(requestDto);
+
+    } catch (Exception e) {
+      log.error("Failed to delete report", e);
+      throw e;
+    }
+  }
 
 }

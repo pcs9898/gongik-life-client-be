@@ -5,6 +5,8 @@ import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateRep
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateReportResponse;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportResponse;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +43,20 @@ public class ReportGrpcService extends ReportServiceGrpc.ReportServiceImplBase {
       responseObserver.onCompleted();
     } catch (Exception e) {
       log.error("Error occurred while creating report", e);
+      responseObserver.onError(e);
+    }
+  }
+
+  @Override
+  public void deleteReport(DeleteReportRequest request,
+      StreamObserver<DeleteReportResponse> responseObserver) {
+    try {
+      DeleteReportResponse response = reportService.deleteReport(request);
+
+      responseObserver.onNext(response);
+      responseObserver.onCompleted();
+    } catch (Exception e) {
+      log.error("Error occurred while deleting report", e);
       responseObserver.onError(e);
     }
   }

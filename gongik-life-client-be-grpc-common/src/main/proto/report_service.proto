@@ -6,6 +6,8 @@ service ReportService{
   rpc CreateSystemReport(CreateSystemReportRequest) returns (CreateSystemReportResponse);
 
   rpc CreateReport(CreateReportRequest) returns (CreateReportResponse);
+
+  rpc DeleteReport(DeleteReportRequest) returns (DeleteReportResponse);
 }
 
 message CreateSystemReportRequest{
@@ -29,4 +31,14 @@ message CreateReportRequest{
 
 message CreateReportResponse{
   string reportId = 1;
+}
+
+message DeleteReportRequest{
+  string userId = 1;
+  string reportId = 2;
+}
+
+message DeleteReportResponse{
+  string reportId = 1;
+  bool success = 2;
 }
