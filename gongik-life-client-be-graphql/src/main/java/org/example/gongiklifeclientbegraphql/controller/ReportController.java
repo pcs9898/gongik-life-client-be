@@ -1,10 +1,13 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
-import dto.report.CreateSystemReportRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.report.createReport.CreateReportRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.report.createReport.CreateReportResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.CreateSystemReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.CreateSystemReportResponseDto;
 import org.example.gongiklifeclientbegraphql.service.ReportService;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -34,7 +37,24 @@ public class ReportController {
       log.error("Failed to create system report", e);
       throw e;
     }
+  }
 
+  @MutationMapping
+  public CreateReportResponseDto createReport(
+      @Argument("createReportInput") @Valid CreateReportRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(UUID.fromString(userId));
+
+      return reportService.createReport(requestDto);
+
+    } catch (Exception e) {
+      log.error("Failed to create report", e);
+      throw e;
+    }
   }
 
 

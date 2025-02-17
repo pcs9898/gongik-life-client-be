@@ -1,5 +1,6 @@
-package dto.report;
+package org.example.gongiklifeclientbegraphql.dto.report.createSystemReport;
 
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 public class CreateSystemReportRequestDto {
 
+
   private String userId;
 
   @Range(min = 1, max = 5)
@@ -27,4 +29,12 @@ public class CreateSystemReportRequestDto {
   @NotBlank
   private String content;
 
+  public CreateSystemReportRequest toProto() {
+    return CreateSystemReportRequest.newBuilder()
+        .setUserId(userId)
+        .setSystemCategoryId(systemCategoryId)
+        .setTitle(title)
+        .setContent(content)
+        .build();
+  }
 }

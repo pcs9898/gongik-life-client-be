@@ -4,6 +4,8 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Cre
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsPostRequest;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostRequest;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountRequest;
@@ -440,6 +442,12 @@ public class PostService {
         .addAllListPost(listPosts)
         .setPageInfo(pageInfoBuilder.build())
         .build();
+  }
+
+  public ExistsPostResponse existsPost(ExistsPostRequest request) {
+    boolean exists = postRepository.existsById(UUID.fromString(request.getPostId()));
+
+    return ExistsPostResponse.newBuilder().setExists(exists).build();
   }
 }
 

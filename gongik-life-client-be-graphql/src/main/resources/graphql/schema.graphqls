@@ -74,6 +74,7 @@ type Mutation{
 
     createSystemReport(createSystemReportInput: CreateSystemReportInput!): CreateSystemReportResponse! @authenticate
 
+    createReport(createReportInput: CreateReportInput!): CreateReportResponse! @authenticate
 }
 
 "search result"
@@ -529,5 +530,17 @@ input CreateSystemReportInput{
 }
 
 type CreateSystemReportResponse{
-    success:Boolean!
+    reportId: ID!
+}
+
+input CreateReportInput{
+    reportTypeId: Int! @range(min: 2, max: 5)
+    title:String!
+    content:String!
+    targetId: ID!
+
+}
+
+type CreateReportResponse{
+    reportId: ID!
 }
