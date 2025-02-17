@@ -13,6 +13,8 @@ import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionDi
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionTagRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.RegionalMilitaryOfficeRepository;
+import org.example.gongiklifeclientbeinstitutionservice.util.RandomDoubleGenerator;
+import org.example.gongiklifeclientbeinstitutionservice.util.RandomNumberGenerator;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -40,6 +42,8 @@ public class BatchConfig {
   private final InstitutionDiseaseRestrictionRepository institutionDiseaseRestrictionRepository;
   private final DataCheckDecider dataCheckDecider;
   private final JobDurationListener jobDurationListener;
+  private final RandomNumberGenerator randomNumberGenerator;
+  private final RandomDoubleGenerator randomDoubleGenerator;
 
   @Bean
   public Job importInstitutionJob(Step SeedInstitutionsToPostgreSQLStep) {
@@ -79,7 +83,7 @@ public class BatchConfig {
   public InstitutionItemProcessor institutionItemProcessor() {
     return new InstitutionItemProcessor(regionalMilitaryOfficeRepository,
         institutionCategoryRepository,
-        institutionTagRepository);
+        institutionTagRepository, randomNumberGenerator, randomDoubleGenerator);
   }
 
   @Bean

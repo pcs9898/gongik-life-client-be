@@ -204,4 +204,19 @@ public class InstitutionService {
 
     }
   }
+
+  public Integer getMyAverageWorkhours(String userId, String userInstitutionId) {
+
+    try {
+      return institutionBlockingStub.getMyAverageWorkhours(
+          com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursRequest.newBuilder()
+              .setUserId(userId)
+              .setInstitutionId(userInstitutionId)
+              .build()
+      ).getMyAverageWorkhours();
+    } catch (Exception e) {
+      log.error("graphql -> institutionService -> getMyAverageWorkhours error", e);
+      throw e;
+    }
+  }
 }

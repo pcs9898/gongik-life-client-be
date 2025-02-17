@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package com.gongik.workhoursService.domain.service;
+
+service WorkhoursService{
+  rpc GetAverageWorkhours(Empty) returns (GetAverageWorkhoursResponse);
+}
+
+message Empty{}
+
+message GetAverageWorkhoursResponse{
+  int32 socialWelfareWorkhours = 1;
+  int32 publicOrganizationWorkhours = 2;
+  int32 nationalAgencyWorkhours = 3;
+  int32   localGovernmentWorkhours = 4;
+  int32 totalVoteCount = 5;
+}

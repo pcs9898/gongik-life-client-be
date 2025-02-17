@@ -41,6 +41,8 @@ type Query {
     report(reportInput: ReportInput!): ReportResponse! @authenticate
 
     myReports(myReportsFilter: MyReportsFilter!): MyReportsResponse! @authenticate
+
+    averageWorkhours: AverageWorkhoursResponse! @authenticate
 }
 
 type Mutation{
@@ -592,4 +594,13 @@ type ReportForList{
 type MyReportsResponse{
     listReport: [ReportForList]
     pageInfo: PageInfo!
+}
+
+type AverageWorkhoursResponse{
+    myAverageWorkhours: Int!
+    socialWelfareWorkhours:Int!
+    publicOrganizationWorkhours:Int!
+    nationalAgencyWorkhours:Int!
+    localGovernmentWorkhours:Int!
+    totalVoteCount:Int!
 }

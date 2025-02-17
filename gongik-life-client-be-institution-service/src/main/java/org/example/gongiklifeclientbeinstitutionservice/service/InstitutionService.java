@@ -11,6 +11,8 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountResponse;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursRequest;
+import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewForList;
@@ -48,6 +50,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionForWorkHoursStatisticsProjection;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionSimpleProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
@@ -89,15 +92,6 @@ public class InstitutionService {
               .build())
           .build();
     }
-//    List<InstitutionDocument> institutions;
-//    if (request.getCursor().isEmpty()) {
-//      institutions = institutionSearchRepository.findByNameContainingOrderByIdAsc(
-//          request.getSearchKeyword(), Pageable.ofSize(request.getPageSize()));
-//    } else {
-//      institutions = institutionSearchRepository.findByNameContainingAndIdGreaterThanOrderByIdAsc(
-//          request.getSearchKeyword(), request.getCursor(),
-//          Pageable.ofSize(request.getPageSize()));
-//    }
 
     List<InstitutionSimpleProjection> institutions = institutionRepository.searchInstitutions(
         request.getSearchKeyword(),
@@ -529,12 +523,38 @@ public class InstitutionService {
 
   public ExistsInstitutionReviewResponse existsInstitutionReview(
       ExistsInstitutionReviewRequest request) {
-    
+
     boolean exists = institutionReviewRepository.existsById(
         UUID.fromString(request.getInstitutionReviewId()));
 
     return ExistsInstitutionReviewResponse.newBuilder()
         .setExists(exists)
         .build();
+  }
+
+  public List<InstitutionForWorkHoursStatisticsProjection> getInstitutionsForWorkHourStatistics() {
+    return institutionRepository.findAllInstitutionsForWorkHoursStatistics();
+  }
+
+  public GetMyAverageWorkhoursResponse getMyAverageWorkhours(GetMyAverageWorkhoursRequest request) {
+    Institution institution = institutionRepository.findById(
+            UUID.fromString(request.getInstitutionId()))
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription("Institution not found, wrong institution id")
+            .asRuntimeException()
+        );
+
+    InstitutionReview institutionReview = institutionReviewRepository.findByUserIdAndInstitution(
+            UUID.fromString(request.getUserId()), institution)
+        .orElseThrow(() -> Status.NOT_FOUND
+            .withDescription(
+                "Institution review not found, if you want to get your average workhours, you should write a review first")
+            .asRuntimeException()
+        );
+
+    return GetMyAverageWorkhoursResponse.newBuilder()
+        .setMyAverageWorkhours(institutionReview.getAverageWorkhours()).build();
+
+
   }
 }
