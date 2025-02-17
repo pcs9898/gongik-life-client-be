@@ -10,6 +10,8 @@ import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateRep
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateReportResponse;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportRequest;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportResponse;
 import io.grpc.Status;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -82,7 +84,7 @@ public class ReportService {
     }
 
     if (!existTarget) {
-      CreateReportThrowNotFoundException(request.getReportTypeId(), targetId);
+      throwCreateReportNotFoundException(request.getReportTypeId(), targetId);
     }
 
     // need to check if user already reported the target
@@ -111,7 +113,7 @@ public class ReportService {
 
   }
 
-  private void CreateReportThrowNotFoundException(int reportTypeId, String targetId) {
+  private void throwCreateReportNotFoundException(int reportTypeId, String targetId) {
     String message;
     switch (reportTypeId) {
       case 2:
@@ -131,6 +133,43 @@ public class ReportService {
   }
 
 
+  public DeleteReportResponse deleteReport(DeleteReportRequest request) {
+    Report report = reportRepository.findById(UUID.fromString(request.getReportId()))
+        .orElseThrow(
+            () -> Status.NOT_FOUND.withDescription("Report not found").asRuntimeException());
+
+    if (!report.getUserId().equals(UUID.fromString(request.getUserId()))) {
+      throw Status.PERMISSION_DENIED.withDescription("You can not delete other user's report")
+          .asRuntimeException();
+    }
+
+    throwDeleteReportException(report.getStatusId());
+
+    reportRepository.delete(report);
+
+    return DeleteReportResponse.newBuilder()
+        .setReportId(request.getReportId())
+        .setSuccess(true)
+        .build();
+  }
+
+  private void throwDeleteReportException(int reportStatus) {
+    String message;
+    switch (reportStatus) {
+      case 2:
+        message = "Can not delete a reviewing report";
+        break;
+      case 3:
+        message = "Can not delete a resolved report";
+        break;
+      case 4:
+        message = "Can not delete a rejected report";
+        break;
+      default:
+        return; // 예외를 던지지 않음
+    }
+    throw Status.FAILED_PRECONDITION.withDescription(message).asRuntimeException();
+  }
 }
 
 

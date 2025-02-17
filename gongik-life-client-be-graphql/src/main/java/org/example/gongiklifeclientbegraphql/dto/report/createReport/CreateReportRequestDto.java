@@ -3,7 +3,6 @@ package org.example.gongiklifeclientbegraphql.dto.report.createReport;
 import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateReportRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +16,7 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 public class CreateReportRequestDto {
 
-  private UUID userId;
+  private String userId;
 
   @Range(min = 2, max = 5)
   private Integer reportTypeId;
@@ -30,15 +29,15 @@ public class CreateReportRequestDto {
   @NotBlank
   private String content;
 
-  private UUID targetId;
+  private String targetId;
 
   public CreateReportRequest toProto() {
     return CreateReportRequest.newBuilder()
-        .setUserId(userId.toString())
+        .setUserId(userId)
         .setReportTypeId(reportTypeId)
         .setTitle(title)
         .setContent(content)
-        .setTargetId(targetId.toString())
+        .setTargetId(targetId)
         .build();
   }
 }
