@@ -15,3 +15,4 @@ DATABASE gongik_life_client_notification_db;
 
 CREATE
 DATABASE gongik_life_client_report_db;
+

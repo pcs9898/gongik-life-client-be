@@ -12,6 +12,8 @@ import org.example.gongiklifeclientbeinstitutionservice.entity.RegionalMilitaryO
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionCategoryRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.InstitutionTagRepository;
 import org.example.gongiklifeclientbeinstitutionservice.repository.RegionalMilitaryOfficeRepository;
+import org.example.gongiklifeclientbeinstitutionservice.util.RandomDoubleGenerator;
+import org.example.gongiklifeclientbeinstitutionservice.util.RandomNumberGenerator;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,8 @@ public class InstitutionItemProcessor implements
   private final RegionalMilitaryOfficeRepository regionalMilitaryOfficeRepository;
   private final InstitutionCategoryRepository institutionCategoryRepository;
   private final InstitutionTagRepository institutionTagRepository;
+  private final RandomNumberGenerator randomNumberGenerator;
+  private final RandomDoubleGenerator randomDoubleGenerator;
 
   @Override
   public InstitutionWithDiseaseRestrictionsDto process(String[] row) {
@@ -50,6 +54,8 @@ public class InstitutionItemProcessor implements
           .parentInstitution(parentInstitution)
           .address(address)
           .reviewCount(0)
+          .averageRating(randomDoubleGenerator.generateRandomDouble())
+          .averageWorkhours(randomNumberGenerator.generateRandomNumber())
           .phoneNumber(phoneNumber)
           .regionalMilitaryOffice(regionalMilitaryOffice.get())
           .sexualCriminalRecordRestriction(sexualCriminalRecordRestriction)

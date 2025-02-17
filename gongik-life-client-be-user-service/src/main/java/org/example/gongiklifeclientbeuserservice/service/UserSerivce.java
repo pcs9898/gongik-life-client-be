@@ -15,6 +15,8 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameBy
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsResponse;
+import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionRequest;
+import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileInstitution;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
@@ -783,5 +785,29 @@ public class UserSerivce {
         .putAllUsers(userNamesMap)
         .build();
 
+  }
+
+
+  public HasInstitutionResponse hasInstitution(HasInstitutionRequest request) {
+
+    String userId = request.getUserId();
+
+    User user = userRepository.findById(UUID.fromString(userId))
+        .orElseThrow(() -> Status.NOT_FOUND.withDescription("User not found with ID: " + userId)
+            .asRuntimeException());
+
+    UserProfile userProfile = userProfileRepository.findByUser(user)
+        .orElseThrow(() ->
+            Status.NOT_FOUND.withDescription("User profile not found with ID: " + userId)
+                .asRuntimeException());
+
+    if (userProfile.getInstitutionId() == null) {
+      throw Status.FAILED_PRECONDITION.withDescription(
+              "User has no institution, if you want to get average workhours, you should have institution")
+          .asRuntimeException();
+    }
+
+    return HasInstitutionResponse.newBuilder()
+        .setInstitutionId(userProfile.getInstitutionId().toString()).build();
   }
 }

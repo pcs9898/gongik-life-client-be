@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
+import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -155,5 +156,7 @@ public interface InstitutionReviewRepository extends JpaRepository<InstitutionRe
       """)
   Optional<InstitutionReview> findByIdWithInstitution(@Param("reviewId") UUID reviewId);
 
+
+  Optional<InstitutionReview> findByUserIdAndInstitution(UUID userId, Institution institution);
 
 }
