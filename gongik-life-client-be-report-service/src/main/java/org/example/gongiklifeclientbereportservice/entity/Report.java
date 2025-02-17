@@ -56,6 +56,4 @@ public class Report extends Auditable {
 
   @Column(name = "deleted_at")
   private Date deletedAt;
-
-
 }

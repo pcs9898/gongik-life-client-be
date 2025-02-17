@@ -10,6 +10,8 @@ import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.Creat
 import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.CreateSystemReportResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.report.deleteReport.DeleteReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.deleteReport.DeleteReportResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.report.myReports.MyReportsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.report.myReports.MyReportsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.report.report.ReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.report.ReportResponseDto;
 import org.example.gongiklifeclientbegraphql.service.ReportService;
@@ -96,4 +98,23 @@ public class ReportController {
       throw e;
     }
   }
+
+  @QueryMapping
+  public MyReportsResponseDto myReports(
+      @Argument("myReportsFilter") @Valid MyReportsRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return reportService.myReports(requestDto);
+
+    } catch (Exception e) {
+      log.error("Failed to get my reports", e);
+      throw e;
+    }
+  }
+  
 }

@@ -10,6 +10,8 @@ service ReportService{
   rpc DeleteReport(DeleteReportRequest) returns (DeleteReportResponse);
 
   rpc Report(ReportRequest) returns (ReportResponse);
+
+  rpc MyReports(MyReportsRequest) returns (MyReportsResponse);
 }
 
 message CreateSystemReportRequest{
@@ -59,4 +61,30 @@ message  ReportResponse{
   string title = 6;
   string content = 7;
   string createdAt = 8;
+}
+
+message PageInfo {
+  string endCursor = 1;
+  bool hasNextPage = 2;
+}
+
+message MyReportsRequest{
+  string userId = 1;
+  optional string cursor = 2;
+  int32 pageSize = 3;
+}
+
+message ReportForList{
+  string id = 1;
+  int32 typeId = 2;
+  optional int32 systemCategoryId = 3;
+  optional string targetId = 4;
+  int32 statusId = 5;
+  string title = 6;
+  string createdAt = 8;
+}
+
+message MyReportsResponse{
+  repeated ReportForList listReport = 1;
+  PageInfo pageInfo = 2;
 }

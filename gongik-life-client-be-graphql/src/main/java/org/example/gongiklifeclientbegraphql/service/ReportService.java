@@ -11,6 +11,8 @@ import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.Creat
 import org.example.gongiklifeclientbegraphql.dto.report.createSystemReport.CreateSystemReportResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.report.deleteReport.DeleteReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.deleteReport.DeleteReportResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.report.myReports.MyReportsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.report.myReports.MyReportsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.report.report.ReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.report.ReportResponseDto;
 import org.springframework.stereotype.Service;
@@ -79,6 +81,20 @@ public class ReportService {
       );
     } catch (Exception e) {
       log.error("Failed to get report", e);
+      throw e;
+    }
+  }
+
+  public MyReportsResponseDto myReports(MyReportsRequestDto requestDto) {
+    try {
+
+      return MyReportsResponseDto.fromProto(
+          reportServiceBlockingStub.myReports(
+              requestDto.toProto()
+          )
+      );
+    } catch (Exception e) {
+      log.error("Failed to get my reports", e);
       throw e;
     }
   }
