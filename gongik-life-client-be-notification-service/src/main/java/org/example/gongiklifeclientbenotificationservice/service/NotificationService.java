@@ -5,6 +5,7 @@ import com.gongik.notificationService.domain.service.NotificationServiceOuterCla
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.NotificationForList;
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.PageInfo;
 import dto.notification.CreateNotificationRequestDto;
+import dto.notification.DeleteAllNotificationsRequestDto;
 import dto.notification.DeleteNotificationRequestDto;
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
@@ -143,5 +144,10 @@ public class NotificationService {
     notification.setDeletedAt(new Date());
 
     notificationRepository.save(notification);
+  }
+
+  public void deleteAllNotifications(DeleteAllNotificationsRequestDto requestDto) {
+
+    notificationRepository.deleteAllNotifications(UUID.fromString(requestDto.getUserId()));
   }
 }
