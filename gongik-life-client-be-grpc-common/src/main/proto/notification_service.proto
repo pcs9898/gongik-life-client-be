@@ -5,7 +5,7 @@ package com.gongik.notificationService.domain.service;
 service NotificationService{
   rpc MyNotifications(MyNotificationsRequest) returns (MyNotificationsResponse);
 
-  rpc markNotificationAsRead(MarkNotificationAsReadRequest) returns (MarkNotificationAsReadResponse);
+
 }
 
 message MyNotificationsRequest{
@@ -26,6 +26,7 @@ message NotificationForList{
   optional string targetedNotificationId = 9;
   optional string   reportId = 10;
   string createdAt = 11;
+  optional string readAt = 12;
 }
 
 message MyNotificationsResponse{

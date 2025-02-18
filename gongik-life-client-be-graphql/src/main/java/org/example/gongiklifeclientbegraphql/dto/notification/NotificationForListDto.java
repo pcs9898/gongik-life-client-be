@@ -23,6 +23,7 @@ public class NotificationForListDto {
   private String targetedNotificationId;
   private String reportId;
   private String createdAt;
+  private String readAt;
 
   public static List<NotificationForListDto> fromProto(
       List<com.gongik.notificationService.domain.service.NotificationServiceOuterClass.NotificationForList> listNotification) {
@@ -44,6 +45,7 @@ public class NotificationForListDto {
                     : null)
             .reportId(notification.hasReportId() ? notification.getReportId() : null)
             .createdAt(notification.getCreatedAt())
+            .readAt(notification.hasReadAt() ? notification.getReadAt() : null)
             .build())
         .toList();
   }
