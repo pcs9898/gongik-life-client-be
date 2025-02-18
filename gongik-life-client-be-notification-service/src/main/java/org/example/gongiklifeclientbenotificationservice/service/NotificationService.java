@@ -5,6 +5,7 @@ import com.gongik.notificationService.domain.service.NotificationServiceOuterCla
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.NotificationForList;
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.PageInfo;
 import dto.notification.CreateNotificationRequestDto;
+import dto.notification.DeleteNotificationRequestDto;
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
 import java.util.Date;
@@ -125,5 +126,22 @@ public class NotificationService {
 
   public void markAllNotificationsAsRead(MarkAllNotificationsAsReadRequestDto requestDto) {
     notificationRepository.markAllNotificationsAsRead(UUID.fromString(requestDto.getUserId()));
+  }
+
+  public void deleteNotification(DeleteNotificationRequestDto requestDto) {
+    Notification notification = notificationRepository.findByIdAndUserIdAndDeletedAtIsNull(
+        UUID.fromString(requestDto.getNotificationId()),
+        UUID.fromString(requestDto.getUserId())
+    ).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        "You can delete only your own notifications"));
+
+    if (notification.getDeletedAt() != null) {
+      log.info("Notification already deleted");
+      return;
+    }
+
+    notification.setDeletedAt(new Date());
+
+    notificationRepository.save(notification);
   }
 }
