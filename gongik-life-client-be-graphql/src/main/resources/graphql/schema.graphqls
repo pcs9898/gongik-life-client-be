@@ -87,6 +87,8 @@ type Mutation{
     deleteReport(deleteReportInput: DeleteReportInput!): DeleteReportResponse! @authenticate
 
     markNotificationAsRead(markNotificationAsReadInput: MarkNotificationAsReadInput!): MarkNotificationAsReadResponse! @authenticate
+
+    markAllNotificationsAsRead: MarkAllNotificationsAsReadResponse! @authenticate
 }
 
 "search result"
@@ -621,6 +623,7 @@ type NotificationForList {
     targetedNotificationId:String
     reportId:String
     createdAt:String!
+    readAt:String
 }
 
 type MyNotificationsResponse{
@@ -639,5 +642,9 @@ input MarkNotificationAsReadInput{
 }
 
 type MarkNotificationAsReadResponse{
+    success: Boolean!
+}
+
+type MarkAllNotificationsAsReadResponse{
     success: Boolean!
 }
