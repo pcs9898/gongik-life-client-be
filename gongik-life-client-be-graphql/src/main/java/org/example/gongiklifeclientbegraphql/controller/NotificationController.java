@@ -1,11 +1,13 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import dto.notification.DeleteNotificationRequestDto;
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.notification.deleteNotification.DeleteNotificationResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.markAllNotificationsAsRead.MarkAllNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.markNotificationAsRead.MarkNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsRequestDto;
@@ -76,4 +78,22 @@ public class NotificationController {
     }
   }
 
+  @MutationMapping
+  public DeleteNotificationResponseDto deleteNotification(
+      @Argument("deleteNotificationInput") DeleteNotificationRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return notificationService.deleteNotification(requestDto);
+
+    } catch (Exception e) {
+      log.error("Failed to delete notification", e);
+      throw e;
+    }
+  }
+  
 }

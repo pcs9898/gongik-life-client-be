@@ -1,15 +1,18 @@
 package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.notificationService.domain.service.NotificationServiceGrpc;
+import dto.notification.DeleteNotificationRequestDto;
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.gongiklifeclientbegraphql.dto.notification.deleteNotification.DeleteNotificationResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.markAllNotificationsAsRead.MarkAllNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.markNotificationAsRead.MarkNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsResponseDto;
+import org.example.gongiklifeclientbegraphql.producer.notification.DeleteNotificationProducer;
 import org.example.gongiklifeclientbegraphql.producer.notification.MarkAllNotificationsAsReadProducer;
 import org.example.gongiklifeclientbegraphql.producer.notification.MarkNotificationAsReadProducer;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,7 @@ public class NotificationService {
 
   private final MarkNotificationAsReadProducer markNotificationAsReadProducer;
   private final MarkAllNotificationsAsReadProducer markAllNotificationsAsReadProducer;
+  private final DeleteNotificationProducer deleteNotificationProducer;
 
   @GrpcClient("gongik-life-client-be-notification-service")
   private NotificationServiceGrpc.NotificationServiceBlockingStub notificationServiceBlockingStub;
@@ -62,6 +66,20 @@ public class NotificationService {
           .build();
     } catch (Exception e) {
       log.error("Failed to mark all notifications as read", e);
+      throw e;
+    }
+  }
+
+  public DeleteNotificationResponseDto deleteNotification(DeleteNotificationRequestDto requestDto) {
+    try {
+
+      deleteNotificationProducer.sendDeleteNotificationRequest(requestDto);
+
+      return DeleteNotificationResponseDto.builder()
+          .success(true)
+          .build();
+    } catch (Exception e) {
+      log.error("Failed to delete notification", e);
       throw e;
     }
   }
