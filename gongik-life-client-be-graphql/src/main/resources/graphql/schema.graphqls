@@ -43,6 +43,8 @@ type Query {
     myReports(myReportsFilter: MyReportsFilter!): MyReportsResponse! @authenticate
 
     averageWorkhours: AverageWorkhoursResponse! @authenticate
+
+    myNotifications(myNotificationsFilter:MyNotificationsFilter!):  MyNotificationsResponse! @authenticate
 }
 
 type Mutation{
@@ -603,4 +605,28 @@ type AverageWorkhoursResponse{
     nationalAgencyWorkhours:Int!
     localGovernmentWorkhours:Int!
     totalVoteCount:Int!
+}
+
+type NotificationForList {
+    id: ID!
+    notificationTypeId: Int!
+    title: String!
+    content:String!
+    postId:String
+    targetCommentId:String
+    noticeId:String
+    targetedNotificationTypeId:Int
+    targetedNotificationId:String
+    reportId:String
+    createdAt:String!
+}
+
+type MyNotificationsResponse{
+    listNotification: [NotificationForList]
+    pageInfo: PageInfo!
+}
+
+input MyNotificationsFilter{
+    cursor: String
+    pageSize: Int = 10
 }
