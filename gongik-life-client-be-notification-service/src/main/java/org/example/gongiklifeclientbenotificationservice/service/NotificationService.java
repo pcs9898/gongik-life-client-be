@@ -5,6 +5,7 @@ import com.gongik.notificationService.domain.service.NotificationServiceOuterCla
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.NotificationForList;
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.PageInfo;
 import dto.notification.CreateNotificationRequestDto;
+import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
 import java.util.Date;
 import java.util.List;
@@ -84,6 +85,10 @@ public class NotificationService {
             builder.setReportId(notification.getReportId().toString());
           }
 
+          if (notification.getReadAt() != null) {
+            builder.setReadAt(notification.getReadAt().toString());
+          }
+
           return builder.build();
         }).toList();
 
@@ -116,5 +121,9 @@ public class NotificationService {
     notification.setReadAt(new Date());
 
     notificationRepository.save(notification);
+  }
+
+  public void markAllNotificationsAsRead(MarkAllNotificationsAsReadRequestDto requestDto) {
+    notificationRepository.markAllNotificationsAsRead(UUID.fromString(requestDto.getUserId()));
   }
 }
