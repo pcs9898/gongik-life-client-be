@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package com.gongik.notificationService.domain.service;
+
+service NotificationService{
+  rpc MyNotifications(MyNotificationsRequest) returns (MyNotificationsResponse);
+}
+
+message MyNotificationsRequest{
+  string userId = 1;
+  optional string cursor = 2;
+  int32 pageSize = 3;
+}
+
+message NotificationForList{
+  string id = 1;
+  int32 notificationTypeId = 2;
+  string title = 3;
+  string content = 4;
+  optional string postId = 5;
+  optional string targetCommentId = 6;
+  optional string noticeId = 7;
+  optional int32   targetedNotificationTypeId = 8;
+  optional string targetedNotificationId = 9;
+  optional string   reportId = 10;
+  string createdAt = 11;
+}
+
+message MyNotificationsResponse{
+  repeated NotificationForList listNotification = 1;
+  PageInfo pageInfo = 2;
+}
+
+message PageInfo {
+  string endCursor = 1;
+  bool hasNextPage = 2;
+}

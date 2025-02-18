@@ -20,6 +20,7 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Upd
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsRequest;
+import dto.notification.CreateNotificationRequestDto;
 import io.grpc.Status;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbecommunityservice.dto.MyCommentProjection;
 import org.example.gongiklifeclientbecommunityservice.entity.Comment;
 import org.example.gongiklifeclientbecommunityservice.entity.Post;
+import org.example.gongiklifeclientbecommunityservice.producer.CreateNotificationProducer;
 import org.example.gongiklifeclientbecommunityservice.respository.CommentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
   private final CommentRepository commentRepository;
+  private final CreateNotificationProducer createNotificationProducer;
   private final PostService postService;
 
   @GrpcClient("gongik-life-client-be-user-service")
@@ -91,6 +94,32 @@ public class CommentService {
     String username = userServiceBlockingStub.getUserNameById(
         GetUserNameByIdRequest.newBuilder().setUserId(request.getUserId()).build()
     ).getUserName();
+
+    if (request.hasParentCommentId()) {
+      // 5. create notification for parent comment
+      createNotificationProducer.sendCreateNotificationRequest(
+          CreateNotificationRequestDto.builder()
+              .userId(savedComment.getParentComment().getUserId().toString())
+              .notificationTypeId(2)
+              .title(username + " replied to your comment")
+              .content(savedComment.getContent())
+              .postId(request.getPostId())
+              .targetCommentId(request.getParentCommentId())
+              .build()
+      );
+    } else {
+      // 5. create notification for post
+      createNotificationProducer.sendCreateNotificationRequest(
+          CreateNotificationRequestDto.builder()
+              .userId(post.getUserId().toString())
+              .notificationTypeId(1)
+              .title(username + " commented on your post")
+              .content(savedComment.getContent())
+              .postId(request.getPostId())
+              .targetCommentId(savedComment.getId().toString())
+              .build()
+      );
+    }
 
     return CreateCommentResponse.newBuilder()
         .setId(savedComment.getId().toString())

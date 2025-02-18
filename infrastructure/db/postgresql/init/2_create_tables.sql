@@ -480,10 +480,23 @@ CREATE TABLE notification_types (
 
 INSERT INTO notification_types (type_name)
 VALUES
-    ('COMMENT'),           -- 댓글 알림
-    ('REPLY'),             -- 대댓글 알림
-    ('NOTICE'),            -- 공지사항 알림
-    ('TARGETED');          -- 맞춤형 알림
+    ('COMMENT'),           -- 댓글 알림  1
+    ('REPLY'),             -- 대댓글 알림  2
+    ('NOTICE'),            -- 공지사항 알림  3
+    ('TARGETED'),          -- 맞춤형 알림  4
+    ('REPORT');            -- 신고 알림  5
+
+
+-- targeted notification types
+CREATE TABLE targeted_notification_types (
+    id SERIAL PRIMARY KEY,
+    type_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO targeted_notification_types (type_name)
+VALUES
+    ('LEFT_DISCHARGE_DATE'), -- 전역일 % 알림 1
+    ('MY_AVERAGE_WORKHOURS'); -- 나의 평균 근무시간 알림 2, users doesn't have a institution review yey
 
 
 -- 알림 테이블
@@ -496,10 +509,14 @@ CREATE TABLE notifications
     content           TEXT              NOT NULL,
     post_id           UUID,      -- 게시글 ID (COMMENT, REPLY 타입일 때 필수)
     target_comment_id UUID,      -- 스크롤할 댓글 ID (필요시)
+    notice_id         UUID,      -- 공지사항 ID (NOTICE 타입일 때 필수)
+    targeted_notification_type_id INT, -- 맞춤형 알림 타입 ID (TARGETED 타입일 때 필수)
+    targeted_notification_id UUID, -- 맞춤형 알림 ID (TARGETED 타입일 때 필수)
+    report_id         UUID,      -- 신고 ID (REPORT 타입일 때 필수)
     read_at           TIMESTAMPTZ, -- NULL이면 읽지 않음, 값이 있으면 읽은 시간
-    created_at        TIMESTAMPTZ        DEFAULT CURRENT_TIMESTAMP
+    created_at        TIMESTAMPTZ        DEFAULT CURRENT_TIMESTAMP,
+    deleted_at        TIMESTAMPTZ
 );
-
 
 -- 읽지 않은 알림 조회를 위한 인덱스
 CREATE INDEX idx_notifications_unread

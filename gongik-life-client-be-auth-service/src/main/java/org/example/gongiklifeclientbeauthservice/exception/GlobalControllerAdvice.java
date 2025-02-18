@@ -4,9 +4,12 @@ package org.example.gongiklifeclientbeauthservice.exception;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbeauthservice.dto.response.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
@@ -27,6 +30,7 @@ public class GlobalControllerAdvice {
         .body(Response.error(ErrorCode.BAD_REQUEST.name()));
   }
 
+
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<?> badCredentialsErrorHandler(BadCredentialsException e) {
     log.error("Bad Credentials Error: {}", e.toString());
@@ -41,6 +45,26 @@ public class GlobalControllerAdvice {
         .body(Response.error(ErrorCode.IO_ERROR.name()));
   }
 
+  @ExceptionHandler(InternalAuthenticationServiceException.class)
+  public ResponseEntity<?> internalAuthenticationServiceExceptionHandler(
+      InternalAuthenticationServiceException e) {
+    log.error("Internal Authentication Service Error: {}", e.toString());
+    return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+        .body(Response.error(e.getMessage()));
+  }
+
+  @ExceptionHandler(InternalAuthenticationServiceException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public String handleInternalAuthenticationServiceException(
+      InternalAuthenticationServiceException ex) {
+
+    System.err.println("InternalAuthenticationServiceException: " + ex.getMessage());
+    return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
+        .body(Response.error(ex.getMessage())).toString();
+
+
+  }
+
   // 마지막으로 처리되지 않은 모든 예외를 처리
   @ExceptionHandler(Exception.class)
   public ResponseEntity<?> handleAllExceptions(Exception e) {
@@ -48,6 +72,8 @@ public class GlobalControllerAdvice {
     return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
         .body(Response.error(e.getMessage()));
   }
+
+
 }
 
 
