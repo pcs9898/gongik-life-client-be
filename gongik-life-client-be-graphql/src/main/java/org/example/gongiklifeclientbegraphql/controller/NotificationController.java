@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import dto.notification.DeleteAllNotificationsRequestDto;
 import dto.notification.DeleteNotificationRequestDto;
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
@@ -7,6 +8,7 @@ import graphql.schema.DataFetchingEnvironment;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbegraphql.dto.notification.deleteAllNotifications.DeleteAllNotificationsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.deleteNotification.DeleteNotificationResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.markAllNotificationsAsRead.MarkAllNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.markNotificationAsRead.MarkNotificationAsReadResponseDto;
@@ -95,5 +97,22 @@ public class NotificationController {
       throw e;
     }
   }
-  
+
+
+  @MutationMapping
+  public DeleteAllNotificationsResponseDto deleteAllNotifications(
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      return notificationService.deleteAllNotifications(
+          DeleteAllNotificationsRequestDto.builder().userId(userId).build());
+
+    } catch (Exception e) {
+      log.error("Failed to delete all notifications", e);
+      throw e;
+    }
+  }
+
 }
