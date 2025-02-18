@@ -5,13 +5,17 @@ import com.gongik.notificationService.domain.service.NotificationServiceOuterCla
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.NotificationForList;
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.PageInfo;
 import dto.notification.CreateNotificationRequestDto;
+import dto.notification.MarkNotificationAsReadRequestDto;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbenotificationservice.entity.Notification;
 import org.example.gongiklifeclientbenotificationservice.repository.NotificationRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -94,5 +98,23 @@ public class NotificationService {
         .addAllListNotification(protoNotifications)
         .setPageInfo(pageInfoBuilder.build())
         .build();
+  }
+
+  public void markNotificationAsRead(MarkNotificationAsReadRequestDto requestDto) {
+
+    Notification notification = notificationRepository.findByIdAndUserIdAndDeletedAtIsNull(
+        UUID.fromString(requestDto.getNotificationId()),
+        UUID.fromString(requestDto.getUserId())
+    ).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+        "You can mark only your own notifications as read"));
+
+    if (notification.getReadAt() != null) {
+      log.info("Notification already read");
+      return;
+    }
+
+    notification.setReadAt(new Date());
+
+    notificationRepository.save(notification);
   }
 }

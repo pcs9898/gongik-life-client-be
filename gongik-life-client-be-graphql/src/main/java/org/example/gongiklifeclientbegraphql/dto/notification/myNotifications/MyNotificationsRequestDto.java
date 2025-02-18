@@ -1,4 +1,4 @@
-package org.example.gongiklifeclientbegraphql.dto.notification;
+package org.example.gongiklifeclientbegraphql.dto.notification.myNotifications;
 
 import com.gongik.notificationService.domain.service.NotificationServiceOuterClass.MyNotificationsRequest;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import org.hibernate.validator.constraints.Range;
 public class MyNotificationsRequestDto {
 
   private String userId;
-  
+
   private String cursor;
 
   @Range(min = 1, max = 20)
