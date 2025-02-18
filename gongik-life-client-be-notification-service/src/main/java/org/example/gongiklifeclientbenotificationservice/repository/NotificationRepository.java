@@ -2,6 +2,7 @@ package org.example.gongiklifeclientbenotificationservice.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.example.gongiklifeclientbenotificationservice.entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,7 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
   List<Notification> findMyNotificationsWithCursor(@Param("userId") String userId,
       @Param("cursor") String cursor,
       @Param("pageSize") int pageSize);
+
+  Optional<Notification> findByIdAndUserIdAndDeletedAtIsNull(UUID id, UUID userId);
+
 }
