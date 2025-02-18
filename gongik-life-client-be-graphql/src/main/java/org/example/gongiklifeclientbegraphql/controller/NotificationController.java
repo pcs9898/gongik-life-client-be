@@ -1,13 +1,16 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
+import dto.notification.MarkNotificationAsReadRequestDto;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gongiklifeclientbegraphql.dto.notification.MyNotificationsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.notification.MyNotificationsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.notification.markNotificationAsRead.MarkNotificationAsReadResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsResponseDto;
 import org.example.gongiklifeclientbegraphql.service.NotificationService;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -35,5 +38,24 @@ public class NotificationController {
       throw e;
     }
   }
+
+  @MutationMapping
+  public MarkNotificationAsReadResponseDto markNotificationAsRead(
+      @Argument("markNotificationAsReadInput") @Valid MarkNotificationAsReadRequestDto requestDto,
+      DataFetchingEnvironment dataFetchingEnvironment
+  ) {
+    try {
+      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+      requestDto.setUserId(userId);
+
+      return notificationService.markNotificationAsRead(requestDto);
+
+    } catch (Exception e) {
+      log.error("Failed to mark notification as read", e);
+      throw e;
+    }
+  }
+
 
 }
