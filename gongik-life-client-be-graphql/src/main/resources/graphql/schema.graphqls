@@ -89,6 +89,8 @@ type Mutation{
     markNotificationAsRead(markNotificationAsReadInput: MarkNotificationAsReadInput!): MarkNotificationAsReadResponse! @authenticate
 
     markAllNotificationsAsRead: MarkAllNotificationsAsReadResponse! @authenticate
+
+    deleteNotification(deleteNotificationInput: DeleteNotificationInput!): DeleteNotificationResponse! @authenticate
 }
 
 "search result"
@@ -646,5 +648,13 @@ type MarkNotificationAsReadResponse{
 }
 
 type MarkAllNotificationsAsReadResponse{
+    success: Boolean!
+}
+
+input DeleteNotificationInput{
+    notificationId: ID!
+}
+
+type DeleteNotificationResponse{
     success: Boolean!
 }
