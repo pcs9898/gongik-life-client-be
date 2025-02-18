@@ -4,6 +4,8 @@ package com.gongik.notificationService.domain.service;
 
 service NotificationService{
   rpc MyNotifications(MyNotificationsRequest) returns (MyNotificationsResponse);
+
+  rpc markNotificationAsRead(MarkNotificationAsReadRequest) returns (MarkNotificationAsReadResponse);
 }
 
 message MyNotificationsRequest{
@@ -35,3 +37,5 @@ message PageInfo {
   string endCursor = 1;
   bool hasNextPage = 2;
 }
+
+

@@ -95,30 +95,32 @@ public class CommentService {
         GetUserNameByIdRequest.newBuilder().setUserId(request.getUserId()).build()
     ).getUserName();
 
-    if (request.hasParentCommentId()) {
-      // 5. create notification for parent comment
-      createNotificationProducer.sendCreateNotificationRequest(
-          CreateNotificationRequestDto.builder()
-              .userId(savedComment.getParentComment().getUserId().toString())
-              .notificationTypeId(2)
-              .title(username + " replied to your comment")
-              .content(savedComment.getContent())
-              .postId(request.getPostId())
-              .targetCommentId(request.getParentCommentId())
-              .build()
-      );
-    } else {
-      // 5. create notification for post
-      createNotificationProducer.sendCreateNotificationRequest(
-          CreateNotificationRequestDto.builder()
-              .userId(post.getUserId().toString())
-              .notificationTypeId(1)
-              .title(username + " commented on your post")
-              .content(savedComment.getContent())
-              .postId(request.getPostId())
-              .targetCommentId(savedComment.getId().toString())
-              .build()
-      );
+    if (!post.getUserId().toString().equals(request.getUserId())) {
+      if (request.hasParentCommentId()) {
+        // 5. create notification for parent comment
+        createNotificationProducer.sendCreateNotificationRequest(
+            CreateNotificationRequestDto.builder()
+                .userId(savedComment.getParentComment().getUserId().toString())
+                .notificationTypeId(2)
+                .title(username + " replied to your comment")
+                .content(savedComment.getContent())
+                .postId(request.getPostId())
+                .targetCommentId(request.getParentCommentId())
+                .build()
+        );
+      } else {
+        // 5. create notification for post
+        createNotificationProducer.sendCreateNotificationRequest(
+            CreateNotificationRequestDto.builder()
+                .userId(post.getUserId().toString())
+                .notificationTypeId(1)
+                .title(username + " commented on your post")
+                .content(savedComment.getContent())
+                .postId(request.getPostId())
+                .targetCommentId(savedComment.getId().toString())
+                .build()
+        );
+      }
     }
 
     return CreateCommentResponse.newBuilder()
