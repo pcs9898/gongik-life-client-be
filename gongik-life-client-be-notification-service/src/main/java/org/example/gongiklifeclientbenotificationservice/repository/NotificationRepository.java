@@ -1,11 +1,13 @@
 package org.example.gongiklifeclientbenotificationservice.repository;
 
 import io.lettuce.core.dynamic.annotation.Param;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.example.gongiklifeclientbenotificationservice.entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -28,5 +30,14 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
       @Param("pageSize") int pageSize);
 
   Optional<Notification> findByIdAndUserIdAndDeletedAtIsNull(UUID id, UUID userId);
+
+  @Transactional
+  @Modifying(clearAutomatically = true)
+  @Query("UPDATE Notification n " +
+      "SET n.readAt = CURRENT_TIMESTAMP " +
+      "WHERE n.userId = :userId " +
+      "  AND n.deletedAt IS NULL " +
+      "  AND n.readAt IS NULL")
+  int markAllNotificationsAsRead(@Param("userId") UUID userId);
 
 }
