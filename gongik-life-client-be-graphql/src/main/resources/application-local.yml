@@ -14,7 +14,7 @@ spring:
         enabled: true
     websocket:
       path: /graphql
-      keep-alive: 60
+      keep-alive: 20000
 
   cache:
     type: redis

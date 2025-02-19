@@ -15,6 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbenotificationservice.entity.Notification;
+import org.example.gongiklifeclientbenotificationservice.producer.SendNotificationProducer;
 import org.example.gongiklifeclientbenotificationservice.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Slf4j
 public class NotificationService {
 
+  private final SendNotificationProducer sendNotificationProducer;
   private final NotificationRepository notificationRepository;
 
   public void createNotification(CreateNotificationRequestDto requestDto) {
@@ -44,7 +46,11 @@ public class NotificationService {
       notification.setTargetCommentId(UUID.fromString(requestDto.getTargetCommentId()));
     }
 
-    notificationRepository.save(notification);
+    Notification savedNotification = notificationRepository.save(notification);
+
+    sendNotificationProducer.sendNotificationRequest(
+        savedNotification.toSendNotificationRequestDto());
+
   }
 
   public MyNotificationsResponse myNotifications(MyNotificationsRequest request) {

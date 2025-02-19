@@ -5,6 +5,7 @@ import dto.notification.DeleteAllNotificationsRequestDto;
 import dto.notification.DeleteNotificationRequestDto;
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
 import dto.notification.MarkNotificationAsReadRequestDto;
+import dto.notification.SendNotificationRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -14,10 +15,12 @@ import org.example.gongiklifeclientbegraphql.dto.notification.markAllNotificatio
 import org.example.gongiklifeclientbegraphql.dto.notification.markNotificationAsRead.MarkNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsResponseDto;
+import org.example.gongiklifeclientbegraphql.dto.notification.notificationRealTime.NotificationRealTimeResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.notification.DeleteAllNotificationsProducer;
 import org.example.gongiklifeclientbegraphql.producer.notification.DeleteNotificationProducer;
 import org.example.gongiklifeclientbegraphql.producer.notification.MarkAllNotificationsAsReadProducer;
 import org.example.gongiklifeclientbegraphql.producer.notification.MarkNotificationAsReadProducer;
+import org.example.gongiklifeclientbegraphql.publisher.NotificationPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,6 +32,7 @@ public class NotificationService {
   private final MarkAllNotificationsAsReadProducer markAllNotificationsAsReadProducer;
   private final DeleteNotificationProducer deleteNotificationProducer;
   private final DeleteAllNotificationsProducer deleteAllNotificationsProducer;
+  private final NotificationPublisher notificationPublisher;
 
   @GrpcClient("gongik-life-client-be-notification-service")
   private NotificationServiceGrpc.NotificationServiceBlockingStub notificationServiceBlockingStub;
@@ -102,5 +106,43 @@ public class NotificationService {
       log.error("Failed to delete all notifications", e);
       throw e;
     }
+  }
+
+  public void sendNotification(SendNotificationRequestDto requestDto) {
+    log.info("Sending notification@@@@@@@@@@@@@@: {}", requestDto.getTitle());
+
+    NotificationRealTimeResponseDto.NotificationRealTimeResponseDtoBuilder response = NotificationRealTimeResponseDto.builder()
+        .id(requestDto.getId())
+        .userId(requestDto.getUserId())
+        .notificationTypeId(requestDto.getNotificationTypeId())
+        .title(requestDto.getTitle())
+        .content(requestDto.getContent())
+        .createdAt(requestDto.getCreatedAt());
+
+    if (requestDto.getPostId() != null) {
+      response.postId(requestDto.getPostId());
+    }
+
+    if (requestDto.getTargetCommentId() != null) {
+      response.targetCommentId(requestDto.getTargetCommentId());
+    }
+
+    if (requestDto.getNoticeId() != null) {
+      response.noticeId(requestDto.getNoticeId());
+    }
+
+    if (requestDto.getTargetedNotificationTypeId() != null) {
+      response.targetedNotificationTypeId(requestDto.getTargetedNotificationTypeId());
+    }
+
+    if (requestDto.getTargetedNotificationId() != null) {
+      response.targetedNotificationId(requestDto.getTargetedNotificationId());
+    }
+
+    if (requestDto.getReportId() != null) {
+      response.reportId(requestDto.getReportId());
+    }
+
+    notificationPublisher.publish(response.build());
   }
 }
