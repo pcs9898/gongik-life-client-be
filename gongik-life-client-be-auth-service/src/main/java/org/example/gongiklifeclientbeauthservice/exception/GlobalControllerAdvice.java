@@ -45,13 +45,6 @@ public class GlobalControllerAdvice {
         .body(Response.error(ErrorCode.IO_ERROR.name()));
   }
 
-  @ExceptionHandler(InternalAuthenticationServiceException.class)
-  public ResponseEntity<?> internalAuthenticationServiceExceptionHandler(
-      InternalAuthenticationServiceException e) {
-    log.error("Internal Authentication Service Error: {}", e.toString());
-    return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-        .body(Response.error(e.getMessage()));
-  }
 
   @ExceptionHandler(InternalAuthenticationServiceException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

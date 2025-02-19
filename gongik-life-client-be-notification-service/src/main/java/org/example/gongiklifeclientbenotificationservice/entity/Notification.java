@@ -1,5 +1,6 @@
 package org.example.gongiklifeclientbenotificationservice.entity;
 
+import dto.notification.SendNotificationRequestDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -78,4 +79,41 @@ public class Notification {
 
   @Column(name = "deleted_at")
   private Date deletedAt;
+
+  public SendNotificationRequestDto toSendNotificationRequestDto(
+  ) {
+    SendNotificationRequestDto.SendNotificationRequestDtoBuilder response = SendNotificationRequestDto.builder()
+        .id(getId().toString())
+        .userId(getUserId().toString())
+        .notificationTypeId(getNotificationTypeId())
+        .title(getTitle())
+        .content(getContent())
+        .createdAt(getCreatedAt().toString());
+
+    if (getPostId() != null) {
+      response.postId(getPostId().toString());
+    }
+
+    if (getTargetCommentId() != null) {
+      response.targetCommentId(getTargetCommentId().toString());
+    }
+
+    if (getNoticeId() != null) {
+      response.noticeId(noticeId.toString());
+    }
+
+    if (getTargetedNotificationTypeId() != null) {
+      response.targetedNotificationTypeId(getTargetedNotificationTypeId());
+    }
+
+    if (getTargetedNotificationId() != null) {
+      response.targetedNotificationId(getTargetedNotificationId().toString());
+    }
+
+    if (getReportId() != null) {
+      response.reportId(getReportId().toString());
+    }
+
+    return response.build();
+  }
 }

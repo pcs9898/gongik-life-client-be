@@ -36,23 +36,25 @@ spring:
             - DedupeResponseHeader=Access-Control-Allow-Origin
             - DedupeResponseHeader=Set-Cookie
 
-        - id: graphql_playground_route
+        - id: graphql_subscription_route
+          uri: lb:ws://gongik-life-client-be-graphql
+          predicates:
+            - Path=/graphql
+          filters:
+
+        - id: graphiql_route
           uri: lb://gongik-life-client-be-graphql
           predicates:
-            - Path=/graphiql/**
+            - Path=/graphiql
             - Method=POST,GET,OPTIONS
           filters:
-            #            - AuthenticationFilter
-            - PreserveHostHeader    # 호스트 헤더 유지
-            - DedupeResponseHeader=Access-Control-Allow-Origin    # CORS 헤더 중복 제거
+            - AuthenticationFilter
+            - PreserveHostHeader
+            - DedupeResponseHeader=Access-Control-Allow-Origin
             - DedupeResponseHeader=Set-Cookie
 
-      #        - id: graphql_subscription_route
-      #          uri: lb:ws://gongik-life-client-be-graphql
-      #          predicates:
-      #            - Path=/graphql
-      #          filters:
-      #            - AuthenticationFilter
+
+
 
       global-cors:
         cors-configurations:
@@ -67,7 +69,7 @@ spring:
             allowCredentials: true
             exposedHeaders:
               - Set-Cookie
-
+      
       
       default-filters:
         - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
