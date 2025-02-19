@@ -95,6 +95,11 @@ type Mutation{
     deleteAllNotifications:DeleteAllNotificationsResponse! @authenticate
 }
 
+type Subscription{
+    notificationRealTime:  NotificationRealTimeResponse! @authenticate # need to send with connect_init message(same spec with jwt header, in graphiql can put in headers) when send request
+
+}
+
 "search result"
 type SearchInstitutionsResponse {
     listSearchInstitution: [SearchInstitution]
@@ -663,4 +668,23 @@ type DeleteNotificationResponse{
 
 type DeleteAllNotificationsResponse {
     success: Boolean!
+}
+
+
+
+type NotificationRealTimeResponse{
+    id: ID!
+    userId: ID!
+    notificationTypeId: Int!
+    title: String!
+    content:String!
+    postId:String
+    targetCommentId:String
+    noticeId:String
+    targetedNotificationTypeId:Int
+    targetedNotificationId:String
+    reportId:String
+    createdAt:String!
+    readAt:String
+
 }
