@@ -16,9 +16,16 @@ public class HttpRequestInterceptor implements WebGraphQlInterceptor {
 
   @Override
   public Mono<WebGraphQlResponse> intercept(WebGraphQlRequest request, Chain chain) {
-    HttpServletRequest servletRequest =
-        ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    // RequestContextHolder를 통해 현재 요청의 속성을 가져옵니다.
+    ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
+    // WebSocket 요청일 경우 attributes가 null이므로 바로 체인을 통과시킵니다.
+    if (attributes == null) {
+      return chain.next(request);
+    }
+
+    // HTTP 요청일 경우 HttpServletRequest를 가져와 GraphQL Context에 추가합니다.
+    HttpServletRequest servletRequest = attributes.getRequest();
     Map<String, Object> context = new HashMap<>();
     context.put("request", servletRequest);
 
@@ -28,4 +35,3 @@ public class HttpRequestInterceptor implements WebGraphQlInterceptor {
     return chain.next(request);
   }
 }
-
