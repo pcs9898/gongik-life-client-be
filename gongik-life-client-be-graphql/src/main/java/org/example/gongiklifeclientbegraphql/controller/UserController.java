@@ -1,13 +1,15 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
-import dto.UserToUser.UserLoginHistoryRequestDto;
+import dto.user.UserLoginHistoryRequestDto;
 import graphql.GraphQLContext;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.user.me.MyProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.user.sendEmailVerificationCode.SendEmailVerificationCodeResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.signUp.SignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.signUp.SignUpUserRequestDto;
@@ -16,7 +18,12 @@ import org.example.gongiklifeclientbegraphql.dto.user.updateProfile.UpdateProfil
 import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeResponseDto;
 import org.example.gongiklifeclientbegraphql.service.UserService;
+import org.example.gongiklifeclientbegraphql.service.user.SendEmailVerificationCodeService;
+import org.example.gongiklifeclientbegraphql.service.user.VerifyEmailCodeService;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -30,19 +37,25 @@ public class UserController {
 
 
   private final UserService userService;
+  private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
+  private final VerifyEmailCodeService verifyEmailCodeService;
 
   @MutationMapping
-  public boolean sendEmailVerificationCode(
-      @Arguments SendEmailVerificationCodeRequestDto requestDto) {
+  public SendEmailVerificationCodeResponseDto sendEmailVerificationCode(
+      @Argument("sendEmailVerificationCodeInput") @Valid SendEmailVerificationCodeRequestDto requestDto) {
 
-    return userService.sendEmailVerificationCode(requestDto);
+    return ControllerExceptionHandlingUtil.handle(
+        () -> sendEmailVerificationCodeService.sendEmailVerificationCode(requestDto));
+
   }
 
   @MutationMapping
-  public boolean verifyEmailCode(
-      @Arguments VerifyEmailCodeRequestDto requestDto) {
+  public VerifyEmailCodeResponseDto verifyEmailCode(
+      @Argument("verifyEmailCodeInput") @Valid VerifyEmailCodeRequestDto requestDto) {
 
-    return userService.verifyEmailCode(requestDto);
+    return ControllerExceptionHandlingUtil.handle(
+        () -> verifyEmailCodeService.verifyEmailCode(requestDto));
+
   }
 
 

@@ -1,4 +1,4 @@
-package dto.UserToUser;
+package dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

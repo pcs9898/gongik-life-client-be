@@ -111,12 +111,12 @@ type Mutation{
     """
     Send email verification code for sign up
     """
-    sendEmailVerificationCode(email: String!): Boolean!
+    sendEmailVerificationCode(sendEmailVerificationCodeInput: SendEmailVerificationCodeInput!): SendEmailVerificationCodeResponse!
 
     """
-    Verify email code for sign up
+    Verify email code for sign up, code length is 6
     """
-    verifyEmailCode(email: String!, code: String!): Boolean!
+    verifyEmailCode(verifyEmailCodeInput: VerifyEmailCodeInput!): VerifyEmailCodeResponse!
 
     """
     Sign up
@@ -232,6 +232,7 @@ type Subscription{
 
 }
 
+
 """
 Search institutions filter
 """
@@ -305,6 +306,46 @@ type SearchInstitution {
     """
     averageRating: Float
 }
+
+"""
+Send email verification code input
+"""
+input SendEmailVerificationCodeInput{
+    """
+    User email
+    """
+    email: String!
+}
+
+"""
+Send email verification code response
+"""
+type SendEmailVerificationCodeResponse{
+    """
+    Success
+    """
+    success: Boolean!
+}
+
+input VerifyEmailCodeInput{
+    """
+    User email
+    """
+    email: String!
+
+    """
+    Verification code, 6 digits
+    """
+    code: String!
+}
+
+type VerifyEmailCodeResponse{
+    """
+    Success
+    """
+    success: Boolean!
+}
+
 
 """
 Sign up response
