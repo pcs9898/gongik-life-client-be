@@ -1,6 +1,6 @@
 package org.example.gongiklifeclientbeauthservice.controller;
 
-import dto.UserToUser.UserLoginHistoryRequestDto;
+import dto.user.UserLoginHistoryRequestDto;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
