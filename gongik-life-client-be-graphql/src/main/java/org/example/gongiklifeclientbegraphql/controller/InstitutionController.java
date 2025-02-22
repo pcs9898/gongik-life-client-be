@@ -3,6 +3,7 @@ package org.example.gongiklifeclientbegraphql.controller;
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
 import graphql.schema.DataFetchingEnvironment;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.institution.createInsitutionReview.CreateInstitutionReviewRequestDto;
@@ -20,9 +21,11 @@ import org.example.gongiklifeclientbegraphql.dto.institution.institutionReviewsB
 import org.example.gongiklifeclientbegraphql.dto.institution.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.myInstitutionReviews.MyInstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResultsDto;
+import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.service.InstitutionService;
+import org.example.gongiklifeclientbegraphql.service.institution.SearchInstitutionsService;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -36,13 +39,16 @@ import org.springframework.stereotype.Controller;
 public class InstitutionController {
 
   private final InstitutionService institutionService;
+  private final SearchInstitutionsService searchInstitutionsService;
 
   @QueryMapping
-  public SearchInstitutionsResultsDto searchInstitutions(
-      @Arguments SearchInstitutionsRequestDto requestDto
+  public SearchInstitutionsResponseDto searchInstitutions(
+      @Argument("searchInstitutionsFilter") @Valid SearchInstitutionsRequestDto requestDto
   ) {
 
-    return institutionService.searchInstitutions(requestDto);
+    return ControllerExceptionHandlingUtil.handle(() ->
+        searchInstitutionsService.searchInstitutions(requestDto)
+    );
   }
 
   @QueryMapping

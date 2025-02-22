@@ -6,7 +6,6 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +26,11 @@ import org.example.gongiklifeclientbegraphql.dto.institution.institutionReviewsB
 import org.example.gongiklifeclientbegraphql.dto.institution.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.myInstitutionReviews.MyInstitutionReviewsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResultsDto;
+import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.institution.LikeInstitutionReviewProducer;
 import org.example.gongiklifeclientbegraphql.producer.institution.UnlikeInstitutionReviewProducer;
+import org.example.gongiklifeclientbegraphql.util.ServiceExceptionHandlingUtil;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
@@ -46,36 +46,31 @@ public class InstitutionService {
   @GrpcClient("gongik-life-client-be-institution-service")
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  public SearchInstitutionsResultsDto searchInstitutions(SearchInstitutionsRequestDto requestDto) {
-    try {
-      SearchInstitutionsResponse response = institutionBlockingStub.searchInstitutions(
-          requestDto.toProto());
+  public SearchInstitutionsResponseDto searchInstitutions(SearchInstitutionsRequestDto requestDto) {
 
-      return SearchInstitutionsResultsDto.fromProto(response);
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    return ServiceExceptionHandlingUtil.handle("searchInstitutions", () ->
+        SearchInstitutionsResponseDto.fromSearchInstitutionsResponseProto(
+            institutionBlockingStub.searchInstitutions(
+                requestDto.toSearchInstitutionsRequestProto())
+        )
+    );
+
   }
 
   public InstitutionResponseDto institution(InstitutionRequestDto requestDto) {
-    try {
+    return ServiceExceptionHandlingUtil.handle("institution", () -> {
       InstitutionResponseDto institutionResponseDto = institutionCacheService.getInstitution(
           requestDto.getInstitutionId());
-
       Integer reviewCount = institutionBlockingStub.getInstitutionReviewCount(
           GetInstitutionReviewCountRequest.newBuilder()
-              .setInstitutionId(requestDto.getInstitutionId()).build()
+              .setInstitutionId(requestDto.getInstitutionId())
+              .build()
       ).getReviewCount();
-
       institutionResponseDto.setReviewCount(reviewCount);
-
       return institutionResponseDto;
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
+
 
   public CreateInstitutionReviewResponseDto createInstitutionReview(
       CreateInstitutionReviewRequestDto requestDto) {

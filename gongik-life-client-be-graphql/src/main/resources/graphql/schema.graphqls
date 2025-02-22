@@ -2,175 +2,507 @@
 directive @authenticate on FIELD_DEFINITION | OBJECT
 directive @range(min: Int!, max: Int!)  on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
-
 scalar Date
 
 type Query {
-    searchInstitutions(searchKeyword: String!, cursor: String, pageSize: Int!): SearchInstitutionsResponse!
+    """
+    Search institutions
+    """
+    searchInstitutions(searchInstitutionsFilter: SearchInstitutionsFilter!): SearchInstitutionsResponse!
 
+    """
+    Get my profile, need to sign in
+    """
     myProfile: MyProfileResponse! @authenticate
 
+    """
+    Get user profile
+    """
     userProfile(userId: ID!): UserProfileResponse!
 
+    """
+    Get institution
+    """
     institution(institutionId: ID!): InstitutionResponse!
 
+    """
+    Get institution review
+    """
     institutionReview(institutionReviewInput: InstitutionReviewInput!): InstitutionReview!
 
+    """
+    Get institution reviews with cursor pagination
+    """
     institutionReviews(institutionReviewsFilter: InstitutionReviewsFilter!): InstitutionReviewsResponse!
 
+    """
+    Get my institution reviews, need to sign in
+    """
     myInstitutionReviews: MyInstitutionReviewsResponse @authenticate
 
+    """
+    Get institution reviews by institution
+    """
     institutionReviewsByInstitution(institutionReviewsByInstitutionFilter: InstitutionReviewsByInstitutionFilters!): InstitutionReviewsByInstitutionResponse!
 
+    """
+    Get post
+    """
     post(postInput: PostInput!): PostResponse!
 
+    """
+    Get posts with cursor pagination
+    """
     posts(postsFilter: PostsFilter!): PostsResponse!
 
+    """
+    Get comments by post
+    """
     comments(commentsInput: CommentsInput!): CommentsResponse!
 
+    """
+    Get my posts with cursor pagination, need to sign in
+    """
     myPosts(myPostsFilter: MyPostsFilter!): MyPostsResponse! @authenticate
 
+    """
+    Get user posts with cursor pagination
+    """
     userPosts(userPostsFilter: UserPostsFilter!): UserPostsResponse!
 
+    """
+    Get my liked posts with cursor pagination, need to sign in
+    """
     myLikedPosts(myLikedPostsFilter: MyLikedPostsFilter!): MyLikedPostsResponse! @authenticate
 
+    """
+    Get my comments with cursor pagination, need to sign in
+    """
     myComments(myCommentsFilter: MyCommentsFilter!): MyCommentsResponse! @authenticate
 
+    """
+    Search posts with cursor pagination
+    """
     searchPosts(searchPostsFilter: SearchPostsFilter!): SearchPostsResponse!
 
+    """
+    Get my report, need to sign in
+    """
     report(reportInput: ReportInput!): ReportResponse! @authenticate
 
+    """
+    Get my reports with cursor pagination, need to sign in
+    """
     myReports(myReportsFilter: MyReportsFilter!): MyReportsResponse! @authenticate
 
+    """
+    Get average workhours with my average workhours, need to sign in
+    """
     averageWorkhours: AverageWorkhoursResponse! @authenticate
 
+    """
+    Get my notifications with cursor pagination, need to sign in
+    """
     myNotifications(myNotificationsFilter:MyNotificationsFilter!):  MyNotificationsResponse! @authenticate
 }
 
+
 type Mutation{
+    """
+    Send email verification code for sign up
+    """
     sendEmailVerificationCode(email: String!): Boolean!
 
+    """
+    Verify email code for sign up
+    """
     verifyEmailCode(email: String!, code: String!): Boolean!
 
+    """
+    Sign up
+    """
     signUp(name: String!,email: String!,password: String!,confirmPassword: String!,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): SignUpResponse!
 
+    """
+    Update my profile, need to sign in
+    """
     updateProfile(name: String,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): UpdateProfileResponse! @authenticate
 
+    """
+    Create institution review, need to sign in
+    """
     createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): InstitutionReview! @authenticate
 
+    """
+    Delete institution review, need to sign in
+    """
     deleteInstitutionReview(institutionReviewId: String!): DeleteInstitutionReviewResponse! @authenticate
 
+    """
+    Like institution review, need to sign in
+    """
     likeInstitutionReview(likeInstitutionReviewInput: LikeInstitutionReviewInput!): LikeInstitutionReviewResponse! @authenticate
 
+    """
+    Unlike institution review, need to sign in
+    """
     unlikeInstitutionReview(unlikeInstitutionReviewInput: UnlikeInstitutionReviewInput!): UnlikeInstitutionReviewResponse! @authenticate
 
+    """
+    Create post, need to sign in
+    """
     createPost(createPostInput: CreatePostInput!): CreatePostResponse! @authenticate
 
+    """
+    Update post, need to sign in
+    """
     updatePost(updatePostInput: UpdatePostInput!): UpdatePostResponse! @authenticate
 
+    """
+    Delete post, need to sign in
+    """
     deletePost(deletePostInput: DeletePostInput!): DeletePostResponse! @authenticate
 
+    """
+    Like post, need to sign in
+    """
     likePost(likePostInput: LikePostInput!): LikePostResponse! @authenticate
 
+    """
+    Unlike post, need to sign in
+    """
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 
+    """
+    Create comment, need to sign in
+    """
     createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
 
+    """
+    Update comment, need to sign in
+    """
     updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
 
+    """
+    Delete comment, need to sign in
+    """
     deleteComment(deleteCommentInput: DeleteCommentInput!): DeleteCommentResponse! @authenticate
 
+    """
+    Create system report, need to sign in
+    """
     createSystemReport(createSystemReportInput: CreateSystemReportInput!): CreateSystemReportResponse! @authenticate
 
+    """
+    Create report, need to sign in
+    """
     createReport(createReportInput: CreateReportInput!): CreateReportResponse! @authenticate
 
+    """
+    Delete report, need to sign in
+    """
     deleteReport(deleteReportInput: DeleteReportInput!): DeleteReportResponse! @authenticate
 
+    """
+    Mark notification as read, need to sign in
+    """
     markNotificationAsRead(markNotificationAsReadInput: MarkNotificationAsReadInput!): MarkNotificationAsReadResponse! @authenticate
 
+    """
+    Mark all notifications as read, need to sign in
+    """
     markAllNotificationsAsRead: MarkAllNotificationsAsReadResponse! @authenticate
 
+    """
+    Delete notification, need to sign in
+    """
     deleteNotification(deleteNotificationInput: DeleteNotificationInput!): DeleteNotificationResponse! @authenticate
 
+    """
+    Delete all notifications, need to sign in
+    """
     deleteAllNotifications:DeleteAllNotificationsResponse! @authenticate
 }
 
 type Subscription{
+    """
+    Get real time notification, need to sign in
+    """
     notificationRealTime:  NotificationRealTimeResponse! @authenticate # need to send with connect_init message(same spec with jwt header, in graphiql can put in headers) when send request
 
 }
 
-"search result"
+"""
+Search institutions filter
+"""
+input SearchInstitutionsFilter {
+    """
+    Search keyword
+    """
+    searchKeyword: String!
+
+    """
+    Cursor for pagination, cursor is institution id, if not provided, it will start from the beginning
+    """
+    cursor: String
+
+    """
+    Page size, default is 5, min is 1, max is 20
+    """
+    pageSize: Int!=5 @range(min: 1, max: 20)
+}
+
+
+"Search result"
 type SearchInstitutionsResponse {
+    """
+    List of institutions
+    """
     listSearchInstitution: [SearchInstitution]
-    pageInfo: PageInfo
+
+    """
+    Pagination info
+    """
+    pageInfo: PageInfo!
 }
 
+"""
+Page info
+"""
 type PageInfo {
+    """
+    End cursor for pagination
+    """
     endCursor: String
-    hasNextPage: Boolean
+
+    """
+    Has next page
+    """
+    hasNextPage: Boolean!
 }
 
+"""
+Search institution
+"""
 type SearchInstitution {
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
+
+    """
+    Institution address
+    """
     address: String!
+
+    """
+    Institution average rating from institution reviews, 0.0 to 5.0
+    """
     averageRating: Float
 }
 
+"""
+Sign up response
+"""
 type SignUpResponse{
+    """
+    Sign up user
+    """
     User: SignUpUser!
+
+    """
+    Access token, valid for 5 hours
+    """
     accessToken: String!
+
+    """
+    Access token expires at
+    """
     accessTokenExpiresAt: String!
 }
 
+"""
+Sign up user
+"""
 type SignUpUser{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     email: String!
+
+    """
+    User institution information, if user has institution, must have enlistmentDate and dischargeDate
+    """
     institution: SignUpInstitution
+
+    """
+    User name
+    """
     name: String!
+
+    """
+    User bio
+    """
     bio: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
     enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     dischargeDate: String
 }
 
+"""
+Sign up institution
+"""
 type SignUpInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+My profile response
+"""
 type MyProfileResponse{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     email: String!
+
+    """
+    User institution information, if user has institution, must have enlistmentDate and dischargeDate
+    """
     institution: MyProfileInstitution
+
+    """
+    User name
+    """
     name: String!
+
+    """
+    User bio
+    """
     bio: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
     enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     dischargeDate: String
 }
 
+"""
+My profile institution
+"""
 type MyProfileInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+User profile response
+"""
 type UserProfileResponse{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     name: String!
+
+    """
+    User institution information
+    """
     bio: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
     institution: UserProfileInstitution
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     dischargeDate: String
 }
 
+"""
+User profile institution
+"""
 type UserProfileInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+Update profile response
+"""
 type UpdateProfileResponse{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     email: String!
+
+    """
+    User institution information, if user has institution, must have enlistmentDate and dischargeDate
+    """
     institution: UpdateProfileInstitution
     name: String!
     bio: String
@@ -178,103 +510,368 @@ type UpdateProfileResponse{
     dischargeDate: String
 }
 
+"""
+Update profile institution
+"""
 type UpdateProfileInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+Institution response
+"""
 type InstitutionResponse{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
+
+    """
+    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government
+    """
     institutionCategoryId: Int!
+
+    """
+    Institution address
+    """
     address: String!
+
+    """
+    Institution phone number
+    """
     phoneNumber: String!
+
+    """
+    Institution tag id, 1: elderly welfare facility, 2: child welfare facility, 3: disabled welfare facility, 4: welfare center, 5:local resident facility, 6: daycare center, 7: self sufficiency center, 8: mental health facility, 9: women welfare facility, 10: youth welfare facility, 11: homeless welfare facility, 12: tuberculosis hansen facility
+    """
     tagId: Int
+
+    """
+    Institution regional military office id, 1: seoul, 2: busan ulsan, 3: daegu gyeongbuk, 4: gyeongin, 5: gwangju jeonnam, 6: daejeon chungnam, 7: gangwon, 8: chungbuk, 9: jeonbuk, 10: gyeongnam, 11: jeju, 12: inchoen, 13: gyeonggi north, 14: gangwon yeongdong
+    """
     regionalMilitaryOfficeId: Int!
+
+    """
+    Institution region
+    """
     region: String!
+
+    """
+    Institution parent institution
+    """
     parentInstitution: String
+
+    """
+    Institution sexual criminal record restriction
+    """
     sexualCriminalRecordRestriction:Boolean!
+
+    """
+    Institution average workhours from institution review
+    """
     averageWorkhours:Int
+
+    """
+    Institution average rating from institution review
+    """
     averageRating: Float
+
+    """
+    Institution review count
+    """
     reviewCount: Int!
+
+    """
+    Institution disease restrictions, 1: mental illness, 2: seizure, 3: tattoo self harm, 4: spine disease, 5: bronchial asthma, 6: atopic dermatitis
+    """
     diseaseRestrictions: [Int]
 }
 
+"""
+Institution review
+"""
 type InstitutionReview {
+    """
+    Institution review id
+    """
     id: ID!
+
+    """
+    Institution short information
+    """
     institution: InstitutionShortInfo!
+
+    """
+    User information left review
+    """
     user: InstitutionReviewUser!
+
+    """
+    Rating, average of facilityRating, locationRating, staffRating, visitorRating, vacationFreedomRating
+    """
     rating: Float!
+
+    """
+    Facility rating, 0 to 5
+    """
     facilityRating: Int!
+
+    """
+    Location rating, 0 to 5
+    """
     locationRating: Int!
+
+    """
+    Staff rating, 0 to 5
+    """
     staffRating: Int!
+
+    """
+    Visitor rating, 0 to 5
+    """
     visitorRating: Int!
+
+    """
+    Vacation freedom rating, 0 to 5
+    """
     vacationFreedomRating: Int!
+
+    """
+    Main tasks
+    """
     mainTasks: String!
+
+    """
+    Pros and cons
+    """
     prosCons: String!
+
+    """
+    Average workhours
+    """
     averageWorkhours: Int!
+
+    """
+    Work type rules id, 1: day shift, 2: three shift two team, 3: three shift three team, 4: four shift two team, 5: four shift three team, 6: residential work
+    """
     workTypeRulesId: Int!
+
+    """
+    Uniform wearing rules id, 1: always, 2: not worn, 3: situational
+    """
     uniformWearingRulesId: Int!
+
+    """
+    Social service people count id, 1: one, 2: two, 3: three to five, 4: six to ten, 5: more than ten
+    """
     socialServicePeopleCountId: Int!
+
+    """
+    Review like count
+    """
     likeCount: Int!
+
+    """
+    Review created at
+    """
     createdAt: String!
+
+    """
+    Is review liked by user, false if user is not authenticated
+    """
     isLiked: Boolean! # its false if user is not authenticated
 }
 
+"""
+Institution short information
+"""
 type InstitutionShortInfo{
+    """
+    Institution id
+    """
     institutionId:ID!
+    """
+    Institution name
+    """
     institutionName:String!
 }
 
 
+"""
+Create Institution review input
+"""
 input CreateInstitutionReviewInput {
+    """
+    Institution id
+    """
     institutionId: ID!
+
+    """
+    Facility rating, 0 to 5
+    """
     facilityRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Location rating, 0 to 5
+    """
     locationRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Staff rating, 0 to 5
+    """
     staffRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Visitor rating, 0 to 5
+    """
     visitorRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Vacation freedom rating, 0 to 5
+    """
     vacationFreedomRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Main tasks
+    """
     mainTasks: String!
+
+    """
+    Pros and cons
+    """
     prosCons: String!
+
+    """
+    Average workhours, 0 to 480 meaning minutes
+    """
     averageWorkhours: Int = 0 @range(min: 0, max: 480)
+
+    """
+    Work type rules id, 1: day shift, 2: three shift two team, 3: three shift three team, 4: four shift two team, 5: four shift three team, 6: residential work
+    """
     workTypeRulesId: Int = 1 @range(min: 1, max: 6)
+
+    """
+    Uniform wearing rules id, 1: always, 2: not worn, 3: situational
+    """
     uniformWearingRulesId: Int = 1 @range(min: 1, max: 3)
+
+    """
+    Social service people count id, 1: one, 2: two, 3: three to five, 4: six to ten, 5: more than ten
+    """
     socialServicePeopleCountId: Int = 1 @range(min: 1, max: 5)
 }
 
+"""
+Institution review user
+"""
 type InstitutionReviewUser{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User name
+    """
     name: String!
 }
 
+"""
+Delete institution review response
+"""
 type DeleteInstitutionReviewResponse{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
+
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Like institution review input
+"""
 input LikeInstitutionReviewInput{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
 }
 
+"""
+Like institution review response
+"""
 type LikeInstitutionReviewResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Unlike institution review input
+"""
 input UnlikeInstitutionReviewInput{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
 }
 
+"""
+Unlike institution review response
+"""
 type UnlikeInstitutionReviewResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Institution review input
+"""
 input InstitutionReviewInput{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
 }
 
+"""
+Institution reviews filter
+"""
 input InstitutionReviewsFilter{
+    """
+    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government
+    """
     institutionCategoryId: Int = 7 @range(min: 1, max: 7)
+
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is institution review id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 

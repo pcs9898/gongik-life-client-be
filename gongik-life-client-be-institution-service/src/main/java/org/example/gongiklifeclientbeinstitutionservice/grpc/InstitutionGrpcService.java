@@ -38,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionForWorkHoursStatisticsProjection;
 import org.example.gongiklifeclientbeinstitutionservice.service.InstitutionService;
+import util.GrpcServiceExceptionHandlingUtil;
 
 @GrpcService
 @Slf4j
@@ -46,24 +47,32 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
 
   private final InstitutionService institutionService;
 
+//  @Override
+//  public void searchInstitutions(SearchInstitutionsRequest request,
+//      StreamObserver<SearchInstitutionsResponse> responseObserver) {
+//
+//    try {
+//      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
+//
+//      responseObserver.onNext(response);
+//      responseObserver.onCompleted();
+//    } catch (Exception e) {
+//      log.info("searchInstitutions error : ", e);
+//      responseObserver.onError(
+//          Status.INTERNAL
+//              .withDescription(e.getMessage())
+//              .withCause(e)  // 원인 예외 포함
+//              .asRuntimeException()
+//      );
+//    }
+//  }
+
   @Override
   public void searchInstitutions(SearchInstitutionsRequest request,
       StreamObserver<SearchInstitutionsResponse> responseObserver) {
-
-    try {
-      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("searchInstitutions error : ", e);
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("searchInstitutions",
+        () -> institutionService.searchInstitutions(request),
+        responseObserver);
   }
 
   @Override

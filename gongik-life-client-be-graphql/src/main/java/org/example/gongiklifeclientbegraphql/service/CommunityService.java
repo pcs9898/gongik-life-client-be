@@ -9,6 +9,7 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.Pos
 import dto.community.LikePostRequestDto;
 import dto.community.UnLikePostRequestDto;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,9 +41,11 @@ import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateC
 import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateCommentResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsResponseDto;
+import org.example.gongiklifeclientbegraphql.exception.CommunityServiceException;
 import org.example.gongiklifeclientbegraphql.producer.community.LikePostProducer;
 import org.example.gongiklifeclientbegraphql.producer.community.UnLikePostProducer;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service
 @Slf4j
@@ -55,112 +58,98 @@ public class CommunityService {
   @GrpcClient("gongik-life-client-be-community-service")
   private CommunityServiceGrpc.CommunityServiceBlockingStub communityServiceBlockingStub;
 
-  public PostResponseDto createPost(CreatePostRequestDto requestDto) {
+  /**
+   * 공통 gRPC 호출 헬퍼
+   */
+  private <T> T executeGrpcCall(Supplier<T> grpcCall) {
     try {
-      return PostResponseDto.fromCreatePostResponseProto(communityServiceBlockingStub.createPost(
-          requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
+      return grpcCall.get();
+    } catch (Exception ex) {
+      log.error("gRPC 호출 중 오류 발생: ", ex);
+      throw new CommunityServiceException("gRPC 호출 오류", ex);
     }
   }
 
+  public PostResponseDto createPost(CreatePostRequestDto requestDto) {
+    Assert.notNull(requestDto, "CreatePostRequestDto는 null일 수 없습니다.");
+    return PostResponseDto.fromCreatePostResponseProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.createPost(requestDto.toProto()))
+    );
+  }
 
   public Boolean isLikedPost(String postId, String userId) {
-    try {
-      return communityServiceBlockingStub.isLikedPost(
-          IsLikedPostRequest.newBuilder()
-              .setPostId(postId)
-              .setUserId(userId)
-              .build()
-      ).getIsLiked();
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.hasText(postId, "postId는 비어있을 수 없습니다.");
+    Assert.hasText(userId, "userId는 비어있을 수 없습니다.");
+    IsLikedPostRequest request = IsLikedPostRequest.newBuilder()
+        .setPostId(postId)
+        .setUserId(userId)
+        .build();
+    return executeGrpcCall(() -> communityServiceBlockingStub.isLikedPost(request))
+        .getIsLiked();
   }
 
   public LikePostResponseDto likePost(LikePostRequestDto requestDto) {
+    Assert.notNull(requestDto, "LikePostRequestDto는 null일 수 없습니다.");
     try {
-
       likePostProducer.sendLikePostRequest(requestDto);
-
       return LikePostResponseDto.builder().success(true).build();
-
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Kafka 호출 중 오류 발생: ", ex);
+      throw new CommunityServiceException("Kafka 호출 오류", ex);
     }
   }
 
   public UnLikePostResponseDto unLikePost(UnLikePostRequestDto requestDto) {
+    Assert.notNull(requestDto, "UnLikePostRequestDto는 null일 수 없습니다.");
     try {
-
       unLikePostProducer.sendUnLikePostRequest(requestDto);
-
       return UnLikePostResponseDto.builder().success(true).build();
-
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
+    } catch (Exception ex) {
+      log.error("Kafka 호출 중 오류 발생: ", ex);
+      throw new CommunityServiceException("Kafka 호출 오류", ex);
     }
   }
 
   public IsLikedPostAndCommentCountResponse isLikedPostAndCommentCount(PostRequestDto requestDto) {
-
-    return communityServiceBlockingStub.isLikedPostAndCommentCount(requestDto.toProto());
+    Assert.notNull(requestDto, "PostRequestDto는 null일 수 없습니다.");
+    return executeGrpcCall(() -> communityServiceBlockingStub
+        .isLikedPostAndCommentCount(requestDto.toProto()));
   }
 
   public PostsResponseDto posts(PostsRequestDto requestDto) {
-    try {
-      return PostsResponseDto.fromProto(communityServiceBlockingStub.posts(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "PostsRequestDto는 null일 수 없습니다.");
+    return PostsResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.posts(requestDto.toProto()))
+    );
   }
 
   public CreateCommentResponseDto createComment(CreateCommentRequestDto requestDto) {
-    try {
-      return CreateCommentResponseDto.fromProto(
-          communityServiceBlockingStub.createComment(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "CreateCommentRequestDto는 null일 수 없습니다.");
+    return CreateCommentResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.createComment(requestDto.toProto()))
+    );
   }
 
-
   public UpdateCommentResponseDto updateComment(UpdateCommentRequestDto requestDto) {
-    try {
-      return UpdateCommentResponseDto.fromProto(
-          communityServiceBlockingStub.updateComment(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "UpdateCommentRequestDto는 null일 수 없습니다.");
+    return UpdateCommentResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.updateComment(requestDto.toProto()))
+    );
   }
 
   public DeleteCommentResponseDto deleteComment(DeleteCommentRequestDto requestDto) {
-    try {
-      return DeleteCommentResponseDto.fromProto(
-          communityServiceBlockingStub.deleteComment(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "DeleteCommentRequestDto는 null일 수 없습니다.");
+    return DeleteCommentResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.deleteComment(requestDto.toProto()))
+    );
   }
 
   public CommentsResponseDto comments(CommentsRequestDto requestDto) {
-    try {
-
-      CommentsResponse grpcResponse = communityServiceBlockingStub.comments(requestDto.toProto());
-
-      return convertCommentsGrpcResponse(grpcResponse);
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "CommentsRequestDto는 null일 수 없습니다.");
+    CommentsResponse grpcResponse = executeGrpcCall(
+        () -> communityServiceBlockingStub.comments(requestDto.toProto())
+    );
+    return convertCommentsGrpcResponse(grpcResponse);
   }
 
   private CommentsResponseDto convertCommentsGrpcResponse(CommentsResponse grpcResponse) {
@@ -180,19 +169,17 @@ public class CommunityService {
     dto.setContent(grpcComment.getContent());
     dto.setCreatedAt(grpcComment.getCreatedAt());
 
-    // parentCommentId 필드는 optional이므로 값이 존재할 때만 설정
-    if (grpcComment.getParentCommentId() != null && !grpcComment.getParentCommentId().isEmpty()) {
+    if (grpcComment.hasParentCommentId() && !grpcComment.getParentCommentId().isEmpty()) {
       dto.setParentCommentId(grpcComment.getParentCommentId());
     }
 
-    // 작성자 정보 매핑
+// 작성자 정보 매핑
     PostUser grpcUser = grpcComment.getUser();
     PostUserDto userDto = new PostUserDto();
     userDto.setUserId(grpcUser.getUserId());
     userDto.setUserName(grpcUser.getUserName());
     dto.setUser(userDto);
 
-    // 재귀적으로 childComments 변환
     List<CommentForListDto> childComments = grpcComment.getChildCommentsList()
         .stream()
         .map(this::convertCommentForList)
@@ -203,53 +190,37 @@ public class CommunityService {
   }
 
   public MyPostsResponseDto myPosts(MyPostsRequestDto requestDto) {
-    try {
-      return MyPostsResponseDto.fromProto(
-          communityServiceBlockingStub.myPosts(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-
-    }
+    Assert.notNull(requestDto, "MyPostsRequestDto는 null일 수 없습니다.");
+    return MyPostsResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.myPosts(requestDto.toProto()))
+    );
   }
 
   public UserPostsResponseDto userPosts(UserPostsRequestDto requestDto) {
-    try {
-      return UserPostsResponseDto.fromProto(
-          communityServiceBlockingStub.userPosts(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "UserPostsRequestDto는 null일 수 없습니다.");
+    return UserPostsResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.userPosts(requestDto.toProto()))
+    );
   }
 
   public MyLikedPostsResponseDto myLikedPosts(MyLikedPostsRequestDto requestDto) {
-    try {
-      return MyLikedPostsResponseDto.fromProto(
-          communityServiceBlockingStub.myLikedPosts(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "MyLikedPostsRequestDto는 null일 수 없습니다.");
+    return MyLikedPostsResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.myLikedPosts(requestDto.toProto()))
+    );
   }
 
   public MyCommentsResponseDto myComments(MyCommentsRequestDto requestDto) {
-    try {
-      return MyCommentsResponseDto.fromProto(
-          communityServiceBlockingStub.myComments(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "MyCommentsRequestDto는 null일 수 없습니다.");
+    return MyCommentsResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.myComments(requestDto.toProto()))
+    );
   }
 
   public SearchPostsResponseDto searchPosts(SearchPostsRequestDto requestDto) {
-    try {
-      return SearchPostsResponseDto.fromProto(
-          communityServiceBlockingStub.searchPosts(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    Assert.notNull(requestDto, "SearchPostsRequestDto는 null일 수 없습니다.");
+    return SearchPostsResponseDto.fromProto(
+        executeGrpcCall(() -> communityServiceBlockingStub.searchPosts(requestDto.toProto()))
+    );
   }
 }

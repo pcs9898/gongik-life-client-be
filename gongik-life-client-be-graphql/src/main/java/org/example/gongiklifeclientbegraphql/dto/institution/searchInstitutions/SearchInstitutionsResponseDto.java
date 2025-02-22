@@ -9,13 +9,14 @@ import org.example.gongiklifeclientbegraphql.dto.common.PageInfoDto;
 
 @Data
 @Slf4j
-public class SearchInstitutionsResultsDto {
+public class SearchInstitutionsResponseDto {
 
   private List<SearchInstitutionDto> listSearchInstitution;
   private PageInfoDto pageInfo;
 
-  public static SearchInstitutionsResultsDto fromProto(SearchInstitutionsResponse proto) {
-    SearchInstitutionsResultsDto dto = new SearchInstitutionsResultsDto();
+  public static SearchInstitutionsResponseDto fromSearchInstitutionsResponseProto(
+      SearchInstitutionsResponse proto) {
+    SearchInstitutionsResponseDto dto = new SearchInstitutionsResponseDto();
     dto.setListSearchInstitution(proto.getListSearchInstitutionList().stream()
         .map(SearchInstitutionDto::fromProto)
         .collect(Collectors.toList()));
