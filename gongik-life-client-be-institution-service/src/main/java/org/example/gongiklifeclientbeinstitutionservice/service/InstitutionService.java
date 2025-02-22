@@ -41,7 +41,6 @@ import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
 import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -82,17 +81,6 @@ public class InstitutionService {
   public SearchInstitutionsResponse searchInstitutions(
       SearchInstitutionsRequest request) {
 
-    if (request.getSearchKeyword().isEmpty()) {
-
-      return SearchInstitutionsResponse.newBuilder()
-          .addAllListSearchInstitution(Collections.emptyList())
-          .setPageInfo(PageInfo.newBuilder()
-              .setEndCursor("")
-              .setHasNextPage(false)
-              .build())
-          .build();
-    }
-
     List<InstitutionSimpleProjection> institutions = institutionRepository.searchInstitutions(
         request.getSearchKeyword(),
         request.getCursor().isEmpty() ? null : UUID.fromString(request.getCursor()),
@@ -129,9 +117,6 @@ public class InstitutionService {
 
   public GetInstitutionNameResponse getInstitutionName(GetInstitutionNameRequest request) {
 
-    String institutionId = request.getId();
-    log.info("getInstitutionName request : {}",
-        (institutionId != null && !institutionId.isEmpty()) ? institutionId : "null");
     Institution institution = institutionRepository.findById(UUID.fromString(request.getId()))
         .orElseThrow(() -> new IllegalArgumentException("Institution not found"));
 
@@ -152,8 +137,6 @@ public class InstitutionService {
           return a.getDiseaseRestriction().getId();
         })
         .collect(Collectors.toList());
-
-    log.info("diseaseids : {}", diseaseids);
 
     InstitutionResponse.Builder response = institution.toInstitutionResponseProto();
 
@@ -205,12 +188,8 @@ public class InstitutionService {
     institution.setReviewCount(institution.getReviewCount() + 1);
     institutionRepository.save(institution);
 
-    InstitutionReviewResponse response = institutionReviewRepository
+    return institutionReviewRepository
         .save(InstitutionReview.fromProto(request, institution, rating)).toProto(userName);
-    log.info("response : {}", response);
-    return response;
-
-
   }
 
 
@@ -488,8 +467,6 @@ public class InstitutionService {
               .build();
         })
         .collect(Collectors.toList());
-
-    log.info("listInstitutionReview : {}", listInstitutionReview);
 
     return InstitutionReviewsByInstitutionResponse.newBuilder()
         .addAllListInstitutionReviewByInstitution(listInstitutionReview)
