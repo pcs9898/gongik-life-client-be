@@ -1,7 +1,7 @@
 package org.example.gongiklifeclientbeuserservice.consumer;
 
 
-import dto.UserToUser.UserLoginHistoryRequestDto;
+import dto.user.UserLoginHistoryRequestDto;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

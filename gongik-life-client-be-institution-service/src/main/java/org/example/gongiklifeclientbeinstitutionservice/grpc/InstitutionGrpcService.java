@@ -47,26 +47,6 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
 
   private final InstitutionService institutionService;
 
-//  @Override
-//  public void searchInstitutions(SearchInstitutionsRequest request,
-//      StreamObserver<SearchInstitutionsResponse> responseObserver) {
-//
-//    try {
-//      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
-//
-//      responseObserver.onNext(response);
-//      responseObserver.onCompleted();
-//    } catch (Exception e) {
-//      log.info("searchInstitutions error : ", e);
-//      responseObserver.onError(
-//          Status.INTERNAL
-//              .withDescription(e.getMessage())
-//              .withCause(e)  // 원인 예외 포함
-//              .asRuntimeException()
-//      );
-//    }
-//  }
-
   @Override
   public void searchInstitutions(SearchInstitutionsRequest request,
       StreamObserver<SearchInstitutionsResponse> responseObserver) {

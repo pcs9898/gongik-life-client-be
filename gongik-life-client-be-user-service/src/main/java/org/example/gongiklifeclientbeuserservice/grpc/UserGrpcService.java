@@ -28,7 +28,10 @@ import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.example.gongiklifeclientbeuserservice.service.SendEmailVerificationCodeService;
 import org.example.gongiklifeclientbeuserservice.service.UserSerivce;
+import org.example.gongiklifeclientbeuserservice.service.VerifyEmailCodeService;
+import util.GrpcServiceExceptionHandlingUtil;
 
 @GrpcService
 @Slf4j
@@ -37,50 +40,25 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
 
 
   private final UserSerivce userService;
+  private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
+  private final VerifyEmailCodeService verifyEmailCodeService;
 
   @Override
   public void sendEmailVerificationCode(SendEmailVerificationCodeRequest request,
       StreamObserver<SendEmailVerificationCodeResponse> responseObserver) {
-    try {
-      SendEmailVerificationCodeResponse response = userService.sendEmailVerificationCode(request);
+    GrpcServiceExceptionHandlingUtil.handle("sendEmailVerificationCode",
+        () -> sendEmailVerificationCodeService.sendEmailVerificationCode(request),
+        responseObserver);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-
-      log.error("sendEmailVerificationCode error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
   }
 
   @Override
   public void verifyEmailCode(VerifyEmailCodeRequest request,
       StreamObserver<VerifyEmailCodeResponse> responseObserver) {
-    try {
-      VerifyEmailCodeResponse response = userService.verifyEmailCode(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-
-      log.error("verifyEmailCode error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-
-    }
+    GrpcServiceExceptionHandlingUtil.handle("verifyEmailCode",
+        () -> verifyEmailCodeService.verifyEmailCode(request),
+        responseObserver);
   }
 
   @Override

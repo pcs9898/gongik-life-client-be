@@ -1,4 +1,4 @@
-package dto.UserToEmail;
+package dto.mail;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
