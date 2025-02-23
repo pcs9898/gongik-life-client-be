@@ -82,14 +82,13 @@ public class UserController {
 
   @QueryMapping
   public MyProfileResponseDto myProfile(DataFetchingEnvironment dataFetchingEnvironment) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return userService.myProfile(userId);
-    } catch (Exception e) {
-      log.error("me error: {}", e);
-      throw e;
-    }
+    return ControllerExceptionHandlingUtil.handle(
+        () -> {
+          String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+          return userService.myProfile(userId);
+        });
   }
 
   @QueryMapping

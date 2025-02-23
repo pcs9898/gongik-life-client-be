@@ -18,7 +18,7 @@ type Query {
     """
     Get user profile
     """
-    userProfile(userId: ID!): UserProfileResponse!
+    userProfile(userProfileInput: UserProfileInput!): UserProfileResponse!
 
     """
     Get institution
@@ -520,6 +520,16 @@ type MyProfileInstitution{
     Institution name
     """
     name: String!
+}
+
+"""
+Update profile input
+"""
+input UserProfileInput{
+    """
+    User id
+    """
+    userId: ID!
 }
 
 """
