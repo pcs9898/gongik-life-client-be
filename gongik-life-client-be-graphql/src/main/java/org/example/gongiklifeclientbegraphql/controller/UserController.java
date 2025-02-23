@@ -20,8 +20,10 @@ import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileRes
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeResponseDto;
 import org.example.gongiklifeclientbegraphql.service.UserService;
+import org.example.gongiklifeclientbegraphql.service.user.MyProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.SendEmailVerificationCodeService;
 import org.example.gongiklifeclientbegraphql.service.user.SignUpService;
+import org.example.gongiklifeclientbegraphql.service.user.UserProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.VerifyEmailCodeService;
 import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -41,6 +43,8 @@ public class UserController {
   private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
   private final VerifyEmailCodeService verifyEmailCodeService;
   private final SignUpService signUpService;
+  private final MyProfileService myProfileService;
+  private final UserProfileService userProfileService;
 
   @MutationMapping
   public SendEmailVerificationCodeResponseDto sendEmailVerificationCode(
@@ -87,20 +91,17 @@ public class UserController {
         () -> {
           String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-          return userService.myProfile(userId);
+          return myProfileService.myProfile(userId);
         });
   }
 
   @QueryMapping
   public UserProfileResponseDto userProfile(
-      @Arguments UserProfileRequestDto requestDto
+      @Argument("userProfileInput") UserProfileRequestDto requestDto
   ) {
-    try {
-      return userService.userProfile(requestDto.getUserId());
-    } catch (Exception e) {
-      log.error("me error: {}", e);
-      throw e;
-    }
+    return ControllerExceptionHandlingUtil.handle(
+        () -> userProfileService.userProfile(requestDto.getUserId()));
+
   }
 
   @MutationMapping
@@ -108,16 +109,14 @@ public class UserController {
       @Arguments UpdateProfileRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    return ControllerExceptionHandlingUtil.handle(
+        () -> {
+          String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      requestDto.setUserId(userId);
+          requestDto.setUserId(userId);
 
-      return userService.updateProfile(requestDto);
-    } catch (Exception e) {
-      log.error("updateProfile error: {}", e);
-      throw e;
-    }
+          return userService.updateProfile(requestDto);
+        });
   }
 
 

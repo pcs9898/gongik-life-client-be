@@ -30,6 +30,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbeuserservice.service.MyProfileService;
 import org.example.gongiklifeclientbeuserservice.service.SendEmailVerificationCodeService;
 import org.example.gongiklifeclientbeuserservice.service.SignupService;
+import org.example.gongiklifeclientbeuserservice.service.UserProfileService;
 import org.example.gongiklifeclientbeuserservice.service.UserSerivce;
 import org.example.gongiklifeclientbeuserservice.service.VerifyEmailCodeService;
 import util.GrpcServiceExceptionHandlingUtil;
@@ -45,6 +46,7 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
   private final VerifyEmailCodeService verifyEmailCodeService;
   private final SignupService signupService;
   private final MyProfileService myProfileService;
+  private final UserProfileService userProfileService;
 
   @Override
   public void sendEmailVerificationCode(SendEmailVerificationCodeRequest request,
@@ -97,10 +99,8 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
       StreamObserver<UserProfileResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("userProfile",
-        () -> userService.userProfile(request),
+        () -> userProfileService.userProfile(request),
         responseObserver);
-
-
   }
 
   @Override
