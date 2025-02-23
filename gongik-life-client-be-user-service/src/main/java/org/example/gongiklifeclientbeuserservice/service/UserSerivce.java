@@ -15,9 +15,6 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameBy
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionResponse;
-import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileInstitution;
-import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
-import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileInstitution;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileResponse;
@@ -156,55 +153,55 @@ public class UserSerivce {
     }
   }
 
-  public MyProfileResponse myProfile(MyProfileRequest request) {
-    String userId = request.getUserId();
-
-    User user = userRepository.findById(UUID.fromString(userId))
-        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
-
-    UserProfile userProfile = userProfileRepository.findByUser(user)
-        .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
-
-    MyProfileResponse.Builder myProfileResponseBuilder = MyProfileResponse.newBuilder()
-        .setId(user.getId().toString())
-        .setEmail(user.getEmail())
-        .setName(userProfile.getName());
-
-    if (!userProfile.getBio().isEmpty()) {
-      myProfileResponseBuilder.setBio(userProfile.getBio());
-    }
-
-    if (userProfile.getEnlistmentDate() != null) {
-      myProfileResponseBuilder.setEnlistmentDate(userProfile.getEnlistmentDate().toString());
-    }
-
-    if (userProfile.getDischargeDate() != null) {
-      myProfileResponseBuilder.setDischargeDate(userProfile.getDischargeDate().toString());
-    }
-
-    GetInstitutionNameResponse getInstitutionNameRequest = null;
-    if (userProfile.getInstitutionId() != null) {
-      try {
-        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
-            GetInstitutionNameRequest.newBuilder().setId(userProfile.getInstitutionId().toString())
-                .build());
-        log.info("Institution name retrieved for institution ID: {}",
-            userProfile.getInstitutionId().toString());
-      } catch (Exception e) {
-        log.error("Error occurred while getting institution name: ", e);
-        throw e;
-      }
-    }
-
-    if (getInstitutionNameRequest != null) {
-      myProfileResponseBuilder.setInstitution(
-          MyProfileInstitution.newBuilder()
-              .setId(userProfile.getInstitutionId().toString())
-              .setName(getInstitutionNameRequest.getName()));
-    }
-
-    return myProfileResponseBuilder.build();
-  }
+//  public MyProfileResponse myProfile(MyProfileRequest request) {
+//    String userId = request.getUserId();
+//
+//    User user = userRepository.findById(UUID.fromString(userId))
+//        .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+//
+//    UserProfile userProfile = userProfileRepository.findByUser(user)
+//        .orElseThrow(() -> new RuntimeException("User profile not found with ID: " + userId));
+//
+//    MyProfileResponse.Builder myProfileResponseBuilder = MyProfileResponse.newBuilder()
+//        .setId(user.getId().toString())
+//        .setEmail(user.getEmail())
+//        .setName(userProfile.getName());
+//
+//    if (!userProfile.getBio().isEmpty()) {
+//      myProfileResponseBuilder.setBio(userProfile.getBio());
+//    }
+//
+//    if (userProfile.getEnlistmentDate() != null) {
+//      myProfileResponseBuilder.setEnlistmentDate(userProfile.getEnlistmentDate().toString());
+//    }
+//
+//    if (userProfile.getDischargeDate() != null) {
+//      myProfileResponseBuilder.setDischargeDate(userProfile.getDischargeDate().toString());
+//    }
+//
+//    GetInstitutionNameResponse getInstitutionNameRequest = null;
+//    if (userProfile.getInstitutionId() != null) {
+//      try {
+//        getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
+//            GetInstitutionNameRequest.newBuilder().setId(userProfile.getInstitutionId().toString())
+//                .build());
+//        log.info("Institution name retrieved for institution ID: {}",
+//            userProfile.getInstitutionId().toString());
+//      } catch (Exception e) {
+//        log.error("Error occurred while getting institution name: ", e);
+//        throw e;
+//      }
+//    }
+//
+//    if (getInstitutionNameRequest != null) {
+//      myProfileResponseBuilder.setInstitution(
+//          MyProfileInstitution.newBuilder()
+//              .setId(userProfile.getInstitutionId().toString())
+//              .setName(getInstitutionNameRequest.getName()));
+//    }
+//
+//    return myProfileResponseBuilder.build();
+//  }
 
   public UserProfileResponse userProfile(UserProfileRequest request) {
     String userId = request.getUserId();

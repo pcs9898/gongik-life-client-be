@@ -23,11 +23,11 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileRe
 import com.gongik.userService.domain.service.UserServiceOuterClass.UserProfileResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.VerifyEmailCodeResponse;
-import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.example.gongiklifeclientbeuserservice.service.MyProfileService;
 import org.example.gongiklifeclientbeuserservice.service.SendEmailVerificationCodeService;
 import org.example.gongiklifeclientbeuserservice.service.SignupService;
 import org.example.gongiklifeclientbeuserservice.service.UserSerivce;
@@ -44,6 +44,7 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
   private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
   private final VerifyEmailCodeService verifyEmailCodeService;
   private final SignupService signupService;
+  private final MyProfileService myProfileService;
 
   @Override
   public void sendEmailVerificationCode(SendEmailVerificationCodeRequest request,
@@ -75,171 +76,75 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
   @Override
   public void findByEmailForAuth(FindByEmailForAuthRequest request,
       StreamObserver<FindByEmailForAuthResponse> responseObserver) {
-    try {
-      log.info("findByEmailForAuth request: {}", request);
-      FindByEmailForAuthResponse response = userService.findByEmailForAuth(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("findByEmailForAuth error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("findByEmailForAuth",
+        () -> userService.findByEmailForAuth(request),
+        responseObserver);
   }
 
   @Override
   public void myProfile(MyProfileRequest request,
       StreamObserver<MyProfileResponse> responseObserver) {
-    try {
-      MyProfileResponse response = userService.myProfile(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("myProfile error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
+    GrpcServiceExceptionHandlingUtil.handle("myProfile",
+        () -> myProfileService.myProfile(request),
+        responseObserver);
 
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
   }
 
   @Override
   public void userProfile(UserProfileRequest request,
       StreamObserver<UserProfileResponse> responseObserver) {
-    try {
-      UserProfileResponse response = userService.userProfile(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("userProfile error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
+    GrpcServiceExceptionHandlingUtil.handle("userProfile",
+        () -> userService.userProfile(request),
+        responseObserver);
 
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+
   }
 
   @Override
   public void updateProfile(UpdateProfileRequest request,
       StreamObserver<UpdateProfileResponse> responseObserver) {
-    try {
-      UpdateProfileResponse response = userService.updateProfile(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("updateProfile error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-
-    }
+    GrpcServiceExceptionHandlingUtil.handle("updateProfile",
+        () -> userService.updateProfile(request),
+        responseObserver);
   }
 
   @Override
   public void checkUserInstitution(CheckUserInstitutionRequest request,
       StreamObserver<CheckUserInstitutionResponse> responseObserver) {
-    try {
-      CheckUserInstitutionResponse response = userService.checkUserInstitution(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("checkUserInstitution error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("checkUserInstitution",
+        () -> userService.checkUserInstitution(request),
+        responseObserver);
   }
 
   @Override
   public void getUserNameById(GetUserNameByIdRequest request,
       StreamObserver<GetUserNameByIdResponse> responseObserver) {
-    try {
-      GetUserNameByIdResponse response = userService.getUserNameById(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("getUserNameById error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("getUserNameById",
+        () -> userService.getUserNameById(request),
+        responseObserver);
   }
 
   @Override
   public void getUserNameByIds(GetUserNameByIdsRequest request,
       StreamObserver<GetUserNameByIdsResponse> responseObserver) {
 
-    try {
-      GetUserNameByIdsResponse response = userService.getUserNameByIds(request);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("getUserNameByIds error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("getUserNameByIds",
+        () -> userService.getUserNameByIds(request),
+        responseObserver);
   }
 
   @Override
   public void hasInstitution(HasInstitutionRequest request,
       StreamObserver<HasInstitutionResponse> responseObserver) {
-    try {
-      HasInstitutionResponse response = userService.hasInstitution(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("hasInstitution error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("hasInstitution",
+        () -> userService.hasInstitution(request),
+        responseObserver);
   }
 }
