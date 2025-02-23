@@ -121,7 +121,7 @@ type Mutation{
     """
     Sign up
     """
-    signUp(name: String!,email: String!,password: String!,confirmPassword: String!,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): SignUpResponse!
+    signUp(signUpInput: SignUpInput!): SignUpResponse!
 
     """
     Update my profile, need to sign in
@@ -346,6 +346,51 @@ type VerifyEmailCodeResponse{
     success: Boolean!
 }
 
+"""
+Sign up input
+"""
+input SignUpInput{
+    """
+    User name
+    """
+    name: String!
+
+    """
+    User email
+    """
+    email: String!
+
+    """
+    User password
+    """
+    password: String!
+
+    """
+    User confirm password
+    """
+    confirmPassword: String!
+
+    """
+    User bio
+    """
+    bio: String
+
+    """
+    Institution id, if user has institution, must have enlistmentDate and dischargeDate
+    """
+    institutionId: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
+    enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
+    dischargeDate: String
+
+}
 
 """
 Sign up response

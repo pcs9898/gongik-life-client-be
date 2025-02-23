@@ -1,8 +1,6 @@
 package org.example.gongiklifeclientbeuserservice.service;
 
 import com.gongik.authservice.domain.service.AuthServiceGrpc;
-import com.gongik.authservice.domain.service.AuthServiceOuterClass.GenerateTokenRequest;
-import com.gongik.authservice.domain.service.AuthServiceOuterClass.GenerateTokenResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionNameResponse;
@@ -20,8 +18,6 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutio
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileInstitution;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.MyProfileResponse;
-import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpRequest;
-import com.gongik.userService.domain.service.UserServiceOuterClass.SignUpResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileInstitution;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileResponse;
@@ -48,7 +44,6 @@ import org.example.gongiklifeclientbeuserservice.util.TimestampConverter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -74,135 +69,6 @@ public class UserSerivce {
   private AuthServiceGrpc.AuthServiceBlockingStub authServiceBlockingStub;
   @GrpcClient("gongik-life-client-be-institution-service")
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionServiceBlockingStub;
-
-
-  @Transactional()
-  public SignUpResponse signUp(SignUpRequest request) {
-    log.info("Starting signUp process for email: {}", request.getEmail());
-
-    try {
-      // 이메일 중복 확인
-      boolean emailExists = userRepository.existsByEmail(request.getEmail());
-      if (emailExists) {
-        log.error("Email is already registered: {}", request.getEmail());
-        throw Status.ALREADY_EXISTS
-            .withDescription("Email is already registered.")
-            .asRuntimeException();
-      }
-
-      boolean isVerified = isEmailVerified(request.getEmail());
-      if (!isVerified) {
-        log.error("Email is not verified: {}", request.getEmail());
-        throw Status.PERMISSION_DENIED
-            .withDescription("Email is not verified.")
-            .asRuntimeException();
-      }
-
-      if (!request.getPassword().equals(request.getConfirmPassword())) {
-        log.error("Password and password confirm do not match for email: {}", request.getEmail());
-        throw Status.INVALID_ARGUMENT
-            .withDescription("Password and password confirm are not same.")
-            .asRuntimeException();
-      }
-
-      String hashedPassword = passwordEncoder.encode(request.getPassword());
-
-      // 사용자 생성
-      User newUser = User.builder()
-          .email(request.getEmail())
-          .build();
-      userRepository.save(newUser);
-      log.info("New user created with ID: {}", newUser.getId());
-
-      UserAuth newUserAuth = UserAuth.builder()
-          .user(newUser)
-          .authTypeId(1)
-          .passwordHash(hashedPassword)
-          .build();
-      userAuthRepository.save(newUserAuth);
-      log.info("New user auth created for user ID: {}", newUser.getId());
-
-      UserProfile newUserProfile = UserProfile.builder()
-          .user(newUser)
-          .name(request.getName())
-          .institutionId(request.getInstitutionId().isEmpty() ? null
-              : UUID.fromString(request.getInstitutionId()))
-          .bio(request.getBio().isEmpty() ? null : request.getBio())
-          .enlistmentDate(request.getEnlistmentDate().isEmpty() ? null
-              : TimestampConverter.convertStringToDate(request.getEnlistmentDate()))
-          .dischargeDate(request.getDischargeDate().isEmpty() ? null
-              : TimestampConverter.convertStringToDate(request.getDischargeDate()))
-          .build();
-      userProfileRepository.save(newUserProfile);
-      log.info("New user profile created for user ID: {}", newUser.getId());
-
-      GetInstitutionNameResponse getInstitutionNameRequest = null;
-      if (!request.getInstitutionId().isEmpty()) {
-        try {
-          getInstitutionNameRequest = institutionServiceBlockingStub.getInstitutionName(
-              GetInstitutionNameRequest.newBuilder().setId(request.getInstitutionId()).build());
-          log.info("Institution name retrieved for institution ID: {}", request.getInstitutionId());
-        } catch (Exception e) {
-          log.error("Error occurred while getting institution name: ", e);
-          throw e;
-        }
-      }
-
-      GenerateTokenResponse generateTokenResponse;
-      try {
-        generateTokenResponse = authServiceBlockingStub.generateToken(
-            GenerateTokenRequest.newBuilder()
-                .setUserId(newUser.getId().toString())
-                .build());
-        if (generateTokenResponse == null) {
-          log.error("generateTokenResponse is null");
-          throw new RuntimeException("Failed to generate token: response is null");
-        }
-        log.info("generateTokenResponse: {}", generateTokenResponse);
-      } catch (Exception e) {
-        log.error("Error occurred while generating token: ", e);
-        throw e;
-      }
-
-      UserServiceOuterClass.SignUpUser.Builder signUpUserBuilder = UserServiceOuterClass.SignUpUser.newBuilder()
-          .setId(newUser.getId().toString())
-          .setEmail(newUser.getEmail())
-          .setName(newUserProfile.getName());
-
-      if (newUserProfile.getBio() != null && !newUserProfile.getBio().isEmpty()) {
-        signUpUserBuilder.setBio(newUserProfile.getBio());
-      }
-
-      if (newUserProfile.getEnlistmentDate() != null) {
-        signUpUserBuilder.setEnlistmentDate(newUserProfile.getEnlistmentDate().toString());
-      }
-
-      if (newUserProfile.getDischargeDate() != null) {
-        signUpUserBuilder.setDischargeDate(newUserProfile.getDischargeDate().toString());
-      }
-
-      if (getInstitutionNameRequest != null) {
-        signUpUserBuilder.setInstitution(UserServiceOuterClass.SignUpInstitution.newBuilder()
-            .setId(request.getInstitutionId())
-            .setName(getInstitutionNameRequest.getName())
-            .build());
-      }
-
-      SignUpResponse response = SignUpResponse.newBuilder()
-          .setUser(signUpUserBuilder.build())
-          .setRefreshToken(generateTokenResponse.getRefreshToken())
-          .setAccessToken(generateTokenResponse.getAccessToken())
-          .setAccessTokenExpiresAt(generateTokenResponse.getAccessTokenExpiresAt())
-          .build();
-
-      log.info("SignUpResponse: {}", response);
-
-      return response;
-    } catch (Exception e) {
-      log.error("signUp error: ", e);
-      throw e;
-    }
-  }
 
 
   private void saveEmailVerificationCode(String email, String code) {
