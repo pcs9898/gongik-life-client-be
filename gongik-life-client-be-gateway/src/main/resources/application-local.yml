@@ -10,6 +10,8 @@ spring:
       host: localhost
   cloud:
     gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
       routes:
         - id: auth_route
           uri: lb://gongik-life-client-be-auth-service
@@ -24,6 +26,11 @@ spring:
               args:
                 name: authCircuitBreaker
                 fallbackUri: forward:/fallback/authFailure
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 5
+                key-resolver: "#{@ipKeyResolver}"
 
         - id: graphql_route
           uri: lb://gongik-life-client-be-graphql
@@ -35,12 +42,23 @@ spring:
             - PreserveHostHeader
             - DedupeResponseHeader=Access-Control-Allow-Origin
             - DedupeResponseHeader=Set-Cookie
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 5
+                key-resolver: "#{@ipKeyResolver}"
 
         - id: graphql_subscription_route
           uri: lb:ws://gongik-life-client-be-graphql
           predicates:
             - Path=/graphql
           filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 5
+                key-resolver: "#{@ipKeyResolver}"
+
 
         - id: graphiql_route
           uri: lb://gongik-life-client-be-graphql
@@ -52,6 +70,76 @@ spring:
             - PreserveHostHeader
             - DedupeResponseHeader=Access-Control-Allow-Origin
             - DedupeResponseHeader=Set-Cookie
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 5
+                key-resolver: "#{@ipKeyResolver}"
+
+
+          # Swagger 등에는 별도의 Rate Limiter 미적용 설정
+        - id: auth_swagger_route
+          uri: lb://gongik-life-client-be-auth-service
+          predicates:
+            - Path=/swagger-ui/**, /v3/api-docs/**, /swagger-resources/**, /webjars/**
+            - Method=POST,GET,OPTIONS
+          filters:
+            - PreserveHostHeader
+            - DedupeResponseHeader=Access-Control-Allow-Origin
+            - DedupeResponseHeader=Set-Cookie
+
+
+      #         - id: auth_route
+      #          uri: lb://gongik-life-client-be-auth-service
+      #          predicates:
+      #            - Path=/api/auth/**
+      #            - Method=POST,GET,OPTIONS
+      #          filters:
+      #            - PreserveHostHeader
+      #            - DedupeResponseHeader=Access-Control-Allow-Origin
+      #            - DedupeResponseHeader=Set-Cookie
+      #            - name: CircuitBreaker
+      #              args:
+      #                name: authCircuitBreaker
+      #                fallbackUri: forward:/fallback/authFailure
+      #
+      #        - id: auth_swagger_route
+      #          uri: lb://gongik-life-client-be-auth-service
+      #          predicates:
+      #            - Path=/swagger-ui/**, /v3/api-docs/**, /swagger-resources/**, /webjars/**
+      #            - Method=POST,GET,OPTIONS
+      #          filters:
+      #            - PreserveHostHeader
+      #            - DedupeResponseHeader=Access-Control-Allow-Origin
+      #            - DedupeResponseHeader=Set-Cookie
+      #
+      #        - id: graphql_route
+      #          uri: lb://gongik-life-client-be-graphql
+      #          predicates:
+      #            - Path=/graphql
+      #            - Method=POST,GET,OPTIONS
+      #          filters:
+      #            - AuthenticationFilter
+      #            - PreserveHostHeader
+      #            - DedupeResponseHeader=Access-Control-Allow-Origin
+      #            - DedupeResponseHeader=Set-Cookie
+      #
+      #        - id: graphql_subscription_route
+      #          uri: lb:ws://gongik-life-client-be-graphql
+      #          predicates:
+      #            - Path=/graphql
+      #          filters:
+      #
+      #        - id: graphiql_route
+      #          uri: lb://gongik-life-client-be-graphql
+      #          predicates:
+      #            - Path=/graphiql
+      #            - Method=POST,GET,OPTIONS
+      #          filters:
+      #            - AuthenticationFilter
+      #            - PreserveHostHeader
+      #            - DedupeResponseHeader=Access-Control-Allow-Origin
+      #            - DedupeResponseHeader=Set-Cookie
 
 
 
@@ -69,15 +157,16 @@ spring:
             allowCredentials: true
             exposedHeaders:
               - Set-Cookie
-      
-      
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-        - name: RequestRateLimiter
-          args:
-            redis-rate-limiter.replenishRate: 1 # replenishRate는 사용자가 일정 시간 동안(보통 초 단위) 발생시킬 수 있는 요청의 수를 정의
-            redis-rate-limiter.burstCapacity: 5 # burstCapacity는 토큰 버킷이 담을 수 있는 최대 토큰의 수를 정의
-            key-resolver: "#{@ipKeyResolver}"
+
+
+
+#      default-filters:
+#        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+#        - name: RequestRateLimiter
+#          args:
+#            redis-rate-limiter.replenishRate: 1 # replenishRate는 사용자가 일정 시간 동안(보통 초 단위) 발생시킬 수 있는 요청의 수를 정의
+#            redis-rate-limiter.burstCapacity: 5 # burstCapacity는 토큰 버킷이 담을 수 있는 최대 토큰의 수를 정의
+#            key-resolver: "#{@ipKeyResolver}"
 eureka:
   client:
     service-url:
