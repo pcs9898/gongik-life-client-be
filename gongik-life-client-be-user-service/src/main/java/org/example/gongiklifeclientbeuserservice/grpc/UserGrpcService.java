@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbeuserservice.service.SendEmailVerificationCodeService;
+import org.example.gongiklifeclientbeuserservice.service.SignupService;
 import org.example.gongiklifeclientbeuserservice.service.UserSerivce;
 import org.example.gongiklifeclientbeuserservice.service.VerifyEmailCodeService;
 import util.GrpcServiceExceptionHandlingUtil;
@@ -42,6 +43,7 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
   private final UserSerivce userService;
   private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
   private final VerifyEmailCodeService verifyEmailCodeService;
+  private final SignupService signupService;
 
   @Override
   public void sendEmailVerificationCode(SendEmailVerificationCodeRequest request,
@@ -63,23 +65,11 @@ public class UserGrpcService extends UserServiceGrpc.UserServiceImplBase {
 
   @Override
   public void signUp(SignUpRequest request, StreamObserver<SignUpResponse> responseObserver) {
-    try {
-      SignUpResponse response = userService.signUp(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
+    GrpcServiceExceptionHandlingUtil.handle("signUp",
+        () -> signupService.signUp(request),
+        responseObserver);
 
-    } catch (Exception e) {
-      log.error("signUp error: {} - {}",
-          e.getMessage(), e.getLocalizedMessage());
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
   }
 
   @Override

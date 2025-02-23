@@ -21,7 +21,7 @@ public class SignUpUserRequestDto {
   private String enlistmentDate;
   private String dischargeDate;
 
-  public SignUpRequest toProto() {
+  public SignUpRequest toSignUpRequestProto() {
     return SignUpRequest.newBuilder()
         .setName(name)
         .setEmail(email)

@@ -21,6 +21,7 @@ import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmai
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeResponseDto;
 import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.example.gongiklifeclientbegraphql.service.user.SendEmailVerificationCodeService;
+import org.example.gongiklifeclientbegraphql.service.user.SignUpService;
 import org.example.gongiklifeclientbegraphql.service.user.VerifyEmailCodeService;
 import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -39,6 +40,7 @@ public class UserController {
   private final UserService userService;
   private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
   private final VerifyEmailCodeService verifyEmailCodeService;
+  private final SignUpService signUpService;
 
   @MutationMapping
   public SendEmailVerificationCodeResponseDto sendEmailVerificationCode(
@@ -61,28 +63,21 @@ public class UserController {
 
   @MutationMapping
   public SignUpResponseDto signUp(
-      @Arguments SignUpUserRequestDto requestDto,
+      @Argument("signUpInput") SignUpUserRequestDto requestDto,
       GraphQLContext context,
       @ContextValue(name = "request") HttpServletRequest request
   ) {
-    ServiceSignUpResponseDto serviceSignUpResponse = userService.signUp(requestDto);
 
-    context.put("refreshToken", serviceSignUpResponse.getRefreshToken());
+    return ControllerExceptionHandlingUtil.handle(
+        () -> {
+          ServiceSignUpResponseDto serviceSignUpResponse = signUpService.signUp(requestDto);
+          context.put("refreshToken", serviceSignUpResponse.getRefreshToken());
 
-    String ipAddress = getClientIpAddress(request);
+          String ipAddress = getClientIpAddress(request);
+          sendUserLoginHistory(serviceSignUpResponse.getUser().getId(), ipAddress);
 
-    UserLoginHistoryRequestDto userLoginHistoryRequestDto = UserLoginHistoryRequestDto.builder()
-        .userId(serviceSignUpResponse.getUser().getId())
-        .ipAddress(ipAddress)
-        .build();
-
-    userService.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
-
-    return SignUpResponseDto.builder()
-        .user(serviceSignUpResponse.getUser())
-        .accessToken(serviceSignUpResponse.getAccessToken())
-        .accessTokenExpiresAt(serviceSignUpResponse.getAccessTokenExpiresAt())
-        .build();
+          return buildSignUpResponse(serviceSignUpResponse);
+        });
   }
 
   @QueryMapping
@@ -147,5 +142,20 @@ public class UserController {
     return ipAddress;
   }
 
+  private void sendUserLoginHistory(String userId, String ipAddress) {
+    UserLoginHistoryRequestDto userLoginHistoryRequestDto = UserLoginHistoryRequestDto.builder()
+        .userId(userId)
+        .ipAddress(ipAddress)
+        .build();
+    userService.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
+  }
+
+  private SignUpResponseDto buildSignUpResponse(ServiceSignUpResponseDto serviceSignUpResponse) {
+    return SignUpResponseDto.builder()
+        .user(serviceSignUpResponse.getUser())
+        .accessToken(serviceSignUpResponse.getAccessToken())
+        .accessTokenExpiresAt(serviceSignUpResponse.getAccessTokenExpiresAt())
+        .build();
+  }
 
 }
