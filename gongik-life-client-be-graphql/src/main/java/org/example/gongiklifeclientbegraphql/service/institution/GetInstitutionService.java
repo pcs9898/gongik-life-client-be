@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionResponseDto;
-import org.example.gongiklifeclientbegraphql.service.InstitutionCacheService;
 import org.example.gongiklifeclientbegraphql.util.ServiceExceptionHandlingUtil;
 import org.springframework.stereotype.Service;
 

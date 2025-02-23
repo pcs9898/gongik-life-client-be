@@ -1,4 +1,4 @@
-package org.example.gongiklifeclientbegraphql.service;
+package org.example.gongiklifeclientbegraphql.service.user;
 
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionRequest;

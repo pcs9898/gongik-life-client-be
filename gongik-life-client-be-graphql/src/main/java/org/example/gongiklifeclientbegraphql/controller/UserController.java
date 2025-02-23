@@ -19,12 +19,12 @@ import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileReq
 import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeResponseDto;
-import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.example.gongiklifeclientbegraphql.service.user.MyProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.SendEmailVerificationCodeService;
 import org.example.gongiklifeclientbegraphql.service.user.SignUpService;
 import org.example.gongiklifeclientbegraphql.service.user.UpdateProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.UserProfileService;
+import org.example.gongiklifeclientbegraphql.service.user.UserService;
 import org.example.gongiklifeclientbegraphql.service.user.VerifyEmailCodeService;
 import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;

@@ -1,4 +1,4 @@
-package org.example.gongiklifeclientbegraphql.service;
+package org.example.gongiklifeclientbegraphql.service.institution;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
@@ -11,6 +11,7 @@ import org.example.gongiklifeclientbegraphql.dto.institution.institutionReview.I
 import org.example.gongiklifeclientbegraphql.util.ServiceExceptionHandlingUtil;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
 
 @Service
 @Slf4j
@@ -45,3 +46,4 @@ public class InstitutionCacheService {
 
   }
 }
+
