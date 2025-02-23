@@ -23,7 +23,7 @@ type Query {
     """
     Get institution
     """
-    institution(institutionId: ID!): InstitutionResponse!
+    institution(institutionInput: InstitutionInput!): InstitutionResponse!
 
     """
     Get institution review
@@ -647,6 +647,16 @@ type UpdateProfileInstitution{
     Institution name
     """
     name: String!
+}
+
+"""
+Institution input
+"""
+input InstitutionInput{
+    """
+    Institution id
+    """
+    institutionId: ID!
 }
 
 """
