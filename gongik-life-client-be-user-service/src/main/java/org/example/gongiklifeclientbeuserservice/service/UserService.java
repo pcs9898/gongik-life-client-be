@@ -15,9 +15,6 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameBy
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdsResponse;
 import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.HasInstitutionResponse;
-import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileInstitution;
-import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileRequest;
-import com.gongik.userService.domain.service.UserServiceOuterClass.UpdateProfileResponse;
 import io.grpc.Status;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +31,6 @@ import org.example.gongiklifeclientbeuserservice.repository.AuthTypeRepository;
 import org.example.gongiklifeclientbeuserservice.repository.UserAuthRepository;
 import org.example.gongiklifeclientbeuserservice.repository.UserProfileRepository;
 import org.example.gongiklifeclientbeuserservice.repository.UserRepository;
-import org.example.gongiklifeclientbeuserservice.util.TimestampConverter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,7 +39,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserSerivce {
+public class UserService {
 
   private static final long EMAIL_VERIFICATION_CODE_EXPIRATION_MINUTES = 6;
   private static final long EMAIL_VERIFICATION_CODE_RESEND_WAIT_MINUTES = 1;
@@ -65,13 +61,13 @@ public class UserSerivce {
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionServiceBlockingStub;
 
 
-  private void saveEmailVerificationCode(String email, String code) {
+  public void saveEmailVerificationCode(String email, String code) {
     String key = VERIFICATION_CODE + email;
     redisTemplate.opsForValue()
         .set(key, code, EMAIL_VERIFICATION_CODE_EXPIRATION_MINUTES, TimeUnit.MINUTES);
   }
 
-  private boolean isEmailVerified(String email) {
+  public boolean isEmailVerified(String email) {
     String verifiedKey = VERIFIED_EMAIL + email;
     String isVerified = redisTemplate.opsForValue().get(verifiedKey);
 
@@ -150,117 +146,6 @@ public class UserSerivce {
     }
   }
 
-
-  public UpdateProfileResponse updateProfile(UpdateProfileRequest request) {
-
-    User user = userRepository.findById(UUID.fromString(request.getUserId()))
-        .orElseThrow(() -> new RuntimeException("User not found with ID: " + request.getUserId()));
-
-    UserProfile userProfile = userProfileRepository.findByUser(user)
-        .orElseThrow(
-            () -> new RuntimeException("User profile not found with ID: " + request.getUserId()));
-
-    if (request.hasInstitutionId()) {
-      boolean hasUserProfileDates = userProfile.getDischargeDate() != null &&
-          userProfile.getEnlistmentDate() != null;
-      boolean hasRequestDates = request.hasEnlistmentDate() &&
-          request.hasDischargeDate();
-
-      if (!hasUserProfileDates && !hasRequestDates) {
-        throw Status.INVALID_ARGUMENT
-            .withDescription(
-                "Institution ID, Enlistment Date, and Discharge Date must all be provided.")
-            .asRuntimeException();
-      }
-    }
-
-    if (request.hasName()) {
-      userProfile.setName(request.getName());
-      if (request.getName().isEmpty()) {
-        throw Status.INVALID_ARGUMENT
-            .withDescription("Name cannot be empty.")
-            .asRuntimeException();
-      } else {
-        userProfile.setName(request.getName());
-      }
-    }
-    if (request.hasBio()) {
-      if (request.getBio().isEmpty()) {
-        userProfile.setBio(null);
-      } else {
-        userProfile.setBio(request.getBio());
-      }
-
-    }
-    if (request.hasEnlistmentDate()) {
-      if (request.getEnlistmentDate().isEmpty()) {
-        userProfile.setEnlistmentDate(null);
-      } else {
-        userProfile.setEnlistmentDate(
-            TimestampConverter.convertStringToDate(request.getEnlistmentDate()));
-      }
-    }
-    if (request.hasDischargeDate()) {
-      if (request.getDischargeDate().isEmpty()) {
-        userProfile.setDischargeDate(null);
-      } else {
-        userProfile.setDischargeDate(
-            TimestampConverter.convertStringToDate(request.getDischargeDate()));
-      }
-    }
-    if (request.hasInstitutionId()) {
-      if (request.getInstitutionId().isEmpty()) {
-        userProfile.setInstitutionId(null);
-      } else {
-        userProfile.setInstitutionId(UUID.fromString(request.getInstitutionId()));
-      }
-    }
-
-    userProfileRepository.save(userProfile);
-
-    UpdateProfileResponse.Builder responseBuilder = UpdateProfileResponse.newBuilder()
-        .setId(user.getId().toString())
-        .setEmail(user.getEmail());
-
-    if (userProfile.getName() != null) {
-      responseBuilder.setName(userProfile.getName());
-    }
-
-    if (userProfile.getBio() != null && !userProfile.getBio().isEmpty()) {
-      responseBuilder.setBio(userProfile.getBio());
-    }
-
-    if (userProfile.getEnlistmentDate() != null) {
-      responseBuilder.setEnlistmentDate(userProfile.getEnlistmentDate().toString());
-    }
-
-    if (userProfile.getDischargeDate() != null) {
-      responseBuilder.setDischargeDate(userProfile.getDischargeDate().toString());
-    }
-
-    if (userProfile.getInstitutionId() != null) {
-      try {
-        String institutionName = getInstitutionName(userProfile.getInstitutionId());
-
-        responseBuilder.setInstitution(UpdateProfileInstitution.newBuilder()
-            .setId(userProfile.getInstitutionId().toString())
-            .setName(institutionName));
-      } catch (Exception e) {
-        log.error("Error occurred while getting institution name: ", e);
-        throw e;
-      }
-    }
-
-    return responseBuilder.build();
-
-  }
-
-  private String getInstitutionName(UUID institutionId) {
-
-    GetInstitutionNameResponse response = institutionServiceBlockingStub.getInstitutionName(
-        GetInstitutionNameRequest.newBuilder().setId(institutionId.toString()).build());
-    return response.getName();
-  }
 
   public CheckUserInstitutionResponse checkUserInstitution(CheckUserInstitutionRequest request) {
     String userId = request.getUserId();

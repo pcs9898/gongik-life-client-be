@@ -23,11 +23,11 @@ import org.example.gongiklifeclientbegraphql.service.UserService;
 import org.example.gongiklifeclientbegraphql.service.user.MyProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.SendEmailVerificationCodeService;
 import org.example.gongiklifeclientbegraphql.service.user.SignUpService;
+import org.example.gongiklifeclientbegraphql.service.user.UpdateProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.UserProfileService;
 import org.example.gongiklifeclientbegraphql.service.user.VerifyEmailCodeService;
 import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -45,6 +45,7 @@ public class UserController {
   private final SignUpService signUpService;
   private final MyProfileService myProfileService;
   private final UserProfileService userProfileService;
+  private final UpdateProfileService updateProfileService;
 
   @MutationMapping
   public SendEmailVerificationCodeResponseDto sendEmailVerificationCode(
@@ -67,7 +68,7 @@ public class UserController {
 
   @MutationMapping
   public SignUpResponseDto signUp(
-      @Argument("signUpInput") SignUpUserRequestDto requestDto,
+      @Argument("signUpInput") @Valid SignUpUserRequestDto requestDto,
       GraphQLContext context,
       @ContextValue(name = "request") HttpServletRequest request
   ) {
@@ -97,7 +98,7 @@ public class UserController {
 
   @QueryMapping
   public UserProfileResponseDto userProfile(
-      @Argument("userProfileInput") UserProfileRequestDto requestDto
+      @Argument("userProfileInput") @Valid UserProfileRequestDto requestDto
   ) {
     return ControllerExceptionHandlingUtil.handle(
         () -> userProfileService.userProfile(requestDto.getUserId()));
@@ -106,7 +107,7 @@ public class UserController {
 
   @MutationMapping
   public UpdateProfileResponseDto updateProfile(
-      @Arguments UpdateProfileRequestDto requestDto,
+      @Argument("updateProfileInput") @Valid UpdateProfileRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
     return ControllerExceptionHandlingUtil.handle(
@@ -115,7 +116,7 @@ public class UserController {
 
           requestDto.setUserId(userId);
 
-          return userService.updateProfile(requestDto);
+          return updateProfileService.updateProfile(requestDto);
         });
   }
 

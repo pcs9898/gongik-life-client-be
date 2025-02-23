@@ -53,7 +53,7 @@ class SignupServiceTest {
   @Mock
   private PasswordEncoder passwordEncoder;
   @Mock
-  private CommonUserService commonUserService;
+  private UserService userService;
   @Mock
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionServiceBlockingStub;
   @Mock
@@ -100,7 +100,7 @@ class SignupServiceTest {
 
     // Mock 설정
     when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(false);
-    when(commonUserService.isEmailVerified(TEST_EMAIL)).thenReturn(true);
+    when(userService.isEmailVerified(TEST_EMAIL)).thenReturn(true);
     when(passwordEncoder.encode(TEST_PASSWORD)).thenReturn("encodedPassword");
     when(userRepository.save(any(User.class))).thenReturn(mockUser);
     when(userProfileRepository.save(any(UserProfile.class))).thenReturn(mockProfile);
@@ -149,7 +149,7 @@ class SignupServiceTest {
     // Given
     SignUpRequest request = createSignUpRequest();
     when(userRepository.existsByEmail(TEST_EMAIL)).thenReturn(false);
-    when(commonUserService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
+    when(userService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
 
     // When & Then
     StatusRuntimeException exception = assertThrows(
