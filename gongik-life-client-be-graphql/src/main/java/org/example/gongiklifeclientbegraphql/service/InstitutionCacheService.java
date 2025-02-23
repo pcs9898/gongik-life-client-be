@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.institutionReview.InstitutionReviewResponseDto;
+import org.example.gongiklifeclientbegraphql.util.ServiceExceptionHandlingUtil;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -21,29 +22,26 @@ public class InstitutionCacheService {
 
   @Cacheable(value = "institutionReview", key = "#institutionReviewId")
   public InstitutionReviewResponseDto getInstitutionReview(String institutionReviewId) {
-    try {
-      return InstitutionReviewResponseDto.fromProto(
+
+    return ServiceExceptionHandlingUtil.handle("institutionReview", () -> {
+      return InstitutionReviewResponseDto.fromInstitutionReviewResponseProto(
           institutionBlockingStub.institutionReview(
               InstitutionReviewRequest.newBuilder().setInstitutionReviewId(institutionReviewId)
                   .build()
           ));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
 
   @Cacheable(value = "institution", key = "#institutionId")
   public InstitutionResponseDto getInstitution(String institutionId) {
-    try {
-      return InstitutionResponseDto.fromProto(
+
+    return ServiceExceptionHandlingUtil.handle("institution", () -> {
+      return InstitutionResponseDto.fromInstitutionResponseProto(
           institutionBlockingStub.institution(
               InstitutionRequest.newBuilder().setInstitutionId(institutionId)
                   .build()
           ));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
+
   }
 }

@@ -2,8 +2,6 @@ package org.example.gongiklifeclientbegraphql.service;
 
 import com.gongik.institutionService.domain.service.InstitutionServiceGrpc;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.DeleteInstitutionReviewResponse;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountRequest;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.IsLikedInstitutionReviewRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
 import dto.institution.LikeInstitutionReviewRequestDto;
@@ -15,8 +13,6 @@ import org.example.gongiklifeclientbegraphql.dto.institution.createInsitutionRev
 import org.example.gongiklifeclientbegraphql.dto.institution.createInsitutionReview.CreateInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.deleteInstitutionReview.DeleteInstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.deleteInstitutionReview.DeleteInstitutionReviewResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.institutionReview.InstitutionReviewRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.institutionReview.InstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.institutionReviews.InstitutionReviewsRequestDto;
@@ -25,8 +21,6 @@ import org.example.gongiklifeclientbegraphql.dto.institution.institutionReviewsB
 import org.example.gongiklifeclientbegraphql.dto.institution.institutionReviewsByInstitution.InstitutionReviewsByInstitutionResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.likeInstitutionReview.LikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.myInstitutionReviews.MyInstitutionReviewsResponseDto;
-import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsRequestDto;
-import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.producer.institution.LikeInstitutionReviewProducer;
 import org.example.gongiklifeclientbegraphql.producer.institution.UnlikeInstitutionReviewProducer;
@@ -46,47 +40,20 @@ public class InstitutionService {
   @GrpcClient("gongik-life-client-be-institution-service")
   private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  public SearchInstitutionsResponseDto searchInstitutions(SearchInstitutionsRequestDto requestDto) {
-
-    return ServiceExceptionHandlingUtil.handle("searchInstitutions", () ->
-        SearchInstitutionsResponseDto.fromSearchInstitutionsResponseProto(
-            institutionBlockingStub.searchInstitutions(
-                requestDto.toSearchInstitutionsRequestProto())
-        )
-    );
-
-  }
-
-  public InstitutionResponseDto institution(InstitutionRequestDto requestDto) {
-    return ServiceExceptionHandlingUtil.handle("institution", () -> {
-      InstitutionResponseDto institutionResponseDto = institutionCacheService.getInstitution(
-          requestDto.getInstitutionId());
-      Integer reviewCount = institutionBlockingStub.getInstitutionReviewCount(
-          GetInstitutionReviewCountRequest.newBuilder()
-              .setInstitutionId(requestDto.getInstitutionId())
-              .build()
-      ).getReviewCount();
-      institutionResponseDto.setReviewCount(reviewCount);
-      return institutionResponseDto;
-    });
-  }
-
-
   public CreateInstitutionReviewResponseDto createInstitutionReview(
       CreateInstitutionReviewRequestDto requestDto) {
-    try {
+
+    return ServiceExceptionHandlingUtil.handle("createInstitutionReview", () -> {
       return CreateInstitutionReviewResponseDto.fromProto(
           institutionBlockingStub.createInstitutionReview(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
 
   @CacheEvict(value = "institutionReview", key = "#requestDto.getInstitutionReviewId()")
   public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
       DeleteInstitutionReviewRequestDto requestDto) {
-    try {
+
+    return ServiceExceptionHandlingUtil.handle("deleteInstitutionReview", () -> {
       DeleteInstitutionReviewResponse result = institutionBlockingStub.deleteInstitutionReview(
           requestDto.toProto());
 
@@ -97,11 +64,7 @@ public class InstitutionService {
       return DeleteInstitutionReviewResponseDto.fromProto(
           requestDto.getInstitutionReviewId()
       );
-
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
 
   public LikeInstitutionReviewResponseDto likeInstitutionReview(
@@ -126,55 +89,45 @@ public class InstitutionService {
 
 
   public InstitutionReviewResponseDto institutionReview(InstitutionReviewRequestDto requestDto) {
-    InstitutionReviewResponseDto institutionReview = institutionCacheService.getInstitutionReview(
-        requestDto.getInstitutionReviewId());
 
-    if (requestDto.getUserId() != null) {
+    return ServiceExceptionHandlingUtil.handle("institutionReview", () -> {
+      InstitutionReviewResponseDto institutionReview = institutionCacheService.getInstitutionReview(
+          requestDto.getInstitutionReviewId());
 
-      boolean isLiked = isLikedInstitutionReview(requestDto.getInstitutionReviewId(),
-          requestDto.getUserId());
-      institutionReview.setIsLiked(isLiked);
-    }
+      if (requestDto.getUserId() != null) {
 
-    return institutionReview;
+        boolean isLiked = isLikedInstitutionReview(requestDto.getInstitutionReviewId(),
+            requestDto.getUserId());
+        institutionReview.setIsLiked(isLiked);
+      }
+
+      return institutionReview;
+    });
   }
 
 
   public Boolean isLikedInstitutionReview(String institutionReviewId, String userId) {
-    try {
-      Boolean response = institutionBlockingStub.isLikedInstitutionReview(
+
+    return ServiceExceptionHandlingUtil.handle("isLikedInstitutionReview", () -> {
+      return institutionBlockingStub.isLikedInstitutionReview(
           IsLikedInstitutionReviewRequest.newBuilder()
               .setInstitutionReviewId(institutionReviewId)
               .setUserId(userId)
               .build()
       ).getIsLiked();
-
-      log.info("isLikedInstitutionReview response: {}", response);
-      return response;
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
 
   public InstitutionReviewsResponseDto institutionReviews(InstitutionReviewsRequestDto requestDto) {
-    try {
-      InstitutionReviewsResponse response = institutionBlockingStub.institutionReviews(
-          requestDto.toProto());
-
-      log.info("institutionReviews response: {}", response.getListInstitutionReviewList());
-
+    return ServiceExceptionHandlingUtil.handle("institutionReviews", () -> {
       return InstitutionReviewsResponseDto.fromProto(
           institutionBlockingStub.institutionReviews(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
 
   public MyInstitutionReviewsResponseDto myInstitutionReviews(String userId) {
 
-    try {
+    return ServiceExceptionHandlingUtil.handle("myInstitutionReviews", () -> {
       return MyInstitutionReviewsResponseDto.fromProto(
           institutionBlockingStub.myInstitutionReviews(
               MyInstitutionReviewsRequest.newBuilder()
@@ -182,36 +135,27 @@ public class InstitutionService {
                   .build()
           )
       );
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-    }
+    });
   }
 
   public InstitutionReviewsByInstitutionResponseDto institutionReviewsByInstitution(
       InstitutionReviewsByInstitutionRequestDto requestDto) {
-    try {
+
+    return ServiceExceptionHandlingUtil.handle("institutionReviewsByInstitution", () -> {
       return InstitutionReviewsByInstitutionResponseDto.fromProto(
           institutionBlockingStub.institutionReviewsByInstitution(requestDto.toProto()));
-    } catch (Exception e) {
-      log.error("gRPC 호출 중 오류 발생: ", e);
-      throw e;
-
-    }
+    });
   }
 
   public Integer getMyAverageWorkhours(String userId, String userInstitutionId) {
 
-    try {
+    return ServiceExceptionHandlingUtil.handle("getMyAverageWorkhours", () -> {
       return institutionBlockingStub.getMyAverageWorkhours(
           com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursRequest.newBuilder()
               .setUserId(userId)
               .setInstitutionId(userInstitutionId)
               .build()
       ).getMyAverageWorkhours();
-    } catch (Exception e) {
-      log.error("graphql -> institutionService -> getMyAverageWorkhours error", e);
-      throw e;
-    }
+    });
   }
 }

@@ -24,6 +24,7 @@ import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.
 import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
 import org.example.gongiklifeclientbegraphql.service.InstitutionService;
+import org.example.gongiklifeclientbegraphql.service.institution.GetInstitutionService;
 import org.example.gongiklifeclientbegraphql.service.institution.SearchInstitutionsService;
 import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -40,6 +41,7 @@ public class InstitutionController {
 
   private final InstitutionService institutionService;
   private final SearchInstitutionsService searchInstitutionsService;
+  private final GetInstitutionService getInstitutionService;
 
   @QueryMapping
   public SearchInstitutionsResponseDto searchInstitutions(
@@ -53,10 +55,12 @@ public class InstitutionController {
 
   @QueryMapping
   public InstitutionResponseDto institution(
-      @Arguments InstitutionRequestDto requestDto
+      @Argument("institutionInput") @Valid InstitutionRequestDto requestDto
   ) {
 
-    return institutionService.institution(requestDto);
+    return ControllerExceptionHandlingUtil.handle(() ->
+        getInstitutionService.institution(requestDto)
+    );
   }
 
   @MutationMapping
@@ -64,18 +68,14 @@ public class InstitutionController {
       @Argument("createInstitutionReviewInput") CreateInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
 
       return institutionService.createInstitutionReview(requestDto);
-
-    } catch (Exception e) {
-      log.error("createInstitutionReview error: {}", e);
-      throw e;
-
-    }
+    });
   }
 
   @MutationMapping
@@ -83,20 +83,14 @@ public class InstitutionController {
       @Arguments DeleteInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
 
-      log.info("deleteInstitutionReview requestDto: {}", requestDto);
-
       return institutionService.deleteInstitutionReview(requestDto);
-
-    } catch (Exception e) {
-      log.error("deleteInstitutionReview error: {}", e);
-      throw e;
-
-    }
+    });
   }
 
   @MutationMapping
@@ -104,17 +98,14 @@ public class InstitutionController {
       @Argument("likeInstitutionReviewInput") LikeInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
 
       return institutionService.likeInstitutionReview(requestDto);
-
-    } catch (Exception e) {
-      log.error("likeInstitutionReview error: {}", e);
-      throw e;
-    }
+    });
   }
 
   @MutationMapping
@@ -122,17 +113,14 @@ public class InstitutionController {
       @Argument("unlikeInstitutionReviewInput") UnlikeInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
 
       return institutionService.unlikeInstitutionReview(requestDto);
-
-    } catch (Exception e) {
-      log.error("unlikeInstitutionReview error: {}", e);
-      throw e;
-    }
+    });
   }
 
   @QueryMapping
@@ -140,17 +128,14 @@ public class InstitutionController {
       @Argument("institutionReviewInput") InstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
 
       return institutionService.institutionReview(requestDto);
-
-    } catch (Exception e) {
-      log.error("institutionReview error: {}", e);
-      throw e;
-    }
+    });
   }
 
   @QueryMapping
@@ -158,32 +143,24 @@ public class InstitutionController {
       @Argument("institutionReviewsFilter") InstitutionReviewsRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       requestDto.setUserId(userId);
 
       return institutionService.institutionReviews(requestDto);
-
-    } catch (Exception e) {
-      log.error("institutionReviews error: {}", e);
-      throw e;
-    }
+    });
   }
 
   @QueryMapping
   public MyInstitutionReviewsResponseDto myInstitutionReviews(
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       return institutionService.myInstitutionReviews(userId);
-
-    } catch (Exception e) {
-      log.error("myInstitutionReview error: {}", e);
-      throw e;
-    }
+    });
   }
 
   @QueryMapping
@@ -191,7 +168,7 @@ public class InstitutionController {
       @Argument("institutionReviewsByInstitutionFilter") InstitutionReviewsByInstitutionRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
+    return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
       if (!"-1".equals(userId)) {
@@ -199,14 +176,7 @@ public class InstitutionController {
       }
 
       return institutionService.institutionReviewsByInstitution(requestDto);
-
-    } catch (Exception e) {
-      log.error("institutionReviews error: {}", e);
-      throw e;
-    }
-
+    });
   }
-
-
 }
 

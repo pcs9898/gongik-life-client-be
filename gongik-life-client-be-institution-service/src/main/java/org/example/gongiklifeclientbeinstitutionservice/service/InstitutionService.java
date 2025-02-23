@@ -13,8 +13,6 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetInstitutionReviewCountResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursResponse;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionRequest;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewForList;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewInstitution;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.InstitutionReviewRequest;
@@ -29,9 +27,6 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.PageInfo;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitution;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
-import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
 import com.gongik.userService.domain.service.UserServiceGrpc;
 import com.gongik.userService.domain.service.UserServiceOuterClass.CheckUserInstitutionRequest;
 import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameByIdRequest;
@@ -39,7 +34,6 @@ import com.gongik.userService.domain.service.UserServiceOuterClass.GetUserNameBy
 import dto.institution.LikeInstitutionReviewRequestDto;
 import dto.institution.UnlikeInstitutionReviewRequestDto;
 import io.grpc.Status;
-import jakarta.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -51,7 +45,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionForWorkHoursStatisticsProjection;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionReviewProjection;
-import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionSimpleProjection;
 import org.example.gongiklifeclientbeinstitutionservice.entity.Institution;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReview;
 import org.example.gongiklifeclientbeinstitutionservice.entity.InstitutionReviewLike;
@@ -78,42 +71,6 @@ public class InstitutionService {
   @GrpcClient("gongik-life-client-be-user-service")
   private UserServiceGrpc.UserServiceBlockingStub userServiceBlockingStub;
 
-  public SearchInstitutionsResponse searchInstitutions(
-      SearchInstitutionsRequest request) {
-
-    List<InstitutionSimpleProjection> institutions = institutionRepository.searchInstitutions(
-        request.getSearchKeyword(),
-        request.getCursor().isEmpty() ? null : UUID.fromString(request.getCursor()),
-        request.getPageSize()
-    );
-
-    List<SearchInstitution> listSearchInstitution = institutions.stream()
-        .map(institution -> {
-          return SearchInstitution.newBuilder()
-              .setId(institution.getId().toString())
-              .setName(institution.getName())
-              .setAddress(institution.getAddress())
-              .setAverageRating(
-                  institution.getAverageRating() != null ? institution.getAverageRating()
-                      .floatValue() : 0.0f)
-              .build();
-        })
-        .toList();
-
-    SearchInstitutionsResponse.Builder responseBuilder = SearchInstitutionsResponse.newBuilder()
-        .addAllListSearchInstitution(listSearchInstitution);
-
-    String endCursor =
-        institutions.isEmpty() ? "" : institutions.get(institutions.size() - 1).getId().toString();
-    boolean hasNextPage = institutions.size() == request.getPageSize();
-
-    responseBuilder.setPageInfo(PageInfo.newBuilder()
-        .setEndCursor(endCursor)
-        .setHasNextPage(hasNextPage)
-        .build());
-
-    return responseBuilder.build();
-  }
 
   public GetInstitutionNameResponse getInstitutionName(GetInstitutionNameRequest request) {
 
@@ -125,25 +82,6 @@ public class InstitutionService {
         .build();
   }
 
-  @Transactional(readOnly = true)
-  public InstitutionResponse institution(InstitutionRequest request) {
-    Institution institution = institutionRepository.findById(
-            UUID.fromString(request.getInstitutionId()))
-        .orElseThrow(() -> new NotFoundException("Institution not found, wrong institution id"));
-
-    List<Integer> diseaseids = institutionDiseaseRestrictionRepository.findByInstitutionId(
-            institution.getId()).stream()
-        .map(a -> {
-          return a.getDiseaseRestriction().getId();
-        })
-        .collect(Collectors.toList());
-
-    InstitutionResponse.Builder response = institution.toInstitutionResponseProto();
-
-    response.addAllDiseaseRestrictions(diseaseids);
-    return response.build();
-
-  }
 
   @Transactional
   public InstitutionReviewResponse createInstitutionReview(CreateInstitutionReviewRequest request) {

@@ -32,13 +32,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class InstitutionServiceTest {
+class SearchInstitutionServiceTest {
 
   @Mock
   private InstitutionRepository institutionRepository;
 
   @InjectMocks
-  private InstitutionService institutionService;
+  private SearchInstitutionService searchInstitutionService;
 
   @Nested
   @DisplayName("searchInstitutions 메서드는")
@@ -91,7 +91,7 @@ class InstitutionServiceTest {
       )).thenReturn(mockInstitutions);
 
       // when
-      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
+      SearchInstitutionsResponse response = searchInstitutionService.searchInstitutions(request);
 
       // then
       assertAll(
@@ -122,7 +122,7 @@ class InstitutionServiceTest {
       )).thenReturn(Collections.emptyList());
 
       // when
-      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
+      SearchInstitutionsResponse response = searchInstitutionService.searchInstitutions(request);
 
       // then
       assertAll(
@@ -154,7 +154,7 @@ class InstitutionServiceTest {
       )).thenReturn(mockInstitutions);
 
       // when
-      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
+      SearchInstitutionsResponse response = searchInstitutionService.searchInstitutions(request);
 
       // then
       assertTrue(response.getPageInfo().getHasNextPage());
@@ -172,7 +172,7 @@ class InstitutionServiceTest {
 
       // when & then
       assertThrows(IllegalArgumentException.class, () ->
-          institutionService.searchInstitutions(invalidRequest)
+          searchInstitutionService.searchInstitutions(invalidRequest)
       );
     }
 
