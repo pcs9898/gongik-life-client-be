@@ -35,7 +35,7 @@ class VerifyEmailCodeServiceTest {
   @Mock
   private RedisTemplate<String, String> redisTemplate;
   @Mock
-  private CommonUserService commonUserService;
+  private UserService userService;
   @Mock
   private ValueOperations<String, String> valueOperations;
   @InjectMocks
@@ -55,7 +55,7 @@ class VerifyEmailCodeServiceTest {
         .setCode(TEST_CODE)
         .build();
 
-    when(commonUserService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
+    when(userService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
     when(valueOperations.get(VERIFICATION_CODE_PREFIX + TEST_EMAIL)).thenReturn(TEST_CODE);
 
     // When
@@ -81,7 +81,7 @@ class VerifyEmailCodeServiceTest {
         .setCode(TEST_CODE)
         .build();
 
-    when(commonUserService.isEmailVerified(TEST_EMAIL)).thenReturn(true);
+    when(userService.isEmailVerified(TEST_EMAIL)).thenReturn(true);
 
     // When & Then
     StatusRuntimeException exception = assertThrows(StatusRuntimeException.class,
@@ -99,7 +99,7 @@ class VerifyEmailCodeServiceTest {
         .setCode(TEST_CODE)
         .build();
 
-    when(commonUserService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
+    when(userService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
     when(valueOperations.get(VERIFICATION_CODE_PREFIX + TEST_EMAIL)).thenReturn(null);
 
     // When & Then
@@ -119,7 +119,7 @@ class VerifyEmailCodeServiceTest {
         .setCode(wrongCode)
         .build();
 
-    when(commonUserService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
+    when(userService.isEmailVerified(TEST_EMAIL)).thenReturn(false);
     when(valueOperations.get(VERIFICATION_CODE_PREFIX + TEST_EMAIL)).thenReturn(TEST_CODE);
 
     // When & Then

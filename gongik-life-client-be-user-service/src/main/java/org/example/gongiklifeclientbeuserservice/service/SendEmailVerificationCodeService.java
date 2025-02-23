@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 public class SendEmailVerificationCodeService {
 
 
-  private final CommonUserService commonUserService;
+  private final UserService userService;
   private final RedisTemplate<String, String> redisTemplate;
   private final EmailVerificationCodeProducer emailVerificationCodeProducer;
   private final UserRepository userRepository;
@@ -91,6 +91,6 @@ public class SendEmailVerificationCodeService {
 
   private void saveVerificationCode(String email, String verificationCode) {
     redisTemplate.delete(VERIFIED_EMAIL_PREFIX + email);
-    commonUserService.saveEmailVerificationCode(email, verificationCode);
+    userService.saveEmailVerificationCode(email, verificationCode);
   }
 }

@@ -38,7 +38,7 @@ class SendEmailVerificationCodeServiceTest {
   private static final String TEST_EMAIL = "test@example.com";
   private static final String TEST_CODE = "123456";
   @Mock
-  private CommonUserService commonUserService;
+  private UserService userService;
   @Mock
   private RedisTemplate<String, String> redisTemplate;
   @Mock
@@ -81,7 +81,7 @@ class SendEmailVerificationCodeServiceTest {
       assertAll(
           () -> assertTrue(response.getSuccess()),
           () -> verify(emailVerificationCodeProducer).sendEmailVerificationRequest(any()),
-          () -> verify(commonUserService).saveEmailVerificationCode(eq(TEST_EMAIL), anyString())
+          () -> verify(userService).saveEmailVerificationCode(eq(TEST_EMAIL), anyString())
       );
     }
 

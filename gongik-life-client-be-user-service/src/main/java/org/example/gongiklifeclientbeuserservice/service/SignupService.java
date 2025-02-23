@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class SignupService {
 
-  private final CommonUserService commonUserService;
+  private final UserService userService;
   private final PasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
   private final UserProfileRepository userProfileRepository;
@@ -75,7 +75,7 @@ public class SignupService {
   }
 
   private void validateEmailVerified(String email) {
-    if (!commonUserService.isEmailVerified(email)) {
+    if (!userService.isEmailVerified(email)) {
       log.error("Email is not verified: {}", email);
       throw Status.PERMISSION_DENIED
           .withDescription("Email is not verified.")

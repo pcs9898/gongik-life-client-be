@@ -126,7 +126,7 @@ type Mutation{
     """
     Update my profile, need to sign in
     """
-    updateProfile(name: String,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): UpdateProfileResponse! @authenticate
+    updateProfile(updateProfileInput: UpdateProfileInput!): UpdateProfileResponse! @authenticate
 
     """
     Create institution review, need to sign in
@@ -581,6 +581,34 @@ type UserProfileInstitution{
     """
     name: String!
 }
+
+input UpdateProfileInput{
+    """
+    User name
+    """
+    name: String
+
+    """
+    User bio
+    """
+    bio: String
+
+    """
+    Institution id, if user has institution, must have enlistmentDate and dischargeDate
+    """
+    institutionId: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
+    enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
+    dischargeDate: String
+}
+
 
 """
 Update profile response

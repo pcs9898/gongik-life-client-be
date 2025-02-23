@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 public class VerifyEmailCodeService {
 
   private final RedisTemplate<String, String> redisTemplate;
-  private final CommonUserService commonUserService;
+  private final UserService userService;
 
   public VerifyEmailCodeResponse verifyEmailCode(VerifyEmailCodeRequest request) {
     String email = request.getEmail();
@@ -37,7 +37,7 @@ public class VerifyEmailCodeService {
 
 
   private void validateNotAlreadyVerified(String email) {
-    if (commonUserService.isEmailVerified(email)) {
+    if (userService.isEmailVerified(email)) {
       throw Status.ALREADY_EXISTS
           .withDescription("Email is already verified.")
           .asRuntimeException();

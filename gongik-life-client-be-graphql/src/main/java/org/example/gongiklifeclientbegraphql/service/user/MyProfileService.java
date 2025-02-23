@@ -25,7 +25,7 @@ public class MyProfileService {
     return ServiceExceptionHandlingUtil.handle("MyProfileService", () -> {
       Assert.notNull(userId, "userId must not be null");
 
-      return MyProfileResponseDto.fromProto(
+      return MyProfileResponseDto.fromMyProfileResponseProto(
           userBlockingStub.myProfile(
               MyProfileRequest.newBuilder()
                   .setUserId(userId)
