@@ -23,12 +23,19 @@ import org.example.gongiklifeclientbegraphql.dto.institution.myInstitutionReview
 import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.searchInstitutions.SearchInstitutionsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.unlikeInstitutionReview.UnlikeInstitutionReviewResponseDto;
-import org.example.gongiklifeclientbegraphql.service.InstitutionService;
+import org.example.gongiklifeclientbegraphql.service.institution.CreateInstitutionReviewService;
+import org.example.gongiklifeclientbegraphql.service.institution.DeleteInstitutionReviewService;
+import org.example.gongiklifeclientbegraphql.service.institution.GetInstitutionReviewService;
+import org.example.gongiklifeclientbegraphql.service.institution.GetInstitutionReviewsService;
 import org.example.gongiklifeclientbegraphql.service.institution.GetInstitutionService;
+import org.example.gongiklifeclientbegraphql.service.institution.InstitutionReviewsByInstitutionService;
+import org.example.gongiklifeclientbegraphql.service.institution.InstitutionService;
+import org.example.gongiklifeclientbegraphql.service.institution.LikeInstitutionReviewService;
+import org.example.gongiklifeclientbegraphql.service.institution.MyInstitutionReviewsService;
 import org.example.gongiklifeclientbegraphql.service.institution.SearchInstitutionsService;
+import org.example.gongiklifeclientbegraphql.service.institution.UnlikeInstitutionReviewService;
 import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.Arguments;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
@@ -42,6 +49,14 @@ public class InstitutionController {
   private final InstitutionService institutionService;
   private final SearchInstitutionsService searchInstitutionsService;
   private final GetInstitutionService getInstitutionService;
+  private final CreateInstitutionReviewService createInstitutionReviewService;
+  private final DeleteInstitutionReviewService deleteInstitutionReviewService;
+  private final LikeInstitutionReviewService likeInstitutionReviewService;
+  private final UnlikeInstitutionReviewService unlikeInstitutionReviewService;
+  private final GetInstitutionReviewService getInstitutionReviewService;
+  private final GetInstitutionReviewsService getInstitutionReviewsService;
+  private final MyInstitutionReviewsService myInstitutionReviewsService;
+  private final InstitutionReviewsByInstitutionService institutionReviewsByInstitutionService;
 
   @QueryMapping
   public SearchInstitutionsResponseDto searchInstitutions(
@@ -65,7 +80,7 @@ public class InstitutionController {
 
   @MutationMapping
   public CreateInstitutionReviewResponseDto createInstitutionReview(
-      @Argument("createInstitutionReviewInput") CreateInstitutionReviewRequestDto requestDto,
+      @Argument("createInstitutionReviewInput") @Valid CreateInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
 
@@ -74,13 +89,13 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      return institutionService.createInstitutionReview(requestDto);
+      return createInstitutionReviewService.createInstitutionReview(requestDto);
     });
   }
 
   @MutationMapping
   public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
-      @Arguments DeleteInstitutionReviewRequestDto requestDto,
+      @Argument("deleteInstitutionReviewInput") @Valid DeleteInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
 
@@ -89,13 +104,13 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      return institutionService.deleteInstitutionReview(requestDto);
+      return deleteInstitutionReviewService.deleteInstitutionReview(requestDto);
     });
   }
 
   @MutationMapping
   public LikeInstitutionReviewResponseDto likeInstitutionReview(
-      @Argument("likeInstitutionReviewInput") LikeInstitutionReviewRequestDto requestDto,
+      @Argument("likeInstitutionReviewInput") @Valid LikeInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
 
@@ -104,13 +119,13 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      return institutionService.likeInstitutionReview(requestDto);
+      return likeInstitutionReviewService.likeInstitutionReview(requestDto);
     });
   }
 
   @MutationMapping
   public UnlikeInstitutionReviewResponseDto unlikeInstitutionReview(
-      @Argument("unlikeInstitutionReviewInput") UnlikeInstitutionReviewRequestDto requestDto,
+      @Argument("unlikeInstitutionReviewInput") @Valid UnlikeInstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
 
@@ -119,13 +134,13 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      return institutionService.unlikeInstitutionReview(requestDto);
+      return unlikeInstitutionReviewService.unlikeInstitutionReview(requestDto);
     });
   }
 
   @QueryMapping
   public InstitutionReviewResponseDto institutionReview(
-      @Argument("institutionReviewInput") InstitutionReviewRequestDto requestDto,
+      @Argument("institutionReviewInput") @Valid InstitutionReviewRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
 
@@ -134,13 +149,13 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      return institutionService.institutionReview(requestDto);
+      return getInstitutionReviewService.institutionReview(requestDto);
     });
   }
 
   @QueryMapping
   public InstitutionReviewsResponseDto institutionReviews(
-      @Argument("institutionReviewsFilter") InstitutionReviewsRequestDto requestDto,
+      @Argument("institutionReviewsFilter") @Valid InstitutionReviewsRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
     return ControllerExceptionHandlingUtil.handle(() -> {
@@ -148,7 +163,7 @@ public class InstitutionController {
 
       requestDto.setUserId(userId);
 
-      return institutionService.institutionReviews(requestDto);
+      return getInstitutionReviewsService.institutionReviews(requestDto);
     });
   }
 
@@ -159,13 +174,13 @@ public class InstitutionController {
     return ControllerExceptionHandlingUtil.handle(() -> {
       String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return institutionService.myInstitutionReviews(userId);
+      return myInstitutionReviewsService.myInstitutionReviews(userId);
     });
   }
 
   @QueryMapping
   public InstitutionReviewsByInstitutionResponseDto institutionReviewsByInstitution(
-      @Argument("institutionReviewsByInstitutionFilter") InstitutionReviewsByInstitutionRequestDto requestDto,
+      @Argument("institutionReviewsByInstitutionFilter") @Valid InstitutionReviewsByInstitutionRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
     return ControllerExceptionHandlingUtil.handle(() -> {
@@ -175,7 +190,7 @@ public class InstitutionController {
         requestDto.setUserId(userId);
       }
 
-      return institutionService.institutionReviewsByInstitution(requestDto);
+      return institutionReviewsByInstitutionService.institutionReviewsByInstitution(requestDto);
     });
   }
 }

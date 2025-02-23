@@ -131,12 +131,12 @@ type Mutation{
     """
     Create institution review, need to sign in
     """
-    createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): InstitutionReview! @authenticate
+    createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): CreateInstitutionReviewResponse! @authenticate
 
     """
     Delete institution review, need to sign in
     """
-    deleteInstitutionReview(institutionReviewId: String!): DeleteInstitutionReviewResponse! @authenticate
+    deleteInstitutionReview(deleteInstitutionReviewInput: DeleteInstitutionReviewInput!): DeleteInstitutionReviewResponse! @authenticate
 
     """
     Like institution review, need to sign in
@@ -910,6 +910,97 @@ input CreateInstitutionReviewInput {
 }
 
 """
+Create institution review response
+"""
+type CreateInstitutionReviewResponse {
+    """
+    Institution review id
+    """
+    id: ID!
+
+    """
+    Institution short information
+    """
+    institution: InstitutionShortInfo!
+
+    """
+    User information left review
+    """
+    user: InstitutionReviewUser!
+
+    """
+    Rating, average of facilityRating, locationRating, staffRating, visitorRating, vacationFreedomRating
+    """
+    rating: Float!
+
+    """
+    Facility rating, 0 to 5
+    """
+    facilityRating: Int!
+
+    """
+    Location rating, 0 to 5
+    """
+    locationRating: Int!
+
+    """
+    Staff rating, 0 to 5
+    """
+    staffRating: Int!
+
+    """
+    Visitor rating, 0 to 5
+    """
+    visitorRating: Int!
+
+    """
+    Vacation freedom rating, 0 to 5
+    """
+    vacationFreedomRating: Int!
+
+    """
+    Main tasks
+    """
+    mainTasks: String!
+
+    """
+    Pros and cons
+    """
+    prosCons: String!
+
+    """
+    Average workhours
+    """
+    averageWorkhours: Int!
+
+    """
+    Work type rules id, 1: day shift, 2: three shift two team, 3: three shift three team, 4: four shift two team, 5: four shift three team, 6: residential work
+    """
+    workTypeRulesId: Int!
+
+    """
+    Uniform wearing rules id, 1: always, 2: not worn, 3: situational
+    """
+    uniformWearingRulesId: Int!
+
+    """
+    Social service people count id, 1: one, 2: two, 3: three to five, 4: six to ten, 5: more than ten
+    """
+    socialServicePeopleCountId: Int!
+
+    """
+    Review like count
+    """
+    likeCount: Int!
+
+    """
+    Review created at
+    """
+    createdAt: String!
+
+}
+
+"""
 Institution review user
 """
 type InstitutionReviewUser{
@@ -923,6 +1014,17 @@ type InstitutionReviewUser{
     """
     name: String!
 }
+
+"""
+Delete institution review input
+"""
+input DeleteInstitutionReviewInput{
+    """
+    Institution review id
+    """
+    institutionReviewId: ID!
+}
+
 
 """
 Delete institution review response
@@ -994,7 +1096,7 @@ Institution reviews filter
 """
 input InstitutionReviewsFilter{
     """
-    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government
+    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government, 7 all
     """
     institutionCategoryId: Int = 7 @range(min: 1, max: 7)
 

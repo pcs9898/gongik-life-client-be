@@ -16,7 +16,6 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.institution.institution.InstitutionResponseDto;
-import org.example.gongiklifeclientbegraphql.service.InstitutionCacheService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

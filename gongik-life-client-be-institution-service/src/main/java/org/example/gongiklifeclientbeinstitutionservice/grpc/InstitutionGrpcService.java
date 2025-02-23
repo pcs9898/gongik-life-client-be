@@ -36,8 +36,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionForWorkHoursStatisticsProjection;
+import org.example.gongiklifeclientbeinstitutionservice.service.CreateInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.DeleteInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.GetInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.GetInstitutionReviewsService;
 import org.example.gongiklifeclientbeinstitutionservice.service.GetInstitutionService;
+import org.example.gongiklifeclientbeinstitutionservice.service.InstitutionReviewsByInstitutionService;
 import org.example.gongiklifeclientbeinstitutionservice.service.InstitutionService;
+import org.example.gongiklifeclientbeinstitutionservice.service.LikeInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.MyInstitutionReviewsService;
 import org.example.gongiklifeclientbeinstitutionservice.service.SearchInstitutionService;
 import util.GrpcServiceExceptionHandlingUtil;
 
@@ -49,6 +56,13 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
   private final InstitutionService institutionService;
   private final SearchInstitutionService searchInstitutionService;
   private final GetInstitutionService getInstitutionService;
+  private final CreateInstitutionReviewService createInstitutionReviewService;
+  private final DeleteInstitutionReviewService deleteInstitutionReviewService;
+  private final LikeInstitutionReviewService likeInstitutionReviewService;
+  private final GetInstitutionReviewService getInstitutionReviewService;
+  private final GetInstitutionReviewsService getInstitutionReviewsService;
+  private final MyInstitutionReviewsService myInstitutionReviewsService;
+  private final InstitutionReviewsByInstitutionService institutionReviewsByInstitutionService;
 
   @Override
   public void searchInstitutions(SearchInstitutionsRequest request,
@@ -81,7 +95,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       StreamObserver<InstitutionReviewResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("createInstitutionReview",
-        () -> institutionService.createInstitutionReview(request),
+        () -> createInstitutionReviewService.createInstitutionReview(request),
         responseObserver);
   }
 
@@ -90,7 +104,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       StreamObserver<DeleteInstitutionReviewResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("deleteInstitutionReview",
-        () -> institutionService.deleteInstitutionReview(request),
+        () -> deleteInstitutionReviewService.deleteInstitutionReview(request),
         responseObserver);
   }
 
@@ -99,7 +113,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       StreamObserver<InstitutionReviewResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("institutionReview",
-        () -> institutionService.institutionReview(request),
+        () -> getInstitutionReviewService.institutionReview(request),
         responseObserver);
   }
 
@@ -117,7 +131,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       StreamObserver<InstitutionReviewsResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("institutionReviews",
-        () -> institutionService.institutionReviews(request),
+        () -> getInstitutionReviewsService.institutionReviews(request),
         responseObserver);
   }
 
@@ -127,7 +141,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       StreamObserver<MyInstitutionReviewsResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("myInstitutionReviews",
-        () -> institutionService.myInstitutionReviews(request),
+        () -> myInstitutionReviewsService.myInstitutionReviews(request),
         responseObserver);
   }
 
@@ -136,7 +150,7 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
       StreamObserver<InstitutionReviewsByInstitutionResponse> responseObserver) {
 
     GrpcServiceExceptionHandlingUtil.handle("institutionReviewsByInstitution",
-        () -> institutionService.institutionReviewsByInstitution(request),
+        () -> institutionReviewsByInstitutionService.institutionReviewsByInstitution(request),
         responseObserver);
   }
 
