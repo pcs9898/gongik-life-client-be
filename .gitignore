@@ -37,3 +37,11 @@ out/
 .vscode/
 
 /infrastructure/**/data/
+
+/infrastructure/docker-compose.yml
+/infrastructure/docker-compose-local.yml
+/infrastructure/.env
+
+/**/src/main/resources/application-local.yml
+/**/src/main/resources/application-dev.yml
+

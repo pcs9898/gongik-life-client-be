@@ -16,25 +16,25 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DeleteInstitutionReviewService {
 
-  @GrpcClient("gongik-life-client-be-institution-service")
-  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
+    @GrpcClient("gongik-life-client-be-institution-service")
+    private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  @CacheEvict(value = "institutionReview", key = "#requestDto.getInstitutionReviewId()")
-  public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
-      DeleteInstitutionReviewRequestDto requestDto) {
+    @CacheEvict(value = "institutionReview", key = "#requestDto.getInstitutionReviewId()")
+    public DeleteInstitutionReviewResponseDto deleteInstitutionReview(
+            DeleteInstitutionReviewRequestDto requestDto) {
 
-    return ServiceExceptionHandlingUtil.handle("deleteInstitutionReview", () -> {
-      DeleteInstitutionReviewResponse result = institutionBlockingStub.deleteInstitutionReview(
-          requestDto.toProto());
+        return ServiceExceptionHandlingUtil.handle("DeleteInstitutionReviewService", () -> {
+            DeleteInstitutionReviewResponse result = institutionBlockingStub.deleteInstitutionReview(
+                    requestDto.toProto());
 
-      if (!result.getSuccess()) {
-        throw new RuntimeException("Failed to delete institution review");
-      }
+            if (!result.getSuccess()) {
+                throw new RuntimeException("Failed to delete institution review");
+            }
 
-      return DeleteInstitutionReviewResponseDto.fromProto(
-          requestDto.getInstitutionReviewId()
-      );
-    });
-  }
+            return DeleteInstitutionReviewResponseDto.fromProto(
+                    requestDto.getInstitutionReviewId()
+            );
+        });
+    }
 
 }

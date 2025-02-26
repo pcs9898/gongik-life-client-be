@@ -14,19 +14,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MyInstitutionReviewsService {
 
-  @GrpcClient("gongik-life-client-be-institution-service")
-  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
+    @GrpcClient("gongik-life-client-be-institution-service")
+    private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  public MyInstitutionReviewsResponseDto myInstitutionReviews(String userId) {
+    public MyInstitutionReviewsResponseDto myInstitutionReviews(String userId) {
 
-    return ServiceExceptionHandlingUtil.handle("myInstitutionReviews", () -> {
-      return MyInstitutionReviewsResponseDto.fromProto(
-          institutionBlockingStub.myInstitutionReviews(
-              MyInstitutionReviewsRequest.newBuilder()
-                  .setUserId(userId)
-                  .build()
-          )
-      );
-    });
-  }
+        return ServiceExceptionHandlingUtil.handle("MyInstitutionReviewsService", () -> {
+            return MyInstitutionReviewsResponseDto.fromProto(
+                    institutionBlockingStub.myInstitutionReviews(
+                            MyInstitutionReviewsRequest.newBuilder()
+                                    .setUserId(userId)
+                                    .build()
+                    )
+            );
+        });
+    }
 }

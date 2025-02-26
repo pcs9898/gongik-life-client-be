@@ -3,10 +3,20 @@ POST http://localhost:8001/api/auth/signIn
 Content-Type: application/json
 
 {
-  "email": "1@2.com",
+  "email": "1@1.com",
   "password": "1234"
 }
-s
+
+### Sign In User
+POST https://clientbe.gongik.shop/api/auth/signIn
+Content-Type: application/json
+
+{
+  "email": "1@1.com",
+  "password": "1234"
+}
+
+
 
 
 

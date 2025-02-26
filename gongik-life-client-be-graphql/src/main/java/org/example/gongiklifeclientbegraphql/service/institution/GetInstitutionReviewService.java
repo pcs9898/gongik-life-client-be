@@ -12,24 +12,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GetInstitutionReviewService {
 
-  private final InstitutionCacheService institutionCacheService;
-  private final InstitutionService institutionService;
+    private final InstitutionCacheService institutionCacheService;
+    private final InstitutionService institutionService;
 
-  public InstitutionReviewResponseDto institutionReview(InstitutionReviewRequestDto requestDto) {
+    public InstitutionReviewResponseDto institutionReview(InstitutionReviewRequestDto requestDto) {
 
-    return ServiceExceptionHandlingUtil.handle("institutionReview", () -> {
-      InstitutionReviewResponseDto institutionReview = institutionCacheService.getInstitutionReview(
-          requestDto.getInstitutionReviewId());
+        return ServiceExceptionHandlingUtil.handle("GetInstitutionReviewService", () -> {
+            InstitutionReviewResponseDto institutionReview = institutionCacheService.getInstitutionReview(
+                    requestDto.getInstitutionReviewId());
 
-      if (requestDto.getUserId() != null) {
+            if (requestDto.getUserId() != null) {
 
-        boolean isLiked = institutionService.isLikedInstitutionReview(
-            requestDto.getInstitutionReviewId(),
-            requestDto.getUserId());
-        institutionReview.setIsLiked(isLiked);
-      }
+                boolean isLiked = institutionService.isLikedInstitutionReview(
+                        requestDto.getInstitutionReviewId(),
+                        requestDto.getUserId());
+                institutionReview.setIsLiked(isLiked);
+            }
 
-      return institutionReview;
-    });
-  }
+            return institutionReview;
+        });
+    }
 }

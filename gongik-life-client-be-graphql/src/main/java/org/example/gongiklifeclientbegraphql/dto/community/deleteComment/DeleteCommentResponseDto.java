@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeleteCommentResponseDto {
 
-  private String commentId;
-  private Boolean success;
+    private String commentId;
+    private Boolean success;
 
-  public static DeleteCommentResponseDto fromProto(DeleteCommentResponse deleteCommentResponse) {
-    return DeleteCommentResponseDto.builder()
-        .commentId(deleteCommentResponse.getCommentId())
-        .success(deleteCommentResponse.getSuccess())
-        .build();
-  }
+    public static DeleteCommentResponseDto fromDeleteCommentResponseProto(DeleteCommentResponse deleteCommentResponse) {
+        return DeleteCommentResponseDto.builder()
+                .commentId(deleteCommentResponse.getCommentId())
+                .success(deleteCommentResponse.getSuccess())
+                .build();
+    }
 }

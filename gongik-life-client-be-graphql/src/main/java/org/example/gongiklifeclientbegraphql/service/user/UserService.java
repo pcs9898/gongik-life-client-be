@@ -15,21 +15,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-  private final UserLoginHistoryProducer userLoginHistoryProducer;
-  @GrpcClient("gongik-life-client-be-user-service")
-  private UserServiceGrpc.UserServiceBlockingStub userBlockingStub;
+    private final UserLoginHistoryProducer userLoginHistoryProducer;
+    @GrpcClient("gongik-life-client-be-user-service")
+    private UserServiceGrpc.UserServiceBlockingStub userBlockingStub;
 
 
-  public void sendUserLoginHistoryRequest(UserLoginHistoryRequestDto userLoginHistoryRequestDto) {
-    userLoginHistoryProducer.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
-  }
+    public void sendUserLoginHistoryRequest(UserLoginHistoryRequestDto userLoginHistoryRequestDto) {
+        userLoginHistoryProducer.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
+    }
 
-  public String hasInstitution(String userId) {
-    return ServiceExceptionHandlingUtil.handle("UserService", () -> {
-      return userBlockingStub.hasInstitution(
-          HasInstitutionRequest.newBuilder().setUserId(userId).buildPartial()
-      ).getInstitutionId();
-    });
-  }
+    public String hasInstitution(String userId) {
+        return ServiceExceptionHandlingUtil.handle("HasInstitutionUserService", () -> {
+            return userBlockingStub.hasInstitution(
+                    HasInstitutionRequest.newBuilder().setUserId(userId).buildPartial()
+            ).getInstitutionId();
+        });
+    }
 
 }

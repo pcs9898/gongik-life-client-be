@@ -12,7 +12,7 @@ COPY ../settings.gradle .
 
 # Gradle 캐시를 활용하여 의존성 설치
 RUN ./gradlew build -x test --stacktrace --no-daemon || return 0
-}
+
 # 프로젝트 소스 복사
 COPY gongik-life-client-be-gateway/ gongik-life-client-be-gateway/
 

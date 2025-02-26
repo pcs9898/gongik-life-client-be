@@ -1,6 +1,6 @@
 spring:
   application:
-    name: next-graphql
+    name: gongik-life-client-be-graphql
   graphql:
     path: /graphql
     graphiql:
@@ -11,37 +11,76 @@ spring:
         enabled: true
     websocket:
       path: /graphql
-      keep-alive: 60
+      keep-alive: 20000
+
+  cache:
+    type: redis
+
   data:
     redis:
-      host: next-campus-redis
+      host: gongik-life-redis
       port: 6379
       client-type: lettuce
+
+  kafka:
+    bootstrap-servers: gongik-life-client-be-kafka:9092
+    consumer:
+      group-id: gongik-life-client-be-graphql-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 eureka:
   client:
     service-url:
-      defaultZone: http://next-discovery:8000/eureka/
+      defaultZone: http://gongik-life-client-be-discovery:8000/eureka/
     registerWithEureka: true
     fetchRegistry: true
 
 grpc:
   client:
-    next-playback-service:
-      address: 'discovery:///next-playback-service'
+    gongik-life-client-be-auth-service:
+      address: 'discovery:///gongik-life-client-be-auth-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-    next-payment-service:
-      address: 'discovery:///next-enrollment-service'
+    gongik-life-client-be-user-service:
+      address: 'discovery:///gongik-life-client-be-user-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
-    next-enrollment-service:
-      address: 'discovery:///next-enrollment-service'
+    gongik-life-client-be-community-service:
+      address: 'discovery:///gongik-life-client-be-community-service'
       enableKeepAlive: true
       keepAliveWithoutCalls: true
       negotiationType: plaintext
+    gongik-life-client-be-institution-service:
+      address: 'discovery:///gongik-life-client-be-institution-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-notification-service:
+      address: 'discovery:///gongik-life-client-be-notification-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-report-service:
+      address: 'discovery:///gongik-life-client-be-report-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+    gongik-life-client-be-workhours-service:
+      address: 'discovery:///gongik-life-client-be-workhours-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
+      negotiationType: plaintext
+
+
 
 management:
   tracing:
@@ -52,7 +91,7 @@ management:
       produce: b3_multi
   zipkin:
     tracing:
-      endpoint: "http://next-campus-zipkin:9411/api/v2/spans"
+      endpoint: "http://gongik-life-client-be-zipkin:9411/api/v2/spans"
   endpoints:
     web:
       exposure:
@@ -66,5 +105,8 @@ management:
           - prometheus
 
 logging:
+  #  level:
+  #    io.grpc: DEBUG
+  #    org.example.gongiklifeclientbegraphql: DEBUG
   pattern:
     level: "%5p [%X{traceId:-},%X{spanId:-}]"

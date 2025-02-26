@@ -14,16 +14,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class VerifyEmailCodeService {
 
-  @GrpcClient("gongik-life-client-be-user-service")
-  private UserServiceGrpc.UserServiceBlockingStub userBlockingStub;
+    @GrpcClient("gongik-life-client-be-user-service")
+    private UserServiceGrpc.UserServiceBlockingStub userBlockingStub;
 
-  public VerifyEmailCodeResponseDto verifyEmailCode(VerifyEmailCodeRequestDto requestDto) {
+    public VerifyEmailCodeResponseDto verifyEmailCode(VerifyEmailCodeRequestDto requestDto) {
 
-    return ServiceExceptionHandlingUtil.handle("UserService",
-        () -> VerifyEmailCodeResponseDto.fromVerifyEmailCodeResponseProto(
-            userBlockingStub.verifyEmailCode(
-                requestDto.toVerifyEmailCodeRequestProto()
-            )
-        ));
-  }
+        return ServiceExceptionHandlingUtil.handle("VerifyEmailCodeService",
+                () -> VerifyEmailCodeResponseDto.fromVerifyEmailCodeResponseProto(
+                        userBlockingStub.verifyEmailCode(
+                                requestDto.toVerifyEmailCodeRequestProto()
+                        )
+                ));
+    }
 }
