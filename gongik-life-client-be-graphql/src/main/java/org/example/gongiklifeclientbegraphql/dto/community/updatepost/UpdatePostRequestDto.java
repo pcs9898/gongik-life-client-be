@@ -14,26 +14,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UpdatePostRequestDto {
 
-  private String userId;
-  private String postId;
-  private String title;
-  private String content;
+    private String userId;
+    private String postId;
+    private String title;
+    private String content;
 
 
-  public UpdatePostRequest toProto() {
+    public UpdatePostRequest toUpdatePostRequestProto() {
 
-    UpdatePostRequest.Builder builder = UpdatePostRequest.newBuilder()
-        .setUserId(userId)
-        .setPostId(postId);
+        UpdatePostRequest.Builder builder = UpdatePostRequest.newBuilder()
+                .setUserId(userId)
+                .setPostId(postId);
 
-    if (title != null) {
-      builder.setTitle(title);
+        if (title != null) {
+            builder.setTitle(title);
+        }
+
+        if (content != null) {
+            builder.setContent(content);
+        }
+
+        return builder.build();
     }
-
-    if (content != null) {
-      builder.setContent(content);
-    }
-
-    return builder.build();
-  }
 }

@@ -20,7 +20,7 @@ public class UserProfileResponseDto {
   private String enlistmentDate;
   private String dischargeDate;
 
-  public static UserProfileResponseDto fromProto(UserProfileResponse response) {
+  public static UserProfileResponseDto fromUserProfileResponseProto(UserProfileResponse response) {
     return UserProfileResponseDto.builder()
         .id(response.getId())
         .name(response.getName())

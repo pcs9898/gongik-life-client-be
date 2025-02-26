@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.dto.community.post;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountRequest;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,17 +13,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PostRequestDto {
 
-  private String userId;
-  private String postId;
+    private String userId;
 
-  public IsLikedPostAndCommentCountRequest toProto() {
-    IsLikedPostAndCommentCountRequest.Builder response = IsLikedPostAndCommentCountRequest.newBuilder()
-        .setPostId(postId);
+    @NotBlank
+    private String postId;
 
-    if (userId != null) {
-      response.setUserId(userId);
+    public IsLikedPostAndCommentCountRequest toIsLikedPostAndCommentCountRequestProto() {
+        IsLikedPostAndCommentCountRequest.Builder response = IsLikedPostAndCommentCountRequest.newBuilder()
+                .setPostId(postId);
+
+        if (userId != null) {
+            response.setUserId(userId);
+        }
+
+        return response.build();
     }
-
-    return response.build();
-  }
 }

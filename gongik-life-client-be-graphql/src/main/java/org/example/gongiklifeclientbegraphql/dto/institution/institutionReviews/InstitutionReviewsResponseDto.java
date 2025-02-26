@@ -15,7 +15,8 @@ public class InstitutionReviewsResponseDto {
   private List<InstitutionReviewForListDto> listInstitutionReview;
   private PageInfoDto pageInfo;
 
-  public static InstitutionReviewsResponseDto fromProto(InstitutionReviewsResponse proto) {
+  public static InstitutionReviewsResponseDto fromInstitutionReviewsResponseProto(
+      InstitutionReviewsResponse proto) {
     InstitutionReviewsResponseDto dto = new InstitutionReviewsResponseDto();
     dto.setListInstitutionReview(proto.getListInstitutionReviewList().stream()
         .map(InstitutionReviewForListDto::fromProto)

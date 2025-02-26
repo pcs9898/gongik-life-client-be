@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.producer.notification;
 
 import dto.notification.DeleteNotificationRequestDto;
+import kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,13 +12,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DeleteNotificationProducer {
 
-  private static final String TOPIC = "delete-notification-topic";
-  private final KafkaTemplate<String, Object> kafkaTemplate;
 
-  public void sendDeleteNotificationRequest(
-      DeleteNotificationRequestDto requestDto) {
-    
-    kafkaTemplate.send(TOPIC, requestDto);
-  }
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    public void sendDeleteNotificationRequest(
+            DeleteNotificationRequestDto requestDto) {
+
+        kafkaTemplate.send(KafkaTopics.DELETE_NOTIFICATION_TOPIC, requestDto);
+    }
 
 }

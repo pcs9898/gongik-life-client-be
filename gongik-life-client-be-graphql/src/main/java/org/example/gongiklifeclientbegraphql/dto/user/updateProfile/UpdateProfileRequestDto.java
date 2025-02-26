@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateProfileRequestDto {
 
+
   private String userId;
+
+
   private String name;
   private String bio;
   private String institutionId;
@@ -21,7 +24,7 @@ public class UpdateProfileRequestDto {
   private String dischargeDate;
 
 
-  public UpdateProfileRequest toProto() {
+  public UpdateProfileRequest toUpdateProfileRequestProto() {
     UpdateProfileRequest.Builder builder = UpdateProfileRequest.newBuilder();
 
     builder.setUserId(userId);

@@ -29,7 +29,8 @@ public class InstitutionResponseDto {
   private Integer reviewCount;
   private List<Integer> diseaseRestrictions;
 
-  public static InstitutionResponseDto fromProto(InstitutionResponse institution) {
+  public static InstitutionResponseDto fromInstitutionResponseProto(
+      InstitutionResponse institution) {
     return InstitutionResponseDto.builder()
         .id(institution.getId())
         .name(institution.getName())

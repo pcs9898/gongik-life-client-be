@@ -18,7 +18,7 @@ public class ServiceSignUpResponseDto {
   private String refreshToken;
 
 
-  public static ServiceSignUpResponseDto fromProto(SignUpResponse proto) {
+  public static ServiceSignUpResponseDto fromSignUpResponseProto(SignUpResponse proto) {
 
     return ServiceSignUpResponseDto.builder()
         .user(SignUpUserDto.fromProto(proto.getUser()))
