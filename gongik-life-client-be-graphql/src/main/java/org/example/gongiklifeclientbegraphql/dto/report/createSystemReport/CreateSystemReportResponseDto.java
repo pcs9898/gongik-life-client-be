@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateSystemReportResponseDto {
 
-  private String reportId;
+    private String reportId;
 
-  public static CreateSystemReportResponseDto fromProto(
-      CreateSystemReportResponse createSystemReportResponse) {
-    return CreateSystemReportResponseDto.builder()
-        .reportId(createSystemReportResponse.getReportId())
-        .build();
-  }
+    public static CreateSystemReportResponseDto fromCreateSystemReportResponseProto(
+            CreateSystemReportResponse createSystemReportResponse) {
+        return CreateSystemReportResponseDto.builder()
+                .reportId(createSystemReportResponse.getReportId())
+                .build();
+    }
 
 }

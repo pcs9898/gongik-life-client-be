@@ -19,14 +19,14 @@ public class CreateSystemReportRequestDto {
 
     @Range(min = 1, max = 5)
     private Integer systemCategoryId;
-  
+
     @NotBlank
     private String title;
 
     @NotBlank
     private String content;
 
-    public CreateSystemReportRequest toProto() {
+    public CreateSystemReportRequest toCreateSystemReportRequestProto() {
         return CreateSystemReportRequest.newBuilder()
                 .setUserId(userId)
                 .setSystemCategoryId(systemCategoryId)

@@ -14,7 +14,8 @@ import org.example.gongiklifeclientbegraphql.dto.report.myReports.MyReportsReque
 import org.example.gongiklifeclientbegraphql.dto.report.myReports.MyReportsResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.report.report.ReportRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.report.report.ReportResponseDto;
-import org.example.gongiklifeclientbegraphql.service.report.ReportService;
+import org.example.gongiklifeclientbegraphql.service.report.*;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -26,23 +27,25 @@ import org.springframework.stereotype.Controller;
 public class ReportController {
 
     private final ReportService reportService;
+    private final CreateSystemReportService createSystemReportService;
+    private final CreateReportService createReportService;
+    private final DeleteReportService deleteReportService;
+    private final GetReportService getReportService;
+    private final MyReportsService myReportsService;
 
     @MutationMapping
     public CreateSystemReportResponseDto createSystemReport(
             @Argument("createSystemReportInput") @Valid CreateSystemReportRequestDto requestDto,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
-        try {
+
+        return ControllerExceptionHandlingUtil.handle(() -> {
             String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
             requestDto.setUserId(userId);
 
-            return reportService.createSystemReport(requestDto);
-
-        } catch (Exception e) {
-            log.error("Failed to create system report", e);
-            throw e;
-        }
+            return createSystemReportService.createSystemReport(requestDto);
+        });
     }
 
     @MutationMapping
@@ -50,17 +53,14 @@ public class ReportController {
             @Argument("createReportInput") @Valid CreateReportRequestDto requestDto,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
-        try {
+
+        return ControllerExceptionHandlingUtil.handle(() -> {
             String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
             requestDto.setUserId(userId);
 
-            return reportService.createReport(requestDto);
-
-        } catch (Exception e) {
-            log.error("Failed to create report", e);
-            throw e;
-        }
+            return createReportService.createReport(requestDto);
+        });
     }
 
     @MutationMapping
@@ -68,17 +68,14 @@ public class ReportController {
             @Argument("deleteReportInput") @Valid DeleteReportRequestDto requestDto,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
-        try {
+
+        return ControllerExceptionHandlingUtil.handle(() -> {
             String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
             requestDto.setUserId(userId);
 
-            return reportService.deleteReport(requestDto);
-
-        } catch (Exception e) {
-            log.error("Failed to delete report", e);
-            throw e;
-        }
+            return deleteReportService.deleteReport(requestDto);
+        });
     }
 
     @QueryMapping
@@ -86,17 +83,14 @@ public class ReportController {
             @Argument("reportInput") @Valid ReportRequestDto requestDto,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
-        try {
+
+        return ControllerExceptionHandlingUtil.handle(() -> {
             String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
             requestDto.setUserId(userId);
 
-            return reportService.getReport(requestDto);
-
-        } catch (Exception e) {
-            log.error("Failed to get report", e);
-            throw e;
-        }
+            return getReportService.getReport(requestDto);
+        });
     }
 
     @QueryMapping
@@ -104,17 +98,14 @@ public class ReportController {
             @Argument("myReportsFilter") @Valid MyReportsRequestDto requestDto,
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
-        try {
+
+        return ControllerExceptionHandlingUtil.handle(() -> {
             String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
             requestDto.setUserId(userId);
 
-            return reportService.myReports(requestDto);
-
-        } catch (Exception e) {
-            log.error("Failed to get my reports", e);
-            throw e;
-        }
+            return myReportsService.myReports(requestDto);
+        });
     }
 
 }

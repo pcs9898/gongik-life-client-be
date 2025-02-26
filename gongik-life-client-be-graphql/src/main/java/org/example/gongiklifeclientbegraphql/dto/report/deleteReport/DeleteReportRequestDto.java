@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 public class DeleteReportRequestDto {
 
     private String userId;
-  
+
     @NotBlank
     private String reportId;
 
-    public DeleteReportRequest toProto() {
+    public DeleteReportRequest toDeleteReportRequestProto() {
         return DeleteReportRequest.newBuilder()
                 .setUserId(userId)
                 .setReportId(reportId)

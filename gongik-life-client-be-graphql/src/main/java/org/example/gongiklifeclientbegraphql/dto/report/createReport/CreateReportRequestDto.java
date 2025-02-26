@@ -22,13 +22,13 @@ public class CreateReportRequestDto {
 
     @NotBlank
     private String title;
-    
+
     @NotBlank
     private String content;
 
     private String targetId;
 
-    public CreateReportRequest toProto() {
+    public CreateReportRequest toCreateReportRequestProto() {
         return CreateReportRequest.newBuilder()
                 .setUserId(userId)
                 .setReportTypeId(reportTypeId)
