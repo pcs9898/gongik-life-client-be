@@ -1,94 +1,67 @@
 package org.example.gongiklifeclientbereportservice.grpc;
 
 import com.gongik.reportService.domain.service.ReportServiceGrpc;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateReportRequest;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateReportResponse;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportRequest;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.CreateSystemReportResponse;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportRequest;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.DeleteReportResponse;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.MyReportsRequest;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.MyReportsResponse;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportRequest;
-import com.gongik.reportService.domain.service.ReportServiceOuterClass.ReportResponse;
+import com.gongik.reportService.domain.service.ReportServiceOuterClass.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.example.gongiklifeclientbereportservice.service.ReportService;
+import org.example.gongiklifeclientbereportservice.service.*;
+import util.GrpcServiceExceptionHandlingUtil;
 
 @GrpcService
 @Slf4j
 @RequiredArgsConstructor
 public class ReportGrpcService extends ReportServiceGrpc.ReportServiceImplBase {
 
-  private final ReportService reportService;
+    private final ReportService reportService;
+    private final CreateReportService createReportService;
+    private final CreateSystemReportService createSystemReportService;
+    private final DeleteReportService deleteReportService;
+    private final GetReportService getReportService;
+    private final MyReportsService myReportsService;
 
-  @Override
-  public void createSystemReport(CreateSystemReportRequest request,
-      StreamObserver<CreateSystemReportResponse> responseObserver) {
-    try {
-      CreateSystemReportResponse response = reportService.createSystemReport(request);
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("Error occurred while creating system report", e);
-      responseObserver.onError(e);
+    @Override
+    public void createSystemReport(CreateSystemReportRequest request,
+                                   StreamObserver<CreateSystemReportResponse> responseObserver) {
+
+        GrpcServiceExceptionHandlingUtil.handle("createSystemReport",
+                () -> createSystemReportService.createSystemReport(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void createReport(CreateReportRequest request,
-      StreamObserver<CreateReportResponse> responseObserver) {
-    try {
-      CreateReportResponse response = reportService.createReport(request);
+    @Override
+    public void createReport(CreateReportRequest request,
+                             StreamObserver<CreateReportResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("Error occurred while creating report", e);
-      responseObserver.onError(e);
+        GrpcServiceExceptionHandlingUtil.handle("createReport",
+                () -> createReportService.createReport(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void deleteReport(DeleteReportRequest request,
-      StreamObserver<DeleteReportResponse> responseObserver) {
-    try {
-      DeleteReportResponse response = reportService.deleteReport(request);
+    @Override
+    public void deleteReport(DeleteReportRequest request,
+                             StreamObserver<DeleteReportResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("Error occurred while deleting report", e);
-      responseObserver.onError(e);
+        GrpcServiceExceptionHandlingUtil.handle("deleteReport",
+                () -> deleteReportService.deleteReport(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void report(ReportRequest request, StreamObserver<ReportResponse> responseObserver) {
-    try {
-      ReportResponse response = reportService.report(request);
+    @Override
+    public void report(ReportRequest request, StreamObserver<ReportResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("Error occurred while reporting", e);
-      responseObserver.onError(e);
+        GrpcServiceExceptionHandlingUtil.handle("report",
+                () -> getReportService.report(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void myReports(MyReportsRequest request,
-      StreamObserver<MyReportsResponse> responseObserver) {
-    try {
-      MyReportsResponse response = reportService.myReports(request);
+    @Override
+    public void myReports(MyReportsRequest request,
+                          StreamObserver<MyReportsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.error("Error occurred while getting my reports", e);
-      responseObserver.onError(e);
+        GrpcServiceExceptionHandlingUtil.handle("myReports",
+                () -> myReportsService.myReports(request),
+                responseObserver);
     }
-  }
 }

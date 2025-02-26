@@ -18,7 +18,7 @@ public class ReportRequestDto {
     @NotBlank
     private String reportId;
 
-    public ReportRequest toProto() {
+    public ReportRequest toReportRequestProto() {
         return ReportRequest.newBuilder()
                 .setUserId(userId)
                 .setReportId(reportId)
