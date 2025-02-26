@@ -2,175 +2,631 @@
 directive @authenticate on FIELD_DEFINITION | OBJECT
 directive @range(min: Int!, max: Int!)  on ARGUMENT_DEFINITION | INPUT_FIELD_DEFINITION
 
-
 scalar Date
 
 type Query {
-    searchInstitutions(searchKeyword: String!, cursor: String, pageSize: Int!): SearchInstitutionsResponse!
+    """
+    Search institutions
+    """
+    searchInstitutions(searchInstitutionsFilter: SearchInstitutionsFilter!): SearchInstitutionsResponse!
 
+    """
+    Get my profile, need to sign in
+    """
     myProfile: MyProfileResponse! @authenticate
 
-    userProfile(userId: ID!): UserProfileResponse!
+    """
+    Get user profile
+    """
+    userProfile(userProfileInput: UserProfileInput!): UserProfileResponse!
 
-    institution(institutionId: ID!): InstitutionResponse!
+    """
+    Get institution
+    """
+    institution(institutionInput: InstitutionInput!): InstitutionResponse!
 
+    """
+    Get institution review
+    """
     institutionReview(institutionReviewInput: InstitutionReviewInput!): InstitutionReview!
 
+    """
+    Get institution reviews with cursor pagination
+    """
     institutionReviews(institutionReviewsFilter: InstitutionReviewsFilter!): InstitutionReviewsResponse!
 
+    """
+    Get my institution reviews, need to sign in
+    """
     myInstitutionReviews: MyInstitutionReviewsResponse @authenticate
 
+    """
+    Get institution reviews by institution
+    """
     institutionReviewsByInstitution(institutionReviewsByInstitutionFilter: InstitutionReviewsByInstitutionFilters!): InstitutionReviewsByInstitutionResponse!
 
+    """
+    Get post
+    """
     post(postInput: PostInput!): PostResponse!
 
+    """
+    Get posts with cursor pagination
+    """
     posts(postsFilter: PostsFilter!): PostsResponse!
 
+    """
+    Get comments by post
+    """
     comments(commentsInput: CommentsInput!): CommentsResponse!
 
+    """
+    Get my posts with cursor pagination, need to sign in
+    """
     myPosts(myPostsFilter: MyPostsFilter!): MyPostsResponse! @authenticate
 
+    """
+    Get user posts with cursor pagination
+    """
     userPosts(userPostsFilter: UserPostsFilter!): UserPostsResponse!
 
+    """
+    Get my liked posts with cursor pagination, need to sign in
+    """
     myLikedPosts(myLikedPostsFilter: MyLikedPostsFilter!): MyLikedPostsResponse! @authenticate
 
+    """
+    Get my comments with cursor pagination, need to sign in
+    """
     myComments(myCommentsFilter: MyCommentsFilter!): MyCommentsResponse! @authenticate
 
+    """
+    Search posts with cursor pagination
+    """
     searchPosts(searchPostsFilter: SearchPostsFilter!): SearchPostsResponse!
 
+    """
+    Get my report, need to sign in
+    """
     report(reportInput: ReportInput!): ReportResponse! @authenticate
 
+    """
+    Get my reports with cursor pagination, need to sign in
+    """
     myReports(myReportsFilter: MyReportsFilter!): MyReportsResponse! @authenticate
 
+    """
+    Get average workhours with my average workhours, need to sign in
+    """
     averageWorkhours: AverageWorkhoursResponse! @authenticate
 
+    """
+    Get my notifications with cursor pagination, need to sign in
+    """
     myNotifications(myNotificationsFilter:MyNotificationsFilter!):  MyNotificationsResponse! @authenticate
 }
 
+
 type Mutation{
-    sendEmailVerificationCode(email: String!): Boolean!
+    """
+    Send email verification code for sign up
+    """
+    sendEmailVerificationCode(sendEmailVerificationCodeInput: SendEmailVerificationCodeInput!): SendEmailVerificationCodeResponse!
 
-    verifyEmailCode(email: String!, code: String!): Boolean!
+    """
+    Verify email code for sign up, code length is 6
+    """
+    verifyEmailCode(verifyEmailCodeInput: VerifyEmailCodeInput!): VerifyEmailCodeResponse!
 
-    signUp(name: String!,email: String!,password: String!,confirmPassword: String!,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): SignUpResponse!
+    """
+    Sign up
+    """
+    signUp(signUpInput: SignUpInput!): SignUpResponse!
 
-    updateProfile(name: String,bio: String,institutionId: String,enlistmentDate: String,dischargeDate: String): UpdateProfileResponse! @authenticate
+    """
+    Update my profile, need to sign in
+    """
+    updateProfile(updateProfileInput: UpdateProfileInput!): UpdateProfileResponse! @authenticate
 
-    createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): InstitutionReview! @authenticate
+    """
+    Create institution review, need to sign in
+    """
+    createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): CreateInstitutionReviewResponse! @authenticate
 
-    deleteInstitutionReview(institutionReviewId: String!): DeleteInstitutionReviewResponse! @authenticate
+    """
+    Delete institution review, need to sign in
+    """
+    deleteInstitutionReview(deleteInstitutionReviewInput: DeleteInstitutionReviewInput!): DeleteInstitutionReviewResponse! @authenticate
 
+    """
+    Like institution review, need to sign in
+    """
     likeInstitutionReview(likeInstitutionReviewInput: LikeInstitutionReviewInput!): LikeInstitutionReviewResponse! @authenticate
 
+    """
+    Unlike institution review, need to sign in
+    """
     unlikeInstitutionReview(unlikeInstitutionReviewInput: UnlikeInstitutionReviewInput!): UnlikeInstitutionReviewResponse! @authenticate
 
+    """
+    Create post, need to sign in
+    """
     createPost(createPostInput: CreatePostInput!): CreatePostResponse! @authenticate
 
+    """
+    Update post, need to sign in
+    """
     updatePost(updatePostInput: UpdatePostInput!): UpdatePostResponse! @authenticate
 
+    """
+    Delete post, need to sign in
+    """
     deletePost(deletePostInput: DeletePostInput!): DeletePostResponse! @authenticate
 
+    """
+    Like post, need to sign in
+    """
     likePost(likePostInput: LikePostInput!): LikePostResponse! @authenticate
 
+    """
+    Unlike post, need to sign in
+    """
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 
+    """
+    Create comment, need to sign in
+    """
     createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
 
+    """
+    Update comment, need to sign in
+    """
     updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
 
+    """
+    Delete comment, need to sign in
+    """
     deleteComment(deleteCommentInput: DeleteCommentInput!): DeleteCommentResponse! @authenticate
 
+    """
+    Create system report, need to sign in
+    """
     createSystemReport(createSystemReportInput: CreateSystemReportInput!): CreateSystemReportResponse! @authenticate
 
+    """
+    Create report, need to sign in
+    """
     createReport(createReportInput: CreateReportInput!): CreateReportResponse! @authenticate
 
+    """
+    Delete report, need to sign in
+    """
     deleteReport(deleteReportInput: DeleteReportInput!): DeleteReportResponse! @authenticate
 
+    """
+    Mark notification as read, need to sign in
+    """
     markNotificationAsRead(markNotificationAsReadInput: MarkNotificationAsReadInput!): MarkNotificationAsReadResponse! @authenticate
 
+    """
+    Mark all notifications as read, need to sign in
+    """
     markAllNotificationsAsRead: MarkAllNotificationsAsReadResponse! @authenticate
 
+    """
+    Delete notification, need to sign in
+    """
     deleteNotification(deleteNotificationInput: DeleteNotificationInput!): DeleteNotificationResponse! @authenticate
 
+    """
+    Delete all notifications, need to sign in
+    """
     deleteAllNotifications:DeleteAllNotificationsResponse! @authenticate
 }
 
 type Subscription{
+    """
+    Get real time notification, need to sign in
+    """
     notificationRealTime:  NotificationRealTimeResponse! @authenticate # need to send with connect_init message(same spec with jwt header, in graphiql can put in headers) when send request
 
 }
 
-"search result"
+
+"""
+Search institutions filter
+"""
+input SearchInstitutionsFilter {
+    """
+    Search keyword
+    """
+    searchKeyword: String!
+
+    """
+    Cursor for pagination, cursor is institution id, if not provided, it will start from the beginning
+    """
+    cursor: String
+
+    """
+    Page size, default is 5, min is 1, max is 20
+    """
+    pageSize: Int!=5 @range(min: 1, max: 20)
+}
+
+
+"Search result"
 type SearchInstitutionsResponse {
+    """
+    List of institutions
+    """
     listSearchInstitution: [SearchInstitution]
-    pageInfo: PageInfo
+
+    """
+    Pagination info
+    """
+    pageInfo: PageInfo!
 }
 
+"""
+Page info
+"""
 type PageInfo {
+    """
+    End cursor for pagination
+    """
     endCursor: String
-    hasNextPage: Boolean
+
+    """
+    Has next page
+    """
+    hasNextPage: Boolean!
 }
 
+"""
+Search institution
+"""
 type SearchInstitution {
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
+
+    """
+    Institution address
+    """
     address: String!
+
+    """
+    Institution average rating from institution reviews, 0.0 to 5.0
+    """
     averageRating: Float
 }
 
+"""
+Send email verification code input
+"""
+input SendEmailVerificationCodeInput{
+    """
+    User email
+    """
+    email: String!
+}
+
+"""
+Send email verification code response
+"""
+type SendEmailVerificationCodeResponse{
+    """
+    Success
+    """
+    success: Boolean!
+}
+
+input VerifyEmailCodeInput{
+    """
+    User email
+    """
+    email: String!
+
+    """
+    Verification code, 6 digits
+    """
+    code: String!
+}
+
+type VerifyEmailCodeResponse{
+    """
+    Success
+    """
+    success: Boolean!
+}
+
+"""
+Sign up input
+"""
+input SignUpInput{
+    """
+    User name
+    """
+    name: String!
+
+    """
+    User email
+    """
+    email: String!
+
+    """
+    User password
+    """
+    password: String!
+
+    """
+    User confirm password
+    """
+    confirmPassword: String!
+
+    """
+    User bio
+    """
+    bio: String
+
+    """
+    Institution id, if user has institution, must have enlistmentDate and dischargeDate
+    """
+    institutionId: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
+    enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
+    dischargeDate: String
+
+}
+
+"""
+Sign up response
+"""
 type SignUpResponse{
+    """
+    Sign up user
+    """
     User: SignUpUser!
+
+    """
+    Access token, valid for 5 hours
+    """
     accessToken: String!
+
+    """
+    Access token expires at
+    """
     accessTokenExpiresAt: String!
 }
 
+"""
+Sign up user
+"""
 type SignUpUser{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     email: String!
+
+    """
+    User institution information, if user has institution, must have enlistmentDate and dischargeDate
+    """
     institution: SignUpInstitution
+
+    """
+    User name
+    """
     name: String!
+
+    """
+    User bio
+    """
     bio: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
     enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     dischargeDate: String
 }
 
+"""
+Sign up institution
+"""
 type SignUpInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+My profile response
+"""
 type MyProfileResponse{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     email: String!
+
+    """
+    User institution information, if user has institution, must have enlistmentDate and dischargeDate
+    """
     institution: MyProfileInstitution
+
+    """
+    User name
+    """
     name: String!
+
+    """
+    User bio
+    """
     bio: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
     enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     dischargeDate: String
 }
 
+"""
+My profile institution
+"""
 type MyProfileInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+Update profile input
+"""
+input UserProfileInput{
+    """
+    User id
+    """
+    userId: ID!
+}
+
+"""
+User profile response
+"""
 type UserProfileResponse{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     name: String!
+
+    """
+    User institution information
+    """
     bio: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
     institution: UserProfileInstitution
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
     dischargeDate: String
 }
 
+"""
+User profile institution
+"""
 type UserProfileInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+input UpdateProfileInput{
+    """
+    User name
+    """
+    name: String
+
+    """
+    User bio
+    """
+    bio: String
+
+    """
+    Institution id, if user has institution, must have enlistmentDate and dischargeDate
+    """
+    institutionId: String
+
+    """
+    User social service enlistment date, "yyyy-MM-dd"
+    """
+    enlistmentDate: String
+
+    """
+    User social service discharge date, "yyyy-MM-dd"
+    """
+    dischargeDate: String
+}
+
+
+"""
+Update profile response
+"""
 type UpdateProfileResponse{
+    """
+    User id
+    """
     id: ID!
+
+    """
+    User email
+    """
     email: String!
+
+    """
+    User institution information, if user has institution, must have enlistmentDate and dischargeDate
+    """
     institution: UpdateProfileInstitution
     name: String!
     bio: String
@@ -178,513 +634,1829 @@ type UpdateProfileResponse{
     dischargeDate: String
 }
 
+"""
+Update profile institution
+"""
 type UpdateProfileInstitution{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
 }
 
+"""
+Institution input
+"""
+input InstitutionInput{
+    """
+    Institution id
+    """
+    institutionId: ID!
+}
+
+"""
+Institution response
+"""
 type InstitutionResponse{
+    """
+    Institution id
+    """
     id: ID!
+
+    """
+    Institution name
+    """
     name: String!
+
+    """
+    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government
+    """
     institutionCategoryId: Int!
+
+    """
+    Institution address
+    """
     address: String!
+
+    """
+    Institution phone number
+    """
     phoneNumber: String!
+
+    """
+    Institution tag id, 1: elderly welfare facility, 2: child welfare facility, 3: disabled welfare facility, 4: welfare center, 5:local resident facility, 6: daycare center, 7: self sufficiency center, 8: mental health facility, 9: women welfare facility, 10: youth welfare facility, 11: homeless welfare facility, 12: tuberculosis hansen facility
+    """
     tagId: Int
+
+    """
+    Institution regional military office id, 1: seoul, 2: busan ulsan, 3: daegu gyeongbuk, 4: gyeongin, 5: gwangju jeonnam, 6: daejeon chungnam, 7: gangwon, 8: chungbuk, 9: jeonbuk, 10: gyeongnam, 11: jeju, 12: inchoen, 13: gyeonggi north, 14: gangwon yeongdong
+    """
     regionalMilitaryOfficeId: Int!
+
+    """
+    Institution region
+    """
     region: String!
+
+    """
+    Institution parent institution
+    """
     parentInstitution: String
+
+    """
+    Institution sexual criminal record restriction
+    """
     sexualCriminalRecordRestriction:Boolean!
+
+    """
+    Institution average workhours from institution review
+    """
     averageWorkhours:Int
+
+    """
+    Institution average rating from institution review
+    """
     averageRating: Float
+
+    """
+    Institution review count
+    """
     reviewCount: Int!
+
+    """
+    Institution disease restrictions, 1: mental illness, 2: seizure, 3: tattoo self harm, 4: spine disease, 5: bronchial asthma, 6: atopic dermatitis
+    """
     diseaseRestrictions: [Int]
 }
 
+"""
+Institution review
+"""
 type InstitutionReview {
+    """
+    Institution review id
+    """
     id: ID!
+
+    """
+    Institution short information
+    """
     institution: InstitutionShortInfo!
+
+    """
+    User information left review
+    """
     user: InstitutionReviewUser!
+
+    """
+    Rating, average of facilityRating, locationRating, staffRating, visitorRating, vacationFreedomRating
+    """
     rating: Float!
+
+    """
+    Facility rating, 0 to 5
+    """
     facilityRating: Int!
+
+    """
+    Location rating, 0 to 5
+    """
     locationRating: Int!
+
+    """
+    Staff rating, 0 to 5
+    """
     staffRating: Int!
+
+    """
+    Visitor rating, 0 to 5
+    """
     visitorRating: Int!
+
+    """
+    Vacation freedom rating, 0 to 5
+    """
     vacationFreedomRating: Int!
+
+    """
+    Main tasks
+    """
     mainTasks: String!
+
+    """
+    Pros and cons
+    """
     prosCons: String!
+
+    """
+    Average workhours
+    """
     averageWorkhours: Int!
+
+    """
+    Work type rules id, 1: day shift, 2: three shift two team, 3: three shift three team, 4: four shift two team, 5: four shift three team, 6: residential work
+    """
     workTypeRulesId: Int!
+
+    """
+    Uniform wearing rules id, 1: always, 2: not worn, 3: situational
+    """
     uniformWearingRulesId: Int!
+
+    """
+    Social service people count id, 1: one, 2: two, 3: three to five, 4: six to ten, 5: more than ten
+    """
     socialServicePeopleCountId: Int!
+
+    """
+    Review like count
+    """
     likeCount: Int!
+
+    """
+    Review created at
+    """
     createdAt: String!
+
+    """
+    Is review liked by user, false if user is not authenticated
+    """
     isLiked: Boolean! # its false if user is not authenticated
 }
 
+"""
+Institution short information
+"""
 type InstitutionShortInfo{
+    """
+    Institution id
+    """
     institutionId:ID!
+    """
+    Institution name
+    """
     institutionName:String!
 }
 
 
+"""
+Create Institution review input
+"""
 input CreateInstitutionReviewInput {
+    """
+    Institution id
+    """
     institutionId: ID!
+
+    """
+    Facility rating, 0 to 5
+    """
     facilityRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Location rating, 0 to 5
+    """
     locationRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Staff rating, 0 to 5
+    """
     staffRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Visitor rating, 0 to 5
+    """
     visitorRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Vacation freedom rating, 0 to 5
+    """
     vacationFreedomRating: Int = 0 @range(min: 0, max: 5)
+
+    """
+    Main tasks
+    """
     mainTasks: String!
+
+    """
+    Pros and cons
+    """
     prosCons: String!
+
+    """
+    Average workhours, 0 to 480 meaning minutes
+    """
     averageWorkhours: Int = 0 @range(min: 0, max: 480)
+
+    """
+    Work type rules id, 1: day shift, 2: three shift two team, 3: three shift three team, 4: four shift two team, 5: four shift three team, 6: residential work
+    """
     workTypeRulesId: Int = 1 @range(min: 1, max: 6)
+
+    """
+    Uniform wearing rules id, 1: always, 2: not worn, 3: situational
+    """
     uniformWearingRulesId: Int = 1 @range(min: 1, max: 3)
+
+    """
+    Social service people count id, 1: one, 2: two, 3: three to five, 4: six to ten, 5: more than ten
+    """
     socialServicePeopleCountId: Int = 1 @range(min: 1, max: 5)
 }
 
-type InstitutionReviewUser{
+"""
+Create institution review response
+"""
+type CreateInstitutionReviewResponse {
+    """
+    Institution review id
+    """
     id: ID!
+
+    """
+    Institution short information
+    """
+    institution: InstitutionShortInfo!
+
+    """
+    User information left review
+    """
+    user: InstitutionReviewUser!
+
+    """
+    Rating, average of facilityRating, locationRating, staffRating, visitorRating, vacationFreedomRating
+    """
+    rating: Float!
+
+    """
+    Facility rating, 0 to 5
+    """
+    facilityRating: Int!
+
+    """
+    Location rating, 0 to 5
+    """
+    locationRating: Int!
+
+    """
+    Staff rating, 0 to 5
+    """
+    staffRating: Int!
+
+    """
+    Visitor rating, 0 to 5
+    """
+    visitorRating: Int!
+
+    """
+    Vacation freedom rating, 0 to 5
+    """
+    vacationFreedomRating: Int!
+
+    """
+    Main tasks
+    """
+    mainTasks: String!
+
+    """
+    Pros and cons
+    """
+    prosCons: String!
+
+    """
+    Average workhours
+    """
+    averageWorkhours: Int!
+
+    """
+    Work type rules id, 1: day shift, 2: three shift two team, 3: three shift three team, 4: four shift two team, 5: four shift three team, 6: residential work
+    """
+    workTypeRulesId: Int!
+
+    """
+    Uniform wearing rules id, 1: always, 2: not worn, 3: situational
+    """
+    uniformWearingRulesId: Int!
+
+    """
+    Social service people count id, 1: one, 2: two, 3: three to five, 4: six to ten, 5: more than ten
+    """
+    socialServicePeopleCountId: Int!
+
+    """
+    Review like count
+    """
+    likeCount: Int!
+
+    """
+    Review created at
+    """
+    createdAt: String!
+
+}
+
+"""
+Institution review user
+"""
+type InstitutionReviewUser{
+    """
+    User id
+    """
+    id: ID!
+
+    """
+    User name
+    """
     name: String!
 }
 
+"""
+Delete institution review input
+"""
+input DeleteInstitutionReviewInput{
+    """
+    Institution review id
+    """
+    institutionReviewId: ID!
+}
+
+
+"""
+Delete institution review response
+"""
 type DeleteInstitutionReviewResponse{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
+
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Like institution review input
+"""
 input LikeInstitutionReviewInput{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
 }
 
+"""
+Like institution review response
+"""
 type LikeInstitutionReviewResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Unlike institution review input
+"""
 input UnlikeInstitutionReviewInput{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
 }
 
+"""
+Unlike institution review response
+"""
 type UnlikeInstitutionReviewResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Institution review input
+"""
 input InstitutionReviewInput{
+    """
+    Institution review id
+    """
     institutionReviewId: ID!
 }
 
+"""
+Institution reviews filter
+"""
 input InstitutionReviewsFilter{
+    """
+    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government, 7 all
+    """
     institutionCategoryId: Int = 7 @range(min: 1, max: 7)
+
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is institution review id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+Institution reviews response
+"""
 type InstitutionReviewsResponse {
+    """
+    List of institution reviews
+    """
     listInstitutionReview: [InstitutionReviewForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+Institution review for list
+"""
 type InstitutionReviewForList {
+    """
+    Institution review id
+    """
     id: ID!
+
+    """
+    Institution short information
+    """
     institution: InstitutionReviewInstitution
+
+    """
+    User information left review
+    """
     user: InstitutionReviewUser!
+
+    """
+    Rating, average of facilityRating, locationRating, staffRating, visitorRating, vacationFreedomRating
+    """
     rating: Float!
+
+    """
+    Main tasks
+    """
     mainTasks: String!
+
+    """
+    Pros and cons
+    """
     prosCons: String!
+
+    """
+    Average workhours, 0 to 480 meaning minutes
+    """
     averageWorkhours: Int!
+
+    """
+    Review like count
+    """
     likeCount: Int!
+
+    """
+    Review created at
+    """
     createdAt: String!
+
+    """
+    Is review liked by user, false if user is not authenticated
+    """
     isLiked: Boolean! # its false if user is not authenticated
 }
 
+"""
+Institution review institution
+"""
 type InstitutionReviewInstitution{
+    """
+    Institution id
+    """
     institutionId: ID!
+
+    """
+    Institution name
+    """
     institutionName: String!
+
+    """
+    Institution category id, 1: social welfare, 2: public organization, 3: national agency, 4: local government
+    """
     institutionCategoryId: Int!
 }
 
+"""
+My institution reviews response
+"""
 type MyInstitutionReviewsResponse{
-    listMyInstitutionReview: [InstitutionReviewForList]!
 
+    """
+    List of my institution reviews
+    """
+    listMyInstitutionReview: [InstitutionReviewForList]!
 }
 
+"""
+Institution reviews by institution filters
+"""
 input InstitutionReviewsByInstitutionFilters{
+    """
+    Institution id
+    """
     institutionId: ID!
+
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is institution review id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+Institution reviews by institution response
+"""
 type InstitutionReviewsByInstitutionResponse{
+    """
+    List of institution reviews by institution
+    """
     listInstitutionReviewByInstitution: [InstitutionReviewForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+Create post input
+"""
 input CreatePostInput{
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event
+    """
     categoryId: Int!=1 @range(min: 1, max: 6)
+
+    """
+    Post title
+    """
     title: String!
+
+    """
+    Post content
+    """
     content: String!
 }
 
+"""
+Create post response
+"""
 type CreatePostResponse{
+    """
+    Post id
+    """
     id: ID!
+
+    """
+    User information left post
+    """
     user: PostUser!
+
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event
+    """
     categoryId: Int!
+
+    """
+    Post title
+    """
     title: String!
+
+    """
+    Post content
+    """
     content: String!
+
+    """
+    Post like count
+    """
     likeCount: Int!
+
+    """
+    Post comment count
+    """
     commentCount: Int!
+
+    """
+    Post created at
+    """
     createdAt:String!
 }
 
+"""
+Post user
+"""
 type PostUser{
+    """
+    User id
+    """
     userId: ID!
+
+    """
+    User name
+    """
     userName: String!
 }
 
+"""
+Update post input
+"""
 input UpdatePostInput{
+    """
+    Post id
+    """
     postId: ID!
+
+    """
+    Post title
+    """
     title: String
+
+    """
+    Post content
+    """
     content: String
 }
 
+"""
+Update post response
+"""
 type UpdatePostResponse{
+    """
+    Post id
+    """
     id: ID!
+
+    """
+    User information left post
+    """
     user: PostUser!
+
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event
+    """
     categoryId: Int!
+
+    """
+    Post title
+    """
     title: String!
+
+    """
+    Post content
+    """
     content: String!
+
+    """
+    Post like count
+    """
     likeCount: Int!
+
+    """
+    Post comment count
+    """
     commentCount: Int!
+
+    """
+    Post created at
+    """
     createdAt:String!
+
+    """
+    Is post liked by user, false if user is not authenticated
+    """
     isLiked:Boolean!
 }
 
+"""
+Delete post input
+"""
 input DeletePostInput{
+    """
+    Post id
+    """
     postId: ID!
 }
 
+"""
+Delete post response
+"""
 type DeletePostResponse{
+    """
+    Post id
+    """
     postId: ID!
+
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Like post input
+"""
 input LikePostInput{
+    """
+    Post id
+    """
     postId: ID!
 }
 
+"""
+Like post response
+"""
 type LikePostResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Unlike post input
+"""
 input UnLikePostInput{
+    """
+    Post id
+    """
     postId: ID!
 }
 
+"""
+Unlike post response
+"""
 type UnLikePostResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Post input
+"""
 input PostInput{
+    """
+    Post id
+    """
     postId: ID!
 }
 
+"""
+Post response
+"""
 type PostResponse{
+    """
+    Post id
+    """
     id: ID!
+
+    """
+    User information left post
+    """
     user: PostUser!
+
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event
+    """
     categoryId: Int!
+
+    """
+    Post title
+    """
     title: String!
+
+    """
+    Post content
+    """
     content: String!
+
+    """
+    Post like count
+    """
     likeCount: Int!
+
+    """
+    Post comment count
+    """
     commentCount: Int!
+
+    """
+    Post created at
+    """
     createdAt:String!
+
+    """
+    Is post liked by user, false if user is not authenticated
+    """
     isLiked:Boolean!
 }
 
+"""
+Posts filter
+"""
 input PostsFilter{
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event, 7: all
+    """
     postCategoryId: Int = 7 @range(min: 1, max: 7)
+
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is post id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+Post for list
+"""
 type PostForList{
+    """
+    Post id
+    """
     id: ID!
+
+    """
+    User information left post
+    """
     user: PostUser!
+
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event
+    """
     categoryId: Int!
+
+    """
+    Post title
+    """
     title: String!
+
+    """
+    Post content
+    """
     content: String!
+
+    """
+    Post like count
+    """
     likeCount: Int!
+
+    """
+    Post comment count
+    """
     commentCount: Int!
+
+    """
+    Post created at
+    """
     createdAt:String!
+
+    """
+    Is post liked by user, false if user is not authenticated
+    """
     isLiked:Boolean!
 }
 
+"""
+Posts response
+"""
 type PostsResponse{
+    """
+    List of posts
+    """
     listPost: [PostForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 
 }
 
+"""
+Create comment input
+"""
 input CreateCommentInput{
+    """
+    Post id
+    """
     postId: ID!
+
+    """
+    Parent comment id, if it is a child comment, must have parent comment id
+    """
     parentCommentId: ID
+
+    """
+    Comment content
+    """
     content: String!
 }
 
+"""
+Create comment response
+"""
 type CreateCommentResponse{
+    """
+    Comment id
+    """
     id: ID!
+
+    """
+    User information left comment
+    """
     user: PostUser!
+
+    """
+    Post id
+    """
     postId: ID!
+
+    """
+    Parent comment id, if it is a child comment, must have parent comment id
+    """
     parentCommentId: ID
+
+    """
+    Comment content
+    """
     content: String!
+
+    """
+    Comment created at
+    """
     createdAt: String!
 
 }
 
+"""
+Update comment input
+"""
 input UpdateCommentInput{
+    """
+    Comment id
+    """
     commentId: ID!
+
+    """
+    Comment content
+    """
     content: String!
 }
 
+"""
+Update comment response
+"""
 type UpdateCommentResponse{
+    """
+    Comment id
+    """
     id: ID!
+
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Delete comment input
+"""
 input DeleteCommentInput{
+    """
+    Comment id
+    """
     commentId: ID!
 }
 
+"""
+Delete comment response
+"""
 type DeleteCommentResponse{
+    """
+    Comment id
+    """
     commentId: ID!
+
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Comments input
+"""
 input CommentsInput{
+    """
+    Post id
+    """
     postId:ID!
 }
 
+"""
+Comments for list
+"""
 type CommentForList{
+    """
+    Comment id
+    """
     id: ID!
+
+    """
+    User information left comment
+    """
     user: PostUser
+
+    """
+    Post id
+    """
     postId: ID!
+
+    """
+    Parent comment id, if it is a child comment, must have parent comment id
+    """
     parentCommentId: ID
+
+    """
+    Comment content
+    """
     content: String
+
+    """
+    Comment created at
+    """
     createdAt: String!
+
+    """
+    Child comments
+    """
     childComments: [CommentForList]
 }
 
+"""
+Comments response
+"""
 type CommentsResponse{
+    """
+    List of comments
+    """
     listComment: [CommentForList]
 }
 
-type Hi{
-    hello:String
-}
-
+"""
+My posts filter
+"""
 input MyPostsFilter{
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is post id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+My posts response
+"""
 type MyPostsResponse{
+    """
+    List of my posts
+    """
     listPost: [PostForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+User posts filter
+"""
 input UserPostsFilter{
+    """
+    User id
+    """
     userId: ID!
+
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is post id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+User posts response
+"""
 type UserPostsResponse{
+    """
+    List of user posts
+    """
     listPost: [PostForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+My liked posts filter
+"""
 input MyLikedPostsFilter{
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is post id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+My liked posts response
+"""
 type MyLikedPostsResponse{
+    """
+    List of my liked posts
+    """
     listPost: [PostForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+My comments filter
+"""
 input MyCommentsFilter{
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is comment id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+My comments response
+"""
 type PostShortInfo{
+    """
+    Post id
+    """
     postId: ID!
+
+    """
+    Post title
+    """
     postTitle: String!
 }
 
+"""
+My comments for list
+"""
 type MyCommentForList{
+    """
+    Comment id
+    """
     id: ID!
+
+    """
+    User information left comment
+    """
     post: PostShortInfo
+
+    """
+    Comment content
+    """
     content: String
+
+    """
+    Comment created at
+    """
     createdAt: String!
 }
 
+"""
+My comments response
+"""
 type MyCommentsResponse{
+    """
+    List of my comments
+    """
     listComment: [MyCommentForList]
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+My liked comments filter
+"""
 input SearchPostsFilter{
+    """
+    Search keyword
+    """
     searchKeyword: String!
+
+    """
+    Post category id, 1: notice, 2: free, 3: question, 4: review, 5: tip, 6: event, 7: all
+    """
     postCategoryId: Int = 7 @range(min: 1, max: 7)
+
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is post id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+Search posts response
+"""
 type SearchPostsResponse{
+    """
+    List of search posts
+    """
     listPost: [PostForList]!
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
-
+"""
+Create system report input
+"""
 input CreateSystemReportInput{
+    """
+    Report title
+    """
     title:String!
+
+    """
+    Report content
+    """
     content:String!
+
+    """
+    System category id, 1: bug, 2: ui issue, 3: performance, 4: data error, 5: feature request
+    """
     systemCategoryId: Int! @range(min: 1, max: 5)
 }
 
+"""
+Create system report response
+"""
 type CreateSystemReportResponse{
+    """
+    Report id
+    """
     reportId: ID!
 }
 
+"""
+Create report input
+"""
 input CreateReportInput{
+    """
+    Report type id,1: system , 2: institution, 3: institution review, 4: post, 5: comment
+    """
     reportTypeId: Int! @range(min: 2, max: 5)
+
+    """
+    Report title
+    """
     title:String!
+
+    """
+    Report content
+    """
     content:String!
+
+    """
+    Target id, can be institution id, institution review id, post id, comment id or else
+    """
     targetId: ID!
 }
 
+"""
+Create report response
+"""
 type CreateReportResponse{
+    """
+    Report id
+    """
     reportId: ID!
 }
 
+"""
+Delete report input
+"""
 input DeleteReportInput{
+    """
+    Report id
+    """
     reportId: ID!
 }
 
+"""
+Delete report response
+"""
 type DeleteReportResponse{
+    """
+    Report id
+    """
     reportId: ID!
+
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Report input
+"""
 input ReportInput{
+    """
+    Report id
+    """
     reportId: ID!
 }
 
+"""
+Report response
+"""
 type ReportResponse{
+    """
+    Report id
+    """
     id:ID!
+
+    """
+    Report type id,1: system , 2: institution, 3: institution review, 4: post, 5: comment
+    """
     typeId:Int!
+
+    """
+    System category id, 1: bug, 2: ui issue, 3: performance, 4: data error, 5: feature request
+    """
     systemCategoryId:Int
+
+    """
+    Target id, can be institution id, institution review id, post id, comment id or else
+    """
     targetId:ID
+
+    """
+    Report status id, 1: pending, 2: reviewing, 3: resolved, 4: rejected
+    """
     statusId:Int!
+
+    """
+    Report title
+    """
     title:String!
+
+    """
+    Report content
+    """
     content:String!
+
+    """
+    Report created at
+    """
     createdAt:String!
 }
 
+"""
+Reports filter
+"""
 input MyReportsFilter{
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is report id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+My reports response
+"""
 type ReportForList{
+    """
+    Report id
+    """
     id:ID!
+
+    """
+    Report type id,1: system , 2: institution, 3: institution review, 4: post, 5: comment
+    """
     typeId:Int!
+
+    """
+    System category id, 1: bug, 2: ui issue, 3: performance, 4: data error, 5: feature request
+    """
     systemCategoryId:Int
+
+    """
+    Target id, can be institution id, institution review id, post id, comment id or else
+    """
     targetId:ID
+
+    """
+    Report status id, 1: pending, 2: reviewing, 3: resolved, 4: rejected
+    """
     statusId:Int!
+
+    """
+    Report title
+    """
     title:String!
+
+    """
+    Report created at
+    """
     createdAt:String!
 }
 
+"""
+My reports response
+"""
 type MyReportsResponse{
+    """
+    List of my reports
+    """
     listReport: [ReportForList]
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+Average workhours response
+"""
 type AverageWorkhoursResponse{
+
+    """
+    My Average workhours
+    """
     myAverageWorkhours: Int!
+
+    """
+    Social welfare average workhours
+    """
     socialWelfareWorkhours:Int!
+
+    """
+    Public organization average workhours
+    """
     publicOrganizationWorkhours:Int!
+
+    """
+    National agency average workhours
+    """
     nationalAgencyWorkhours:Int!
+
+    """
+    Local government average workhours
+    """
     localGovernmentWorkhours:Int!
+
+    """
+    Total vote count
+    """
     totalVoteCount:Int!
 }
 
+"""
+Notification for list
+"""
 type NotificationForList {
+    """
+    Notification id
+    """
     id: ID!
+
+    """
+    Notification type id, 1: system, 2: institution, 3: institution review, 4: post, 5: comment
+    """
     notificationTypeId: Int!
+
+    """
+    Notification title
+    """
     title: String!
+
+    """
+    Notification content
+    """
     content:String!
+
+    """
+    Post id
+    """
     postId:String
+
+    """
+    Target comment id
+    """
     targetCommentId:String
+
+    """
+    Notice id
+    """
     noticeId:String
+
+    """
+    Targeted notification type id, 1: comment, 2: reply, 3: notice, 4: targeted, 5: report
+    """
     targetedNotificationTypeId:Int
+
+    """
+    Targeted notification id
+    """
     targetedNotificationId:String
+
+    """
+    Report id
+    """
     reportId:String
+
+    """
+    Notification created at
+    """
     createdAt:String!
+
+    """
+    Notification read at
+    """
     readAt:String
 }
 
+"""
+My notifications response
+"""
 type MyNotificationsResponse{
+    """
+    List of my notifications
+    """
     listNotification: [NotificationForList]
+
+    """
+    Pagination info
+    """
     pageInfo: PageInfo!
 }
 
+"""
+My notifications filter
+"""
 input MyNotificationsFilter{
+    """
+    Cursor for pagination, if not provided, it will start from the beginning, cursor is notification id
+    """
     cursor: String
+
+    """
+    Page size, default is 10, min is 1, max is 20
+    """
     pageSize: Int = 10
 }
 
+"""
+Mark notification as read input
+"""
 input MarkNotificationAsReadInput{
+    """
+    Notification id
+    """
     notificationId: ID!
-
 }
 
+"""
+Mark notification as read response
+"""
 type MarkNotificationAsReadResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Mark all notifications as read response
+"""
 type MarkAllNotificationsAsReadResponse{
+    """
+    Success
+    """
     success: Boolean!
 }
 
+"""
+Delete notification input
+"""
 input DeleteNotificationInput{
+    """
+    Notification id
+    """
     notificationId: ID!
 }
 
+"""
+Delete notification response
+"""
 type DeleteNotificationResponse{
+    """
+    Notification id
+    """
     success: Boolean!
 }
 
+"""
+Delete all notifications response
+"""
 type DeleteAllNotificationsResponse {
+    """
+    Success
+    """
     success: Boolean!
 }
 
-
-
+"""
+Notification real time response
+"""
 type NotificationRealTimeResponse{
+    """
+    Notification id
+    """
     id: ID!
+
+    """
+    User id
+    """
     userId: ID!
+
+    """
+    Notification type id, 1: system, 2: institution, 3: institution review, 4: post, 5: comment
+    """
     notificationTypeId: Int!
+
+    """
+    Notification title
+    """
     title: String!
+
+    """
+    Notification content
+    """
     content:String!
+
+    """
+    Post id
+    """
     postId:String
+
+    """
+    Target comment id
+    """
     targetCommentId:String
+
+    """
+    Notice id
+    """
     noticeId:String
+
+    """
+    Targeted notification type id, 1: comment, 2: reply, 3: notice, 4: targeted, 5: report
+    """
     targetedNotificationTypeId:Int
+
+    """
+    Targeted notification id
+    """
     targetedNotificationId:String
+
+    """
+    Report id
+    """
     reportId:String
+
+    """
+    Notification created at
+    """
     createdAt:String!
+
+    """
+    Notification read at
+    """
     readAt:String
 
 }

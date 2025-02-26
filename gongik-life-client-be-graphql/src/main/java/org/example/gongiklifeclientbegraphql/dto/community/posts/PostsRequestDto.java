@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Builder
@@ -12,24 +13,29 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PostsRequestDto {
 
-  private String userId;
-  private Integer postCategoryId;
-  private String cursor;
-  private Integer pageSize;
+    private String userId;
 
-  public PostsRequest toProto() {
-    PostsRequest.Builder builder = PostsRequest.newBuilder()
-        .setPostCategoryId(postCategoryId)
-        .setPageSize(pageSize);
+    @Range(min = 1, max = 7)
+    private Integer postCategoryId;
 
-    if (userId != null) {
-      builder.setUserId(userId);
+    private String cursor;
+
+    @Range(min = 1, max = 20)
+    private Integer pageSize;
+
+    public PostsRequest toPostsRequestProto() {
+        PostsRequest.Builder builder = PostsRequest.newBuilder()
+                .setPostCategoryId(postCategoryId)
+                .setPageSize(pageSize);
+
+        if (userId != null) {
+            builder.setUserId(userId);
+        }
+
+        if (cursor != null) {
+            builder.setCursor(cursor);
+        }
+
+        return builder.build();
     }
-
-    if (cursor != null) {
-      builder.setCursor(cursor);
-    }
-
-    return builder.build();
-  }
 }

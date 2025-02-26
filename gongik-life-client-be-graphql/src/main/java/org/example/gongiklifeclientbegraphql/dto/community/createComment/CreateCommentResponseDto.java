@@ -14,22 +14,22 @@ import org.example.gongiklifeclientbegraphql.dto.common.PostUserDto;
 @AllArgsConstructor
 public class CreateCommentResponseDto {
 
-  private String id;
-  private PostUserDto user;
-  private String postId;
-  private String parentCommentId;
-  private String content;
-  private String createdAt;
+    private String id;
+    private PostUserDto user;
+    private String postId;
+    private String parentCommentId;
+    private String content;
+    private String createdAt;
 
-  public static CreateCommentResponseDto fromProto(CreateCommentResponse comment) {
-    return CreateCommentResponseDto.builder()
-        .id(comment.getId())
-        .user(PostUserDto.fromProto(comment.getUser()))
-        .postId(comment.getPostId())
-        .parentCommentId(
-            comment.getParentCommentId().isEmpty() ? null : comment.getParentCommentId())
-        .content(comment.getContent())
-        .createdAt(comment.getCreatedAt())
-        .build();
-  }
+    public static CreateCommentResponseDto fromCreateCommentResponseProto(CreateCommentResponse comment) {
+        return CreateCommentResponseDto.builder()
+                .id(comment.getId())
+                .user(PostUserDto.fromProto(comment.getUser()))
+                .postId(comment.getPostId())
+                .parentCommentId(
+                        comment.getParentCommentId().isEmpty() ? null : comment.getParentCommentId())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .build();
+    }
 }

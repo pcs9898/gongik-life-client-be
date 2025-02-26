@@ -14,7 +14,8 @@ import org.example.gongiklifeclientbegraphql.dto.notification.markAllNotificatio
 import org.example.gongiklifeclientbegraphql.dto.notification.markNotificationAsRead.MarkNotificationAsReadResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.notification.myNotifications.MyNotificationsResponseDto;
-import org.example.gongiklifeclientbegraphql.service.NotificationService;
+import org.example.gongiklifeclientbegraphql.service.notification.*;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -25,94 +26,85 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class NotificationController {
 
-  private final NotificationService notificationService;
+    private final NotificationService notificationService;
+    private final MyNotificationsService myNotificationsService;
+    private final MarkNotificationAsReadService markNotificationAsReadService;
+    private final MarkAllNotificationsAsReadService markAllNotificationsAsReadService;
+    private final DeleteNotificationService deleteNotificationService;
+    private final DeleteAllNotificationsService deleteAllNotificationsService;
 
-  @QueryMapping
-  public MyNotificationsResponseDto myNotifications(
-      @Argument("myNotificationsFilter") @Valid MyNotificationsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public MyNotificationsResponseDto myNotifications(
+            @Argument("myNotificationsFilter") @Valid MyNotificationsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return notificationService.myNotifications(requestDto);
+            requestDto.setUserId(userId);
 
-    } catch (Exception e) {
-      log.error("Failed to get my notifications", e);
-      throw e;
+            return myNotificationsService.myNotifications(requestDto);
+        });
     }
-  }
 
-  @MutationMapping
-  public MarkNotificationAsReadResponseDto markNotificationAsRead(
-      @Argument("markNotificationAsReadInput") @Valid MarkNotificationAsReadRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public MarkNotificationAsReadResponseDto markNotificationAsRead(
+            @Argument("markNotificationAsReadInput") @Valid MarkNotificationAsReadRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return notificationService.markNotificationAsRead(requestDto);
+            requestDto.setUserId(userId);
 
-    } catch (Exception e) {
-      log.error("Failed to mark notification as read", e);
-      throw e;
+            return markNotificationAsReadService.markNotificationAsRead(requestDto);
+        });
     }
-  }
 
-  @MutationMapping
-  public MarkAllNotificationAsReadResponseDto markAllNotificationsAsRead(
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
+    @MutationMapping
+    public MarkAllNotificationAsReadResponseDto markAllNotificationsAsRead(
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+        return ControllerExceptionHandlingUtil.handle(() -> {
 
-      return notificationService.markAllNotificationsAsRead(MarkAllNotificationsAsReadRequestDto
-          .builder().userId(userId).build());
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-    } catch (Exception e) {
-      log.error("Failed to mark all notifications as read", e);
-      throw e;
+            return markAllNotificationsAsReadService.markAllNotificationsAsRead(
+                    MarkAllNotificationsAsReadRequestDto.builder().userId(userId).build());
+        });
     }
-  }
 
-  @MutationMapping
-  public DeleteNotificationResponseDto deleteNotification(
-      @Argument("deleteNotificationInput") DeleteNotificationRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public DeleteNotificationResponseDto deleteNotification(
+            @Argument("deleteNotificationInput") DeleteNotificationRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return notificationService.deleteNotification(requestDto);
+            requestDto.setUserId(userId);
 
-    } catch (Exception e) {
-      log.error("Failed to delete notification", e);
-      throw e;
+            return deleteNotificationService.deleteNotification(requestDto);
+        });
     }
-  }
 
 
-  @MutationMapping
-  public DeleteAllNotificationsResponseDto deleteAllNotifications(
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public DeleteAllNotificationsResponseDto deleteAllNotifications(
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      return notificationService.deleteAllNotifications(
-          DeleteAllNotificationsRequestDto.builder().userId(userId).build());
+        return ControllerExceptionHandlingUtil.handle(() -> {
 
-    } catch (Exception e) {
-      log.error("Failed to delete all notifications", e);
-      throw e;
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+            return deleteAllNotificationsService.deleteAllNotifications(
+                    DeleteAllNotificationsRequestDto.builder().userId(userId).build());
+        });
     }
-  }
 
 }

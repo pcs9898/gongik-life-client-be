@@ -12,15 +12,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeleteReportResponseDto {
 
-  private String reportId;
-  private boolean success;
+    private String reportId;
+    private boolean success;
 
-  public static DeleteReportResponseDto fromProto(DeleteReportResponse response) {
-    return DeleteReportResponseDto.builder()
-        .reportId(response.getReportId())
-        .success(response.getSuccess())
-        .build();
-  }
+    public static DeleteReportResponseDto fromDeleteReportResponseProto(DeleteReportResponse response) {
+        return DeleteReportResponseDto.builder()
+                .reportId(response.getReportId())
+                .success(response.getSuccess())
+                .build();
+    }
 
 
 }

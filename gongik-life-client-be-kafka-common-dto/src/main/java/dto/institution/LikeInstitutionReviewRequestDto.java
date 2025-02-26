@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LikeInstitutionReviewRequestDto {
 
+
   private String institutionReviewId;
+
   private String userId;
 
 }

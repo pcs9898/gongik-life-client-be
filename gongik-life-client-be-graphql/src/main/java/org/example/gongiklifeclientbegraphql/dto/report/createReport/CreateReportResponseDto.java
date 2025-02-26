@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreateReportResponseDto {
 
-  private String reportId;
+    private String reportId;
 
 
-  public static CreateReportResponseDto fromProto(CreateReportResponse report) {
-    return CreateReportResponseDto.builder()
-        .reportId(report.getReportId())
-        .build();
-  }
+    public static CreateReportResponseDto fromCreateReportResponseProto(CreateReportResponse report) {
+        return CreateReportResponseDto.builder()
+                .reportId(report.getReportId())
+                .build();
+    }
 }

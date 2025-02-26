@@ -13,24 +13,24 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 public class MyReportsRequestDto {
 
-  private String userId;
+    private String userId;
 
-  private String cursor;
+    private String cursor;
 
-  @Range(min = 1, max = 20)
-  private int pageSize;
+    @Range(min = 1, max = 20)
+    private int pageSize;
 
-  public MyReportsRequest toProto() {
-    MyReportsRequest.Builder response = MyReportsRequest.newBuilder()
-        .setUserId(userId)
-        .setPageSize(pageSize);
+    public MyReportsRequest toMyReportsRequestProto() {
+        MyReportsRequest.Builder response = MyReportsRequest.newBuilder()
+                .setUserId(userId)
+                .setPageSize(pageSize);
 
-    if (cursor != null && !cursor.isEmpty()) {
-      response.setCursor(cursor);
+        if (cursor != null && !cursor.isEmpty()) {
+            response.setCursor(cursor);
+        }
+
+        return response.build();
+
     }
-
-    return response.build();
-
-  }
 
 }

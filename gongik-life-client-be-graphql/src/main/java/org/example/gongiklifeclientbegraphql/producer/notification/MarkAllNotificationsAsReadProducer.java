@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.producer.notification;
 
 import dto.notification.MarkAllNotificationsAsReadRequestDto;
+import kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,13 +12,13 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MarkAllNotificationsAsReadProducer {
 
-  private static final String TOPIC = "mark-all-notifications-as-read-topic";
-  private final KafkaTemplate<String, Object> kafkaTemplate;
 
-  public void sendMarkAllNotificationsAsReadRequest(
-      MarkAllNotificationsAsReadRequestDto requestDto) {
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    kafkaTemplate.send(TOPIC, requestDto);
-  }
+    public void sendMarkAllNotificationsAsReadRequest(
+            MarkAllNotificationsAsReadRequestDto requestDto) {
+
+        kafkaTemplate.send(KafkaTopics.MARK_ALL_NOTIFICATIONS_AS_READ_TOPIC, requestDto);
+    }
 
 }
