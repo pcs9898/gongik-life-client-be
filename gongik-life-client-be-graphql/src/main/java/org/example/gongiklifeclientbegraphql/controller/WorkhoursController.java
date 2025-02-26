@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.workhours.averageWorkhours.AverageWorkhoursResponseDto;
 import org.example.gongiklifeclientbegraphql.service.workhours.WorkhoursService;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -19,16 +20,11 @@ public class WorkhoursController {
     public AverageWorkhoursResponseDto averageWorkhours(
             DataFetchingEnvironment dataFetchingEnvironment
     ) {
-        try {
+
+        return ControllerExceptionHandlingUtil.handle(() -> {
             String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
             return workhoursService.averageWorkhours(userId);
-
-        } catch (Exception e) {
-            log.error("Failed to get average workhours", e);
-            throw e;
-        }
+        });
     }
-
-
 }

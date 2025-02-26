@@ -4,6 +4,7 @@ import dto.notification.CreateNotificationRequestDto;
 import kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.gongiklifeclientbenotificationservice.service.CreateNotificationService;
 import org.example.gongiklifeclientbenotificationservice.service.NotificationService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CreateNotificationConsumer {
 
     private final NotificationService notificationService;
+    private final CreateNotificationService createNotificationService;
 
     @KafkaListener(topics = KafkaTopics.CREATE_NOTIFICATION_TOPIC)
     @Transactional
@@ -22,7 +24,7 @@ public class CreateNotificationConsumer {
         try {
             log.info("Received CreateNotificationRequestDto: {}", requestDto);
 
-            notificationService.createNotification(requestDto);
+            createNotificationService.createNotification(requestDto);
 
             // Todo: Implement notification logic, send notification
         } catch (Exception e) {
