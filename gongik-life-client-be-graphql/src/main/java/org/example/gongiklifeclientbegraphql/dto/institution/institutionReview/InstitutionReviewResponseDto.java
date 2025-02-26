@@ -34,7 +34,8 @@ public class InstitutionReviewResponseDto {
   private String createdAt;
   private Boolean isLiked;
 
-  public static InstitutionReviewResponseDto fromProto(InstitutionReviewResponse proto) {
+  public static InstitutionReviewResponseDto fromInstitutionReviewResponseProto(
+      InstitutionReviewResponse proto) {
     return InstitutionReviewResponseDto.builder()
         .id(proto.getId())
         .institution(InstitutionShortInfoDto.fromProto(proto.getInstitution()))

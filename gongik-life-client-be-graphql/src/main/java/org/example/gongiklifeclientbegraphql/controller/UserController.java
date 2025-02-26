@@ -1,13 +1,15 @@
 package org.example.gongiklifeclientbegraphql.controller;
 
-import dto.UserToUser.UserLoginHistoryRequestDto;
+import dto.user.UserLoginHistoryRequestDto;
 import graphql.GraphQLContext;
 import graphql.schema.DataFetchingEnvironment;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.user.me.MyProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.sendEmailVerificationCode.SendEmailVerificationCodeRequestDto;
+import org.example.gongiklifeclientbegraphql.dto.user.sendEmailVerificationCode.SendEmailVerificationCodeResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.signUp.ServiceSignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.signUp.SignUpResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.signUp.SignUpUserRequestDto;
@@ -16,8 +18,16 @@ import org.example.gongiklifeclientbegraphql.dto.user.updateProfile.UpdateProfil
 import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.user.userProfile.UserProfileResponseDto;
 import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeRequestDto;
-import org.example.gongiklifeclientbegraphql.service.UserService;
-import org.springframework.graphql.data.method.annotation.Arguments;
+import org.example.gongiklifeclientbegraphql.dto.user.verifyEmailCode.VerifyEmailCodeResponseDto;
+import org.example.gongiklifeclientbegraphql.service.user.MyProfileService;
+import org.example.gongiklifeclientbegraphql.service.user.SendEmailVerificationCodeService;
+import org.example.gongiklifeclientbegraphql.service.user.SignUpService;
+import org.example.gongiklifeclientbegraphql.service.user.UpdateProfileService;
+import org.example.gongiklifeclientbegraphql.service.user.UserProfileService;
+import org.example.gongiklifeclientbegraphql.service.user.UserService;
+import org.example.gongiklifeclientbegraphql.service.user.VerifyEmailCodeService;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
+import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.ContextValue;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -30,87 +40,84 @@ public class UserController {
 
 
   private final UserService userService;
+  private final SendEmailVerificationCodeService sendEmailVerificationCodeService;
+  private final VerifyEmailCodeService verifyEmailCodeService;
+  private final SignUpService signUpService;
+  private final MyProfileService myProfileService;
+  private final UserProfileService userProfileService;
+  private final UpdateProfileService updateProfileService;
 
   @MutationMapping
-  public boolean sendEmailVerificationCode(
-      @Arguments SendEmailVerificationCodeRequestDto requestDto) {
+  public SendEmailVerificationCodeResponseDto sendEmailVerificationCode(
+      @Argument("sendEmailVerificationCodeInput") @Valid SendEmailVerificationCodeRequestDto requestDto) {
 
-    return userService.sendEmailVerificationCode(requestDto);
+    return ControllerExceptionHandlingUtil.handle(
+        () -> sendEmailVerificationCodeService.sendEmailVerificationCode(requestDto));
+
   }
 
   @MutationMapping
-  public boolean verifyEmailCode(
-      @Arguments VerifyEmailCodeRequestDto requestDto) {
+  public VerifyEmailCodeResponseDto verifyEmailCode(
+      @Argument("verifyEmailCodeInput") @Valid VerifyEmailCodeRequestDto requestDto) {
 
-    return userService.verifyEmailCode(requestDto);
+    return ControllerExceptionHandlingUtil.handle(
+        () -> verifyEmailCodeService.verifyEmailCode(requestDto));
+
   }
 
 
   @MutationMapping
   public SignUpResponseDto signUp(
-      @Arguments SignUpUserRequestDto requestDto,
+      @Argument("signUpInput") @Valid SignUpUserRequestDto requestDto,
       GraphQLContext context,
       @ContextValue(name = "request") HttpServletRequest request
   ) {
-    ServiceSignUpResponseDto serviceSignUpResponse = userService.signUp(requestDto);
 
-    context.put("refreshToken", serviceSignUpResponse.getRefreshToken());
+    return ControllerExceptionHandlingUtil.handle(
+        () -> {
+          ServiceSignUpResponseDto serviceSignUpResponse = signUpService.signUp(requestDto);
+          context.put("refreshToken", serviceSignUpResponse.getRefreshToken());
 
-    String ipAddress = getClientIpAddress(request);
+          String ipAddress = getClientIpAddress(request);
+          sendUserLoginHistory(serviceSignUpResponse.getUser().getId(), ipAddress);
 
-    UserLoginHistoryRequestDto userLoginHistoryRequestDto = UserLoginHistoryRequestDto.builder()
-        .userId(serviceSignUpResponse.getUser().getId())
-        .ipAddress(ipAddress)
-        .build();
-
-    userService.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
-
-    return SignUpResponseDto.builder()
-        .user(serviceSignUpResponse.getUser())
-        .accessToken(serviceSignUpResponse.getAccessToken())
-        .accessTokenExpiresAt(serviceSignUpResponse.getAccessTokenExpiresAt())
-        .build();
+          return buildSignUpResponse(serviceSignUpResponse);
+        });
   }
 
   @QueryMapping
   public MyProfileResponseDto myProfile(DataFetchingEnvironment dataFetchingEnvironment) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return userService.myProfile(userId);
-    } catch (Exception e) {
-      log.error("me error: {}", e);
-      throw e;
-    }
+    return ControllerExceptionHandlingUtil.handle(
+        () -> {
+          String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+
+          return myProfileService.myProfile(userId);
+        });
   }
 
   @QueryMapping
   public UserProfileResponseDto userProfile(
-      @Arguments UserProfileRequestDto requestDto
+      @Argument("userProfileInput") @Valid UserProfileRequestDto requestDto
   ) {
-    try {
-      return userService.userProfile(requestDto.getUserId());
-    } catch (Exception e) {
-      log.error("me error: {}", e);
-      throw e;
-    }
+    return ControllerExceptionHandlingUtil.handle(
+        () -> userProfileService.userProfile(requestDto.getUserId()));
+
   }
 
   @MutationMapping
   public UpdateProfileResponseDto updateProfile(
-      @Arguments UpdateProfileRequestDto requestDto,
+      @Argument("updateProfileInput") @Valid UpdateProfileRequestDto requestDto,
       DataFetchingEnvironment dataFetchingEnvironment
   ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    return ControllerExceptionHandlingUtil.handle(
+        () -> {
+          String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      requestDto.setUserId(userId);
+          requestDto.setUserId(userId);
 
-      return userService.updateProfile(requestDto);
-    } catch (Exception e) {
-      log.error("updateProfile error: {}", e);
-      throw e;
-    }
+          return updateProfileService.updateProfile(requestDto);
+        });
   }
 
 
@@ -134,5 +141,20 @@ public class UserController {
     return ipAddress;
   }
 
+  private void sendUserLoginHistory(String userId, String ipAddress) {
+    UserLoginHistoryRequestDto userLoginHistoryRequestDto = UserLoginHistoryRequestDto.builder()
+        .userId(userId)
+        .ipAddress(ipAddress)
+        .build();
+    userService.sendUserLoginHistoryRequest(userLoginHistoryRequestDto);
+  }
+
+  private SignUpResponseDto buildSignUpResponse(ServiceSignUpResponseDto serviceSignUpResponse) {
+    return SignUpResponseDto.builder()
+        .user(serviceSignUpResponse.getUser())
+        .accessToken(serviceSignUpResponse.getAccessToken())
+        .accessTokenExpiresAt(serviceSignUpResponse.getAccessTokenExpiresAt())
+        .build();
+  }
 
 }

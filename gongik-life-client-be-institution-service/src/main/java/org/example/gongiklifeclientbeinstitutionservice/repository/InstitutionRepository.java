@@ -30,12 +30,23 @@ public interface InstitutionRepository extends JpaRepository<Institution, UUID> 
           +
           "FROM institutions i " +
           "WHERE i.name LIKE CONCAT('%', :searchKeyword, '%') " +
-          "  AND (:cursor IS NULL OR i.id > :cursor) " +
-          "ORDER BY i.average_rating DESC " +
+          " AND ( " +
+          " :cursorId IS NULL " +
+          " OR ( " +
+          " i.average_rating < (SELECT i2.average_rating FROM institutions i2 WHERE i2.id = :cursorId) "
+          +
+          " OR ( " +
+          " i.average_rating = (SELECT i2.average_rating FROM institutions i2 WHERE i2.id = :cursorId) "
+          +
+          " AND i.id > :cursorId " +
+          " ) " +
+          " ) " +
+          ") " + // 추가된 괄호
+          "ORDER BY i.average_rating DESC, i.id ASC " +
           "LIMIT :limit", nativeQuery = true)
   List<InstitutionSimpleProjection> searchInstitutions(
       @Param("searchKeyword") String searchKeyword,
-      @Param("cursor") UUID cursor,
+      @Param("cursorId") UUID cursorId,
       @Param("limit") int limit);
 
   @Query("select i.id as id, i.institutionCategory.id as institutionCategoryId, " +

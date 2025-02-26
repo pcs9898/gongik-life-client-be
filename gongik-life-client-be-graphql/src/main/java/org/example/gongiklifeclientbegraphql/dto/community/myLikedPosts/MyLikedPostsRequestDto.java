@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 @Data
 @Builder
@@ -13,20 +14,22 @@ import lombok.NoArgsConstructor;
 public class MyLikedPostsRequestDto {
 
 
-  private String userId;
-  private String cursor;
-  private Integer pageSize;
+    private String userId;
+    private String cursor;
 
-  public MyLikedPostsRequest toProto() {
-    MyLikedPostsRequest.Builder builder = MyLikedPostsRequest.newBuilder()
-        .setUserId(userId)
-        .setPageSize(pageSize);
+    @Range(min = 1, max = 20)
+    private Integer pageSize;
 
-    if (cursor != null) {
-      builder.setCursor(cursor);
+    public MyLikedPostsRequest toMyLikedPostsRequestProto() {
+        MyLikedPostsRequest.Builder builder = MyLikedPostsRequest.newBuilder()
+                .setUserId(userId)
+                .setPageSize(pageSize);
+
+        if (cursor != null) {
+            builder.setCursor(cursor);
+        }
+
+        return builder.build();
     }
-
-    return builder.build();
-  }
 
 }

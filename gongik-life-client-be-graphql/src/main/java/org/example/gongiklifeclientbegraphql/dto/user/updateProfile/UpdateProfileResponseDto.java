@@ -16,7 +16,7 @@ public class UpdateProfileResponseDto {
   private String enlistmentDate;
   private String dischargeDate;
 
-  public static UpdateProfileResponseDto fromProto(
+  public static UpdateProfileResponseDto fromUpdateProfileResponseProto(
       UpdateProfileResponse proto) {
     return UpdateProfileResponseDto.builder()
         .id(proto.getId())

@@ -1,419 +1,202 @@
 package org.example.gongiklifeclientbecommunityservice.grpc;
 
 import com.gongik.communityService.domain.service.CommunityServiceGrpc;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CommentsResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreateCommentResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.CreatePostResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeleteCommentResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.DeletePostResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsCommentRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsCommentResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsPostRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.ExistsPostResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.GetPostResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostAndCommentCountResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsLikedPostResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyCommentsResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyLikedPostsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyLikedPostsResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.MyPostsResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.PostsResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.SearchPostsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.SearchPostsResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdatePostResponse;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsRequest;
-import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UserPostsResponse;
+import com.gongik.communityService.domain.service.CommunityServiceOuterClass.*;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbecommunityservice.producer.DeleteAllCommentsByPostProducer;
 import org.example.gongiklifeclientbecommunityservice.service.CommentService;
-import org.example.gongiklifeclientbecommunityservice.service.PostService;
+import org.example.gongiklifeclientbecommunityservice.service.comment.*;
+import org.example.gongiklifeclientbecommunityservice.service.post.*;
+import util.GrpcServiceExceptionHandlingUtil;
 
 @GrpcService
 @Slf4j
 @RequiredArgsConstructor
 public class CommunityGrpcService extends CommunityServiceGrpc.CommunityServiceImplBase {
 
-  private final DeleteAllCommentsByPostProducer deleteAllCommentsByPostProducer;
-  private final PostService postService;
-  private final CommentService commentService;
+    private final DeleteAllCommentsByPostProducer deleteAllCommentsByPostProducer;
+    private final PostService postService;
+    private final CommentService commentService;
+    private final CreatePostService createPostService;
+    private final UpdatePostService updatePostService;
+    private final DeletePostService deletePostService;
+    private final GetPostService getPostService;
+    private final GetPostsService getPostsService;
+    private final MyPostsService myPostsService;
+    private final UserPostsService userPostsService;
+    private final MyLikedPostsService myLikedPostsService;
+    private final SearchPostsService searchPostsService;
+    private final CreateCommentService createCommentService;
+    private final UpdateCommentService updateCommentService;
+    private final DeleteCommentService deleteCommentService;
+    private final GetCommentsService getCommentsService;
+    private final MyCommentsService myCommentsService;
 
-  @Override
-  public void createPost(CreatePostRequest request,
-      StreamObserver<CreatePostResponse> responseObserver) {
+    @Override
+    public void createPost(CreatePostRequest request,
+                           StreamObserver<CreatePostResponse> responseObserver) {
 
-    try {
-      CreatePostResponse response = postService.createPost(request);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("createPost error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("createPost",
+                () -> createPostService.createPost(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void updatePost(UpdatePostRequest request,
-      StreamObserver<UpdatePostResponse> responseObserver) {
-    try {
-      UpdatePostResponse response = postService.updatePost(request);
+    @Override
+    public void updatePost(UpdatePostRequest request,
+                           StreamObserver<UpdatePostResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("updatePost error : ", e);
+        GrpcServiceExceptionHandlingUtil.handle("updatePost",
+                () -> updatePostService.updatePost(request),
+                responseObserver);
 
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
     }
-  }
 
-  @Override
-  public void isLikedPost(IsLikedPostRequest request,
-      StreamObserver<IsLikedPostResponse> responseObserver) {
+    @Override
+    public void isLikedPost(IsLikedPostRequest request,
+                            StreamObserver<IsLikedPostResponse> responseObserver) {
 
-    try {
-      IsLikedPostResponse response = postService.isLikedPost(request);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("isLikedPost error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("isLikedPost",
+                () -> postService.isLikedPost(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void deletePost(DeletePostRequest request,
-      StreamObserver<DeletePostResponse> responseObserver) {
-    try {
-      DeletePostResponse response = postService.deletePost(request);
+    @Override
+    public void deletePost(DeletePostRequest request,
+                           StreamObserver<DeletePostResponse> responseObserver) {
 
-      deleteAllCommentsByPostProducer.sendDeleteAllCommentsByPostRequest(request.getPostId());
+        GrpcServiceExceptionHandlingUtil.handle("deletePost",
+                () -> {
+                    DeletePostResponse response = deletePostService.deletePost(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("deletePost error : ", e);
+                    deleteAllCommentsByPostProducer.sendDeleteAllCommentsByPostRequest(request.getPostId());
 
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+                    return response;
+                },
+                responseObserver);
     }
-  }
 
-  @Override
-  public void getPost(GetPostRequest request, StreamObserver<GetPostResponse> responseObserver) {
-    try {
-      GetPostResponse response = postService.getPost(request);
+    @Override
+    public void getPost(GetPostRequest request, StreamObserver<GetPostResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("getPost error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("getPost",
+                () -> getPostService.getPost(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void isLikedPostAndCommentCount(IsLikedPostAndCommentCountRequest request,
-      StreamObserver<IsLikedPostAndCommentCountResponse> responseObserver) {
-    try {
-      IsLikedPostAndCommentCountResponse response = postService.isLikedPostAndCommentCount(request);
+    @Override
+    public void isLikedPostAndCommentCount(IsLikedPostAndCommentCountRequest request,
+                                           StreamObserver<IsLikedPostAndCommentCountResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("isLikedPostAndCommentCount error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("isLikedPostAndCommentCount",
+                () -> postService.isLikedPostAndCommentCount(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void posts(PostsRequest request, StreamObserver<PostsResponse> responseObserver) {
-    try {
-      PostsResponse response = postService.posts(request);
+    @Override
+    public void posts(PostsRequest request, StreamObserver<PostsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("posts error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("posts",
+                () -> getPostsService.posts(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void createComment(CreateCommentRequest request,
-      StreamObserver<CreateCommentResponse> responseObserver) {
-    try {
-      CreateCommentResponse response = commentService.createComment(request);
+    @Override
+    public void createComment(CreateCommentRequest request,
+                              StreamObserver<CreateCommentResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("createComment error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("createComment",
+                () -> createCommentService.createComment(request),
+                responseObserver);
     }
-  }
 
+    @Override
+    public void updateComment(UpdateCommentRequest request,
+                              StreamObserver<UpdateCommentResponse> responseObserver) {
 
-  @Override
-  public void updateComment(UpdateCommentRequest request,
-      StreamObserver<UpdateCommentResponse> responseObserver) {
-    try {
-      UpdateCommentResponse response = commentService.updateComment(request);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("updateComment error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("updateComment",
+                () -> updateCommentService.updateComment(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void deleteComment(DeleteCommentRequest request,
-      StreamObserver<DeleteCommentResponse> responseObserver) {
-    try {
-      DeleteCommentResponse response = commentService.deleteComment(request);
+    @Override
+    public void deleteComment(DeleteCommentRequest request,
+                              StreamObserver<DeleteCommentResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("deleteComment error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("deleteComment",
+                () -> deleteCommentService.deleteComment(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void comments(CommentsRequest request, StreamObserver<CommentsResponse> responseObserver) {
-    try {
-      CommentsResponse response = commentService.comments(request);
+    @Override
+    public void comments(CommentsRequest request, StreamObserver<CommentsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("comments error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("comments",
+                () -> getCommentsService.comments(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void myPosts(MyPostsRequest request, StreamObserver<MyPostsResponse> responseObserver) {
-    try {
-      MyPostsResponse response = postService.myPosts(request);
+    @Override
+    public void myPosts(MyPostsRequest request, StreamObserver<MyPostsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("myPosts error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("myPosts",
+                () -> myPostsService.myPosts(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void userPosts(UserPostsRequest request,
-      StreamObserver<UserPostsResponse> responseObserver) {
-    try {
-      UserPostsResponse response = postService.userPosts(request);
+    @Override
+    public void userPosts(UserPostsRequest request,
+                          StreamObserver<UserPostsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("userPosts error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("userPosts",
+                () -> userPostsService.userPosts(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void myLikedPosts(MyLikedPostsRequest request,
-      StreamObserver<MyLikedPostsResponse> responseObserver) {
-    try {
-      MyLikedPostsResponse response = postService.myLikedPosts(request);
+    @Override
+    public void myLikedPosts(MyLikedPostsRequest request,
+                             StreamObserver<MyLikedPostsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("myLikedPosts error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("myLikedPosts",
+                () -> myLikedPostsService.myLikedPosts(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void myComments(MyCommentsRequest request,
-      StreamObserver<MyCommentsResponse> responseObserver) {
-    try {
-      MyCommentsResponse response = commentService.myComments(request);
+    @Override
+    public void myComments(MyCommentsRequest request,
+                           StreamObserver<MyCommentsResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("myComments error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("myComments",
+                () -> myCommentsService.myComments(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void searchPosts(SearchPostsRequest request,
-      StreamObserver<SearchPostsResponse> responseObserver) {
-    try {
-      SearchPostsResponse response = postService.searchPosts(request);
+    @Override
+    public void searchPosts(SearchPostsRequest request,
+                            StreamObserver<SearchPostsResponse> responseObserver) {
 
-      log.info("searchPosts response : {}", response);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("searchPosts error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("searchPosts",
+                () -> searchPostsService.searchPosts(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void existsPost(ExistsPostRequest request,
-      StreamObserver<ExistsPostResponse> responseObserver) {
-    try {
-      ExistsPostResponse response = postService.existsPost(request);
+    @Override
+    public void existsPost(ExistsPostRequest request,
+                           StreamObserver<ExistsPostResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("existsPost error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("existsPost",
+                () -> postService.existsPost(request),
+                responseObserver);
     }
-  }
 
-  @Override
-  public void existsComment(ExistsCommentRequest request,
-      StreamObserver<ExistsCommentResponse> responseObserver) {
-    try {
-      ExistsCommentResponse response = commentService.existsComment(request);
+    @Override
+    public void existsComment(ExistsCommentRequest request,
+                              StreamObserver<ExistsCommentResponse> responseObserver) {
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("existsComment error : ", e);
-
-      responseObserver.onError(
-          io.grpc.Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
+        GrpcServiceExceptionHandlingUtil.handle("existsComment",
+                () -> commentService.existsComment(request),
+                responseObserver);
     }
-  }
 }
