@@ -15,16 +15,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CreateInstitutionReviewService {
 
-  @GrpcClient("gongik-life-client-be-institution-service")
-  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
+    @GrpcClient("gongik-life-client-be-institution-service")
+    private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  public CreateInstitutionReviewResponseDto createInstitutionReview(
-      CreateInstitutionReviewRequestDto requestDto) {
+    public CreateInstitutionReviewResponseDto createInstitutionReview(
+            CreateInstitutionReviewRequestDto requestDto) {
 
-    return ServiceExceptionHandlingUtil.handle("createInstitutionReview", () -> {
-      return CreateInstitutionReviewResponseDto.fromInstitutionReviewResponseProto(
-          institutionBlockingStub.createInstitutionReview(
-              requestDto.toCreateInstitutionReviewRequestProto()));
-    });
-  }
+        return ServiceExceptionHandlingUtil.handle("CreateInstitutionReviewService", () -> {
+            return CreateInstitutionReviewResponseDto.fromInstitutionReviewResponseProto(
+                    institutionBlockingStub.createInstitutionReview(
+                            requestDto.toCreateInstitutionReviewRequestProto()));
+        });
+    }
 }

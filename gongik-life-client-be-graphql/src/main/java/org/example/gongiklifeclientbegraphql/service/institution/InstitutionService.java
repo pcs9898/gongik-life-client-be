@@ -14,33 +14,33 @@ import org.springframework.stereotype.Service;
 public class InstitutionService {
 
 
-  private final LikeInstitutionReviewService InstitutionCacheService;
+    private final LikeInstitutionReviewService InstitutionCacheService;
 
-  @GrpcClient("gongik-life-client-be-institution-service")
-  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
+    @GrpcClient("gongik-life-client-be-institution-service")
+    private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  public Boolean isLikedInstitutionReview(String institutionReviewId, String userId) {
+    public Boolean isLikedInstitutionReview(String institutionReviewId, String userId) {
 
-    return ServiceExceptionHandlingUtil.handle("isLikedInstitutionReview", () -> {
-      return institutionBlockingStub.isLikedInstitutionReview(
-          IsLikedInstitutionReviewRequest.newBuilder()
-              .setInstitutionReviewId(institutionReviewId)
-              .setUserId(userId)
-              .build()
-      ).getIsLiked();
-    });
-  }
+        return ServiceExceptionHandlingUtil.handle("isLikedInstitutionReviewInstitutionService", () -> {
+            return institutionBlockingStub.isLikedInstitutionReview(
+                    IsLikedInstitutionReviewRequest.newBuilder()
+                            .setInstitutionReviewId(institutionReviewId)
+                            .setUserId(userId)
+                            .build()
+            ).getIsLiked();
+        });
+    }
 
 
-  public Integer getMyAverageWorkhours(String userId, String userInstitutionId) {
+    public Integer getMyAverageWorkhours(String userId, String userInstitutionId) {
 
-    return ServiceExceptionHandlingUtil.handle("getMyAverageWorkhours", () -> {
-      return institutionBlockingStub.getMyAverageWorkhours(
-          com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursRequest.newBuilder()
-              .setUserId(userId)
-              .setInstitutionId(userInstitutionId)
-              .build()
-      ).getMyAverageWorkhours();
-    });
-  }
+        return ServiceExceptionHandlingUtil.handle("getMyAverageWorkhoursInstitutionService", () -> {
+            return institutionBlockingStub.getMyAverageWorkhours(
+                    com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.GetMyAverageWorkhoursRequest.newBuilder()
+                            .setUserId(userId)
+                            .setInstitutionId(userInstitutionId)
+                            .build()
+            ).getMyAverageWorkhours();
+        });
+    }
 }

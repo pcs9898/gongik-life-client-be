@@ -18,32 +18,32 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class InstitutionCacheService {
 
-  @GrpcClient("gongik-life-client-be-institution-service")
-  private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
+    @GrpcClient("gongik-life-client-be-institution-service")
+    private InstitutionServiceGrpc.InstitutionServiceBlockingStub institutionBlockingStub;
 
-  @Cacheable(value = "institutionReview", key = "#institutionReviewId")
-  public InstitutionReviewResponseDto getInstitutionReview(String institutionReviewId) {
+    @Cacheable(value = "institutionReview", key = "#institutionReviewId")
+    public InstitutionReviewResponseDto getInstitutionReview(String institutionReviewId) {
 
-    return ServiceExceptionHandlingUtil.handle("institutionReview", () -> {
-      return InstitutionReviewResponseDto.fromInstitutionReviewResponseProto(
-          institutionBlockingStub.institutionReview(
-              InstitutionReviewRequest.newBuilder().setInstitutionReviewId(institutionReviewId)
-                  .build()
-          ));
-    });
-  }
+        return ServiceExceptionHandlingUtil.handle("InstitutionCacheService", () -> {
+            return InstitutionReviewResponseDto.fromInstitutionReviewResponseProto(
+                    institutionBlockingStub.institutionReview(
+                            InstitutionReviewRequest.newBuilder().setInstitutionReviewId(institutionReviewId)
+                                    .build()
+                    ));
+        });
+    }
 
-  @Cacheable(value = "institution", key = "#institutionId")
-  public InstitutionResponseDto getInstitution(String institutionId) {
+    @Cacheable(value = "institution", key = "#institutionId")
+    public InstitutionResponseDto getInstitution(String institutionId) {
 
-    return ServiceExceptionHandlingUtil.handle("institution", () -> {
-      return InstitutionResponseDto.fromInstitutionResponseProto(
-          institutionBlockingStub.institution(
-              InstitutionRequest.newBuilder().setInstitutionId(institutionId)
-                  .build()
-          ));
-    });
+        return ServiceExceptionHandlingUtil.handle("institution", () -> {
+            return InstitutionResponseDto.fromInstitutionResponseProto(
+                    institutionBlockingStub.institution(
+                            InstitutionRequest.newBuilder().setInstitutionId(institutionId)
+                                    .build()
+                    ));
+        });
 
-  }
+    }
 }
 

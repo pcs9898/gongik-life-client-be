@@ -12,13 +12,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateCommentResponseDto {
 
-  private String id;
-  private Boolean success;
+    private String id;
+    private Boolean success;
 
-  public static UpdateCommentResponseDto fromProto(UpdateCommentResponse comment) {
-    return UpdateCommentResponseDto.builder()
-        .id(comment.getId())
-        .success(comment.getSuccess())
-        .build();
-  }
+    public static UpdateCommentResponseDto fromUpdateCommentResponseProto(UpdateCommentResponse comment) {
+        return UpdateCommentResponseDto.builder()
+                .id(comment.getId())
+                .success(comment.getSuccess())
+                .build();
+    }
 }

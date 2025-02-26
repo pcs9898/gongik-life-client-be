@@ -1,6 +1,7 @@
 package org.example.gongiklifeclientbegraphql.dto.community.updateComment;
 
 import com.gongik.communityService.domain.service.CommunityServiceOuterClass.UpdateCommentRequest;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,15 +13,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UpdateCommentRequestDto {
 
-  private String userId;
-  private String commentId;
-  private String content;
+    private String userId;
 
-  public UpdateCommentRequest toProto() {
-    return UpdateCommentRequest.newBuilder()
-        .setUserId(userId)
-        .setCommentId(commentId)
-        .setContent(content)
-        .build();
-  }
+    @NotBlank
+    private String commentId;
+
+    @NotBlank
+    private String content;
+
+    public UpdateCommentRequest toUpdateCommentRequestProto() {
+        return UpdateCommentRequest.newBuilder()
+                .setUserId(userId)
+                .setCommentId(commentId)
+                .setContent(content)
+                .build();
+    }
 }
