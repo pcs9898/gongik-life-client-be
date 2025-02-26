@@ -31,7 +31,8 @@ public class CreateInstitutionReviewResponseDto {
   private int likeCount;
   private String createdAt;
 
-  public static CreateInstitutionReviewResponseDto fromProto(InstitutionReviewResponse proto) {
+  public static CreateInstitutionReviewResponseDto fromInstitutionReviewResponseProto(
+      InstitutionReviewResponse proto) {
     return CreateInstitutionReviewResponseDto.builder()
         .id(proto.getId())
         .institution(InstitutionShortInfoDto.fromProto(proto.getInstitution()))

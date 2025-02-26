@@ -13,22 +13,22 @@ import org.hibernate.validator.constraints.Range;
 @AllArgsConstructor
 public class MyNotificationsRequestDto {
 
-  private String userId;
+    private String userId;
 
-  private String cursor;
+    private String cursor;
 
-  @Range(min = 1, max = 20)
-  private Integer pageSize;
+    @Range(min = 1, max = 20)
+    private Integer pageSize;
 
-  public MyNotificationsRequest toProto() {
-    MyNotificationsRequest.Builder builder = MyNotificationsRequest.newBuilder()
-        .setUserId(userId)
-        .setPageSize(pageSize);
+    public MyNotificationsRequest toMyNotificationsRequestProto() {
+        MyNotificationsRequest.Builder builder = MyNotificationsRequest.newBuilder()
+                .setUserId(userId)
+                .setPageSize(pageSize);
 
-    if (cursor != null) {
-      builder.setCursor(cursor);
+        if (cursor != null) {
+            builder.setCursor(cursor);
+        }
+
+        return builder.build();
     }
-
-    return builder.build();
-  }
 }

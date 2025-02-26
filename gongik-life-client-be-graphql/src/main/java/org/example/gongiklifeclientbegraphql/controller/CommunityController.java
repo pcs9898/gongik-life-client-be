@@ -4,6 +4,7 @@ import com.gongik.communityService.domain.service.CommunityServiceOuterClass.IsL
 import dto.community.LikePostRequestDto;
 import dto.community.UnLikePostRequestDto;
 import graphql.schema.DataFetchingEnvironment;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.gongiklifeclientbegraphql.dto.common.PostResponseDto;
@@ -34,8 +35,8 @@ import org.example.gongiklifeclientbegraphql.dto.community.updateComment.UpdateC
 import org.example.gongiklifeclientbegraphql.dto.community.updatepost.UpdatePostRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsRequestDto;
 import org.example.gongiklifeclientbegraphql.dto.community.userPosts.UserPostsResponseDto;
-import org.example.gongiklifeclientbegraphql.service.CommunityCacheService;
-import org.example.gongiklifeclientbegraphql.service.CommunityService;
+import org.example.gongiklifeclientbegraphql.service.community.*;
+import org.example.gongiklifeclientbegraphql.util.ControllerExceptionHandlingUtil;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -46,300 +47,277 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class CommunityController {
 
-  private final CommunityService communityService;
-  private final CommunityCacheService communityCacheService;
+    private final CommunityService communityService;
+    private final CommunityCacheService communityCacheService;
+    private final CreatePostService createPostService;
+    private final LikePostService likePostService;
+    private final UnLikePostService unLikePostService;
+    private final PostsService postsService;
+    private final CreateCommentService createCommentService;
+    private final UpdateCommentService updateCommentService;
+    private final DeleteCommentService deleteCommentService;
+    private final CommentsService commentsService;
+    private final MyPostsService myPostsService;
+    private final UserPostsService userPostsService;
+    private final MyLikedPostsService myLikedPostsService;
+    private final MyCommentsService myCommentsService;
+    private final SearchPostsService searchPostsService;
 
-  @MutationMapping
-  public PostResponseDto createPost(
-      @Argument("createPostInput") CreatePostRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
+    @MutationMapping
+    public PostResponseDto createPost(
+            @Argument("createPostInput") @Valid CreatePostRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      requestDto.setUserId(userId);
+            requestDto.setUserId(userId);
 
-      return communityService.createPost(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get userId from dataFetchingEnvironment", e);
-      throw e;
+            return createPostService.createPost(requestDto);
+        });
     }
-  }
 
-  @MutationMapping
-  public PostResponseDto updatePost(
-      @Argument("updatePostInput") UpdatePostRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public PostResponseDto updatePost(
+            @Argument("updatePostInput") @Valid UpdatePostRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      PostResponseDto updatedPostResponse = communityCacheService.updatePost(requestDto);
+            requestDto.setUserId(userId);
 
-      Boolean isLiked = communityService.isLikedPost(requestDto.getPostId(), userId);
+            PostResponseDto updatedPostResponse = communityCacheService.updatePost(requestDto);
 
-      updatedPostResponse.setIsLiked(isLiked);
+            Boolean isLiked = communityService.isLikedPost(requestDto.getPostId(), userId);
 
-      return updatedPostResponse;
+            updatedPostResponse.setIsLiked(isLiked);
 
-    } catch (Exception e) {
-      log.error("Failed to update post", e);
-      throw e;
+            return updatedPostResponse;
+        });
     }
-  }
 
-  @MutationMapping
-  public DeletePostResponseDto deletePost(
-      @Argument("deletePostInput") DeletePostRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public DeletePostResponseDto deletePost(
+            @Argument("deletePostInput") @Valid DeletePostRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityCacheService.deletePost(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to delete post", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return communityCacheService.deletePost(requestDto);
+        });
     }
-  }
 
-  @MutationMapping()
-  public LikePostResponseDto likePost(
-      @Argument("likePostInput") LikePostRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping()
+    public LikePostResponseDto likePost(
+            @Argument("likePostInput") LikePostRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.likePost(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to like post", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return likePostService.likePost(requestDto);
+        });
     }
-  }
 
-  @MutationMapping
-  public UnLikePostResponseDto unLikePost(
-      @Argument("unLikePostInput") UnLikePostRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public UnLikePostResponseDto unLikePost(
+            @Argument("unLikePostInput") UnLikePostRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.unLikePost(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to unLike post", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return unLikePostService.unLikePost(requestDto);
+        });
     }
-  }
 
-  @QueryMapping
-  public PostResponseDto post(
-      @Argument("postInput") PostRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public PostResponseDto post(
+            @Argument("postInput") @Valid PostRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      if (!"-1".equals(userId)) {
-        requestDto.setUserId(userId);
-      }
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      PostResponseDto postResponse = communityCacheService.getPost(requestDto.getPostId());
+            if (!"-1".equals(userId)) {
+                requestDto.setUserId(userId);
+            }
 
-      IsLikedPostAndCommentCountResponse isLikedPostAndCommentCountResponse = communityService.isLikedPostAndCommentCount(
-          requestDto);
+            PostResponseDto postResponse = communityCacheService.getPost(requestDto.getPostId());
 
-      postResponse.setIsLiked(isLikedPostAndCommentCountResponse.getIsLiked());
+            IsLikedPostAndCommentCountResponse isLikedPostAndCommentCountResponse = communityService.isLikedPostAndCommentCount(
+                    requestDto);
 
-      postResponse.setCommentCount(isLikedPostAndCommentCountResponse.getCommentCount());
+            postResponse.setIsLiked(isLikedPostAndCommentCountResponse.getIsLiked());
 
-      return postResponse;
-    } catch (Exception e) {
-      log.error("Failed to get post", e);
-      throw e;
+            postResponse.setCommentCount(isLikedPostAndCommentCountResponse.getCommentCount());
+
+            return postResponse;
+        });
     }
-  }
 
-  @QueryMapping
-  public PostsResponseDto posts(
-      @Argument("postsFilter") PostsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public PostsResponseDto posts(
+            @Argument("postsFilter") @Valid PostsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      if (!"-1".equals(userId)) {
-        requestDto.setUserId(userId);
-      }
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.posts(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get posts", e);
-      throw e;
+            if (!"-1".equals(userId)) {
+                requestDto.setUserId(userId);
+            }
+
+            return postsService.posts(requestDto);
+        });
     }
-  }
 
-  @MutationMapping
-  public CreateCommentResponseDto createComment(
-      @Argument("createCommentInput") CreateCommentRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public CreateCommentResponseDto createComment(
+            @Argument("createCommentInput") @Valid CreateCommentRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.createComment(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to create comment", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return createCommentService.createComment(requestDto);
+        });
     }
-  }
 
 
-  @MutationMapping
-  public UpdateCommentResponseDto updateComment(
-      @Argument("updateCommentInput") UpdateCommentRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public UpdateCommentResponseDto updateComment(
+            @Argument("updateCommentInput") @Valid UpdateCommentRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.updateComment(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to update comment", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return updateCommentService.updateComment(requestDto);
+        });
     }
-  }
 
-  @MutationMapping
-  public DeleteCommentResponseDto deleteComment(
-      @Argument("deleteCommentInput") DeleteCommentRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @MutationMapping
+    public DeleteCommentResponseDto deleteComment(
+            @Argument("deleteCommentInput") @Valid DeleteCommentRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.deleteComment(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to delete comment", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return deleteCommentService.deleteComment(requestDto);
+        });
     }
-  }
 
 
-  @QueryMapping
-  public CommentsResponseDto comments(
-      @Argument("commentsInput") CommentsRequestDto requestDto
-  ) {
-    try {
+    @QueryMapping
+    public CommentsResponseDto comments(
+            @Argument("commentsInput") @Valid CommentsRequestDto requestDto
+    ) {
 
-      return communityService.comments(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get comments", e);
-      throw e;
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            return commentsService.comments(requestDto);
+        });
     }
-  }
 
-  @QueryMapping
-  public MyPostsResponseDto myPosts(
-      @Argument("myPostsFilter") MyPostsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public MyPostsResponseDto myPosts(
+            @Argument("myPostsFilter") @Valid MyPostsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.myPosts(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get my posts", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return myPostsService.myPosts(requestDto);
+        });
     }
-  }
 
-  @QueryMapping
-  public UserPostsResponseDto userPosts(
-      @Argument("userPostsFilter") UserPostsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String myUserId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public UserPostsResponseDto userPosts(
+            @Argument("userPostsFilter") @Valid UserPostsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setMyUserId(myUserId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String myUserId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.userPosts(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get user posts", e);
-      throw e;
+            requestDto.setMyUserId(myUserId);
+
+            return userPostsService.userPosts(requestDto);
+        });
     }
-  }
 
-  @QueryMapping
-  public MyLikedPostsResponseDto myLikedPosts(
-      @Argument("myLikedPostsFilter") MyLikedPostsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public MyLikedPostsResponseDto myLikedPosts(
+            @Argument("myLikedPostsFilter") @Valid MyLikedPostsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.myLikedPosts(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get my liked posts", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return myLikedPostsService.myLikedPosts(requestDto);
+        });
     }
-  }
 
-  @QueryMapping
-  public MyCommentsResponseDto myComments(
-      @Argument("myCommentsFilter") MyCommentsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public MyCommentsResponseDto myComments(
+            @Argument("myCommentsFilter") @Valid MyCommentsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      requestDto.setUserId(userId);
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.myComments(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to get my comments", e);
-      throw e;
+            requestDto.setUserId(userId);
+
+            return myCommentsService.myComments(requestDto);
+        });
     }
-  }
 
-  @QueryMapping
-  public SearchPostsResponseDto searchPosts(
-      @Argument("searchPostsFilter") SearchPostsRequestDto requestDto,
-      DataFetchingEnvironment dataFetchingEnvironment
-  ) {
-    try {
-      String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
+    @QueryMapping
+    public SearchPostsResponseDto searchPosts(
+            @Argument("searchPostsFilter") @Valid SearchPostsRequestDto requestDto,
+            DataFetchingEnvironment dataFetchingEnvironment
+    ) {
 
-      if (!"-1".equals(userId)) {
-        requestDto.setUserId(userId);
-      }
+        return ControllerExceptionHandlingUtil.handle(() -> {
+            String userId = dataFetchingEnvironment.getGraphQlContext().get("X-USER-ID");
 
-      return communityService.searchPosts(requestDto);
-    } catch (Exception e) {
-      log.error("Failed to search posts", e);
-      throw e;
+            if (!"-1".equals(userId)) {
+                requestDto.setUserId(userId);
+            }
+
+            return searchPostsService.searchPosts(requestDto);
+        });
     }
-  }
-
 }

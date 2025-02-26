@@ -30,6 +30,16 @@ public class SecurityConfig {
             .requestMatchers("/api/auth/refreshAccessToken").permitAll()
             .requestMatchers("/api/auth/validateAccessToken").permitAll()
             .requestMatchers("/api/auth/signOut").permitAll()
+            .requestMatchers(
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+                "/swagger-resources/**",
+                "/v3/api-docs/**",
+                "/webjars/**",
+                "/swagger-resources",
+                "/swagger-resources/configuration/ui",
+                "/swagger-resources/configuration/security"
+            ).permitAll()
             .anyRequest().authenticated()
         )
 //        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

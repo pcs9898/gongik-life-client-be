@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DeletePostResponseDto {
 
-  private String postId;
-  private Boolean success;
+    private String postId;
+    private Boolean success;
 
-  public static DeletePostResponseDto fromProto(DeletePostResponse proto, String postId) {
-    return DeletePostResponseDto.builder()
-        .postId(postId)
-        .success(proto.getSuccess())
-        .build();
-  }
+    public static DeletePostResponseDto fromDeletePostResponseProto(DeletePostResponse proto, String postId) {
+        return DeletePostResponseDto.builder()
+                .postId(postId)
+                .success(proto.getSuccess())
+                .build();
+    }
 
 }

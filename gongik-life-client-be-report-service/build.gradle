@@ -59,6 +59,7 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     implementation project(':gongik-life-client-be-kafka-common-dto')
+    implementation project(':gongik-life-client-be-common')
 }
 
 dependencyManagement {

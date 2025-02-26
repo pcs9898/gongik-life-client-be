@@ -30,14 +30,23 @@ import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.MyInstitutionReviewsResponse;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsRequest;
 import com.gongik.institutionService.domain.service.InstitutionServiceOuterClass.SearchInstitutionsResponse;
-import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.example.gongiklifeclientbeinstitutionservice.dto.InstitutionForWorkHoursStatisticsProjection;
+import org.example.gongiklifeclientbeinstitutionservice.service.CreateInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.DeleteInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.GetInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.GetInstitutionReviewsService;
+import org.example.gongiklifeclientbeinstitutionservice.service.GetInstitutionService;
+import org.example.gongiklifeclientbeinstitutionservice.service.InstitutionReviewsByInstitutionService;
 import org.example.gongiklifeclientbeinstitutionservice.service.InstitutionService;
+import org.example.gongiklifeclientbeinstitutionservice.service.LikeInstitutionReviewService;
+import org.example.gongiklifeclientbeinstitutionservice.service.MyInstitutionReviewsService;
+import org.example.gongiklifeclientbeinstitutionservice.service.SearchInstitutionService;
+import util.GrpcServiceExceptionHandlingUtil;
 
 @GrpcService
 @Slf4j
@@ -45,272 +54,131 @@ import org.example.gongiklifeclientbeinstitutionservice.service.InstitutionServi
 public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionServiceImplBase {
 
   private final InstitutionService institutionService;
+  private final SearchInstitutionService searchInstitutionService;
+  private final GetInstitutionService getInstitutionService;
+  private final CreateInstitutionReviewService createInstitutionReviewService;
+  private final DeleteInstitutionReviewService deleteInstitutionReviewService;
+  private final LikeInstitutionReviewService likeInstitutionReviewService;
+  private final GetInstitutionReviewService getInstitutionReviewService;
+  private final GetInstitutionReviewsService getInstitutionReviewsService;
+  private final MyInstitutionReviewsService myInstitutionReviewsService;
+  private final InstitutionReviewsByInstitutionService institutionReviewsByInstitutionService;
 
   @Override
   public void searchInstitutions(SearchInstitutionsRequest request,
       StreamObserver<SearchInstitutionsResponse> responseObserver) {
-
-    try {
-      SearchInstitutionsResponse response = institutionService.searchInstitutions(request);
-
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("searchInstitutions error : ", e);
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("searchInstitutions",
+        () -> searchInstitutionService.searchInstitutions(request),
+        responseObserver);
   }
 
   @Override
   public void getInstitutionName(GetInstitutionNameRequest request,
       StreamObserver<GetInstitutionNameResponse> responseObserver) {
-    try {
-      GetInstitutionNameResponse response = institutionService.getInstitutionName(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("getInstitutionName error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("getInstitutionName",
+        () -> institutionService.getInstitutionName(request),
+        responseObserver);
   }
 
   @Override
   public void institution(InstitutionRequest request,
       StreamObserver<InstitutionResponse> responseObserver) {
-    try {
-      InstitutionResponse response = institutionService.institution(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("institution error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("institution",
+        () -> getInstitutionService.institution(request),
+        responseObserver);
   }
 
   @Override
   public void createInstitutionReview(CreateInstitutionReviewRequest request,
       StreamObserver<InstitutionReviewResponse> responseObserver) {
-    try {
-      InstitutionReviewResponse response = institutionService.createInstitutionReview(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("createInstitutionReview error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-
-    }
+    GrpcServiceExceptionHandlingUtil.handle("createInstitutionReview",
+        () -> createInstitutionReviewService.createInstitutionReview(request),
+        responseObserver);
   }
 
   @Override
   public void deleteInstitutionReview(DeleteInstitutionReviewRequest request,
       StreamObserver<DeleteInstitutionReviewResponse> responseObserver) {
-    try {
-      DeleteInstitutionReviewResponse response = institutionService.deleteInstitutionReview(
-          request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("deleteInstitutionReview error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("deleteInstitutionReview",
+        () -> deleteInstitutionReviewService.deleteInstitutionReview(request),
+        responseObserver);
   }
 
   @Override
   public void institutionReview(InstitutionReviewRequest request,
       StreamObserver<InstitutionReviewResponse> responseObserver) {
-    try {
-      InstitutionReviewResponse response = institutionService.institutionReview(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("institutionReview error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("institutionReview",
+        () -> getInstitutionReviewService.institutionReview(request),
+        responseObserver);
   }
 
   @Override
   public void isLikedInstitutionReview(IsLikedInstitutionReviewRequest request,
       StreamObserver<IsLikedInstitutionReviewResponse> responseObserver) {
-    try {
-      IsLikedInstitutionReviewResponse response = institutionService.isLikedInstitutionReview(
-          request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("isLikedInstitutionReview error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("isLikedInstitutionReview",
+        () -> institutionService.isLikedInstitutionReview(request),
+        responseObserver);
   }
 
   @Override
   public void institutionReviews(InstitutionReviewsRequest request,
       StreamObserver<InstitutionReviewsResponse> responseObserver) {
-    try {
-      InstitutionReviewsResponse response = institutionService.institutionReviews(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("institutionReviews error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("institutionReviews",
+        () -> getInstitutionReviewsService.institutionReviews(request),
+        responseObserver);
   }
 
 
   @Override
   public void myInstitutionReviews(MyInstitutionReviewsRequest request,
       StreamObserver<MyInstitutionReviewsResponse> responseObserver) {
-    try {
-      MyInstitutionReviewsResponse response = institutionService.myInstitutionReviews(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("myInstitutionReviews error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("myInstitutionReviews",
+        () -> myInstitutionReviewsService.myInstitutionReviews(request),
+        responseObserver);
   }
 
   @Override
   public void institutionReviewsByInstitution(InstitutionReviewsByInstitutionRequest request,
       StreamObserver<InstitutionReviewsByInstitutionResponse> responseObserver) {
-    try {
-      InstitutionReviewsByInstitutionResponse response = institutionService
-          .institutionReviewsByInstitution(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("institutionReviewsByInstitution error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("institutionReviewsByInstitution",
+        () -> institutionReviewsByInstitutionService.institutionReviewsByInstitution(request),
+        responseObserver);
   }
 
   @Override
   public void getInstitutionReviewCount(GetInstitutionReviewCountRequest request,
       StreamObserver<GetInstitutionReviewCountResponse> responseObserver) {
-    try {
-      GetInstitutionReviewCountResponse response = institutionService.getInstitutionReviewCount(
-          request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("getInstitutionReviewCount error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("getInstitutionReviewCount",
+        () -> institutionService.getInstitutionReviewCount(request),
+        responseObserver);
   }
 
   @Override
   public void existsInstitution(ExistsInstitutionRequest request,
       StreamObserver<ExistsInstitutionResponse> responseObserver) {
-    try {
-      ExistsInstitutionResponse response = institutionService.existsInstitution(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("existsInstitution error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("existsInstitution",
+        () -> institutionService.existsInstitution(request),
+        responseObserver);
   }
 
   @Override
   public void existsInstitutionReview(ExistsInstitutionReviewRequest request,
       StreamObserver<ExistsInstitutionReviewResponse> responseObserver) {
-    try {
-      ExistsInstitutionReviewResponse response = institutionService.existsInstitutionReview(
-          request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("existsInstitutionReview error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("existsInstitutionReview",
+        () -> institutionService.existsInstitutionReview(request),
+        responseObserver);
   }
 
   @Override
@@ -348,20 +216,9 @@ public class InstitutionGrpcService extends InstitutionServiceGrpc.InstitutionSe
   @Override
   public void getMyAverageWorkhours(GetMyAverageWorkhoursRequest request,
       StreamObserver<GetMyAverageWorkhoursResponse> responseObserver) {
-    try {
-      GetMyAverageWorkhoursResponse response = institutionService.getMyAverageWorkhours(request);
 
-      responseObserver.onNext(response);
-      responseObserver.onCompleted();
-    } catch (Exception e) {
-      log.info("getMyAverageWorkhours error : ", e);
-
-      responseObserver.onError(
-          Status.INTERNAL
-              .withDescription(e.getMessage())
-              .withCause(e)  // 원인 예외 포함
-              .asRuntimeException()
-      );
-    }
+    GrpcServiceExceptionHandlingUtil.handle("getMyAverageWorkhours",
+        () -> institutionService.getMyAverageWorkhours(request),
+        responseObserver);
   }
 }
