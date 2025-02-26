@@ -11,4 +11,8 @@ public class KafkaTopics {
     public static final String UNLIKE_POST_TOPIC = "unlike-post-topic";
     public static final String DELETE_ALL_COMMENTS_BY_POST_TOPIC = "delete-all-comments-by-post-topic";
     public static final String CREATE_NOTIFICATION_TOPIC = "create-notification-topic";
+    public static final String DELETE_ALL_NOTIFICATION_TOPIC = "delete-all-notifications-topic";
+    public static final String DELETE_NOTIFICATION_TOPIC = "delete-notification-topic";
+    public static final String MARK_ALL_NOTIFICATIONS_AS_READ_TOPIC = "mark-all-notifications-as-read-topic";
+    public static final String MARK_NOTIFICATION_AS_READ_TOPIC = "mark-notification-as-read-topic";
 }

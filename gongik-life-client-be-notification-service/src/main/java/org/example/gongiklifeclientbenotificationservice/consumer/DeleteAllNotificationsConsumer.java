@@ -1,9 +1,10 @@
 package org.example.gongiklifeclientbenotificationservice.consumer;
 
 import dto.notification.DeleteAllNotificationsRequestDto;
+import kafka.KafkaTopics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.gongiklifeclientbenotificationservice.service.NotificationService;
+import org.example.gongiklifeclientbenotificationservice.service.DeleteAllNotificationsService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -12,19 +13,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class DeleteAllNotificationsConsumer {
 
-  private final NotificationService notificationService;
 
-  @KafkaListener(topics = "delete-all-notifications-topic")
-  public void consume(DeleteAllNotificationsRequestDto requestDto) {
-    try {
-      log.info("Received DeleteAllNotificationsRequestDto: {}", requestDto);
+    private final DeleteAllNotificationsService deleteAllNotificationsService;
 
-      notificationService.deleteAllNotifications(requestDto);
-    } catch (Exception e) {
-      log.error("Error processing delete all notifications message: {}", requestDto, e);
-      throw e;
+    @KafkaListener(topics = KafkaTopics.DELETE_ALL_NOTIFICATION_TOPIC)
+    public void consume(DeleteAllNotificationsRequestDto requestDto) {
+        try {
+            log.info("Received DeleteAllNotificationsRequestDto: {}", requestDto);
+
+            deleteAllNotificationsService.deleteAllNotifications(requestDto);
+        } catch (Exception e) {
+            log.error("Error processing delete all notifications message: {}", requestDto, e);
+            throw e;
+        }
     }
-  }
 
 
 }
