@@ -14,9 +14,9 @@
 api 보시라고 배포해둔 상태이나 msa프로젝트라 aws or gcp에 배포하기엔 금액적인 부담이 있어 홈서버에 배포해두었습니다.
 홈서버라 불안정한 면이 있어 우선 서버 상태를 확인하시고 swagger, graphiql로 api를 확인하시기 바랍니다.
 
-- [Eureka Discovery] https://clientbediscovery.gongik.shop
-- [Swagger Rest Api(Only Auth service)] https://clientbe.gongik.shop/swagger-ui/index.html
-- [Graphiql Api] https://clientbe.gongik.shop/graphiql
+- [Eureka Discovery](https://clientbediscovery.gongik.shop)
+- [Swagger Rest Api(Only Auth service)](https://clientbe.gongik.shop/swagger-ui/index.html)
+- [Graphiql Api](https://clientbe.gongik.shop/graphiql)
 
 ## 제작 기간 📅 && 참여 인원 🧑‍🤝‍🧑
 
