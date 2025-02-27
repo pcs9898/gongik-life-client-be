@@ -6,102 +6,102 @@ scalar Date
 
 type Query {
     """
-    Search institutions
+    Search institutions, 복무지 검색하는 API입니다.(커서 페이징)
     """
     searchInstitutions(searchInstitutionsFilter: SearchInstitutionsFilter!): SearchInstitutionsResponse!
 
     """
-    Get my profile, need to sign in
+    Get my profile, need to sign in, 내 프로필 조회하는 API입니다.
     """
     myProfile: MyProfileResponse! @authenticate
 
     """
-    Get user profile
+    Get user profile, 유저 프로필 조회하는 API입니다.
     """
     userProfile(userProfileInput: UserProfileInput!): UserProfileResponse!
 
     """
-    Get institution
+    Get institution, 복무지 조회하는 API입니다.
     """
     institution(institutionInput: InstitutionInput!): InstitutionResponse!
 
     """
-    Get institution review
+    Get institution review, 복무지 리뷰 조회하는 API입니다.
     """
     institutionReview(institutionReviewInput: InstitutionReviewInput!): InstitutionReview!
 
     """
-    Get institution reviews with cursor pagination
+    Get institution reviews with cursor pagination, 복무지 리뷰 목록 조회하는 API입니다. (커서 페이징, 카테고리 적용)
     """
     institutionReviews(institutionReviewsFilter: InstitutionReviewsFilter!): InstitutionReviewsResponse!
 
     """
-    Get my institution reviews, need to sign in
+    Get my institution reviews, need to sign in, 내 복무지 리뷰 목록 조회하는 API입니다.
     """
     myInstitutionReviews: MyInstitutionReviewsResponse @authenticate
 
     """
-    Get institution reviews by institution
+    Get institution reviews by institution, 복무지별 리뷰 목록 조회하는 API입니다. (커서 페이징)
     """
     institutionReviewsByInstitution(institutionReviewsByInstitutionFilter: InstitutionReviewsByInstitutionFilters!): InstitutionReviewsByInstitutionResponse!
 
     """
-    Get post
+    Get post, 포스트 조회하는 API입니다.
     """
     post(postInput: PostInput!): PostResponse!
 
     """
-    Get posts with cursor pagination
+    Get posts with cursor pagination, 포스트 목록 조회하는 API입니다. (커서 페이징, 카테고리 적용)
     """
     posts(postsFilter: PostsFilter!): PostsResponse!
 
     """
-    Get comments by post
+    Get comments by post, 포스트 댓글 목록 조회하는 API입니다.
     """
     comments(commentsInput: CommentsInput!): CommentsResponse!
 
     """
-    Get my posts with cursor pagination, need to sign in
+    Get my posts with cursor pagination, need to sign in, 내 포스트 목록 조회하는 API입니다. (커서 페이징)
     """
     myPosts(myPostsFilter: MyPostsFilter!): MyPostsResponse! @authenticate
 
     """
-    Get user posts with cursor pagination
+    Get user posts with cursor pagination, 유저 포스트 목록 조회하는 API입니다. (커서 페이징)
     """
     userPosts(userPostsFilter: UserPostsFilter!): UserPostsResponse!
 
     """
-    Get my liked posts with cursor pagination, need to sign in
+    Get my liked posts with cursor pagination, need to sign in, 내가 좋아요한 포스트 목록 조회하는 API입니다. (커서 페이징)
     """
     myLikedPosts(myLikedPostsFilter: MyLikedPostsFilter!): MyLikedPostsResponse! @authenticate
 
     """
-    Get my comments with cursor pagination, need to sign in
+    Get my comments with cursor pagination, need to sign in, 내 댓글 목록 조회하는 API입니다. (커서 페이징)
     """
     myComments(myCommentsFilter: MyCommentsFilter!): MyCommentsResponse! @authenticate
 
     """
-    Search posts with cursor pagination
+    Search posts with cursor pagination, 포스트 검색하는 API입니다. (커서 페이징, 카테고리 적용)
     """
     searchPosts(searchPostsFilter: SearchPostsFilter!): SearchPostsResponse!
 
     """
-    Get my report, need to sign in
+    Get my report, need to sign in, 내 신고글 조회하는 API입니다.
     """
     report(reportInput: ReportInput!): ReportResponse! @authenticate
 
     """
-    Get my reports with cursor pagination, need to sign in
+    Get my reports with cursor pagination, need to sign in, 내 신고글 목록 조회하는 API입니다. (커서 페이징)
     """
     myReports(myReportsFilter: MyReportsFilter!): MyReportsResponse! @authenticate
 
     """
-    Get average workhours with my average workhours, need to sign in
+    Get average workhours with my average workhours, need to sign in, 내 평균 근무시간과 복무지 평균 근무시간 조회하는 API입니다.
     """
     averageWorkhours: AverageWorkhoursResponse! @authenticate
 
     """
-    Get my notifications with cursor pagination, need to sign in
+    Get my notifications with cursor pagination, need to sign in, 내 알림 목록 조회하는 API입니다. (커서 페이징)
     """
     myNotifications(myNotificationsFilter:MyNotificationsFilter!):  MyNotificationsResponse! @authenticate
 }
@@ -109,124 +109,124 @@ type Query {
 
 type Mutation{
     """
-    Send email verification code for sign up
+    Send email verification code for sign up, 회원가입을 위해 이메일 인증코드를 전송하는 API입니다.
     """
     sendEmailVerificationCode(sendEmailVerificationCodeInput: SendEmailVerificationCodeInput!): SendEmailVerificationCodeResponse!
 
     """
-    Verify email code for sign up, code length is 6
+    Verify email code for sign up, code length is 6, 회원가입을 위해 이메일 인증코드를 검증하는 API입니다.
     """
     verifyEmailCode(verifyEmailCodeInput: VerifyEmailCodeInput!): VerifyEmailCodeResponse!
 
     """
-    Sign up
+    Sign up, 회원가입하는 API입니다. 복무지정보를 입력할려면 소집일자, 소집해제일자도 필수로 입력해야 합니다.
     """
     signUp(signUpInput: SignUpInput!): SignUpResponse!
 
     """
-    Update my profile, need to sign in
+    Update my profile, need to sign in, 내 프로필 수정하는 API입니다. 복무지정보를 입력할려면 소집일자, 소집해제일자도 필수로 입력해야 합니다.
     """
     updateProfile(updateProfileInput: UpdateProfileInput!): UpdateProfileResponse! @authenticate
 
     """
-    Create institution review, need to sign in
+    Create institution review, need to sign in, 복무지 리뷰 작성하는 API입니다. 복무지 리뷰 작성을 위해선 내 정보에 복무지 정보가 있어야 합니다.
     """
     createInstitutionReview(createInstitutionReviewInput: CreateInstitutionReviewInput!): CreateInstitutionReviewResponse! @authenticate
 
     """
-    Delete institution review, need to sign in
+    Delete institution review, need to sign in, 복무지 리뷰 삭제하는 API입니다.
     """
     deleteInstitutionReview(deleteInstitutionReviewInput: DeleteInstitutionReviewInput!): DeleteInstitutionReviewResponse! @authenticate
 
     """
-    Like institution review, need to sign in
+    Like institution review, need to sign in, 복무지 리뷰 좋아요 하는 API입니다.
     """
     likeInstitutionReview(likeInstitutionReviewInput: LikeInstitutionReviewInput!): LikeInstitutionReviewResponse! @authenticate
 
     """
-    Unlike institution review, need to sign in
+    Unlike institution review, need to sign in, 복무지 리뷰 좋아요 취소하는 API입니다.
     """
     unlikeInstitutionReview(unlikeInstitutionReviewInput: UnlikeInstitutionReviewInput!): UnlikeInstitutionReviewResponse! @authenticate
 
     """
-    Create post, need to sign in
+    Create post, need to sign in, 포스트 작성하는 API입니다.
     """
     createPost(createPostInput: CreatePostInput!): CreatePostResponse! @authenticate
 
     """
-    Update post, need to sign in
+    Update post, need to sign in, 포스트 수정하는 API입니다.
     """
     updatePost(updatePostInput: UpdatePostInput!): UpdatePostResponse! @authenticate
 
     """
-    Delete post, need to sign in
+    Delete post, need to sign in, 포스트 삭제하는 API입니다.
     """
     deletePost(deletePostInput: DeletePostInput!): DeletePostResponse! @authenticate
 
     """
-    Like post, need to sign in
+    Like post, need to sign in, 포스트 좋아요 하는 API입니다.
     """
     likePost(likePostInput: LikePostInput!): LikePostResponse! @authenticate
 
     """
-    Unlike post, need to sign in
+    Unlike post, need to sign in, 포스트 좋아요 취소하는 API입니다.
     """
     unLikePost(unLikePostInput: UnLikePostInput!): UnLikePostResponse! @authenticate
 
     """
-    Create comment, need to sign in
+    Create comment, need to sign in, 포스트 댓글 작성하는 API입니다. 1차 대댓글까지만 가능합니다.
     """
     createComment(createCommentInput: CreateCommentInput!): CreateCommentResponse! @authenticate
 
     """
-    Update comment, need to sign in
+    Update comment, need to sign in, 포스트 댓글 수정하는 API입니다.
     """
     updateComment(updateCommentInput: UpdateCommentInput!): UpdateCommentResponse! @authenticate
 
     """
-    Delete comment, need to sign in
+    Delete comment, need to sign in, 포스트 댓글 삭제하는 API입니다.
     """
     deleteComment(deleteCommentInput: DeleteCommentInput!): DeleteCommentResponse! @authenticate
 
     """
-    Create system report, need to sign in
+    Create system report, need to sign in, 시스템 신고글 작성하는 API입니다.
     """
     createSystemReport(createSystemReportInput: CreateSystemReportInput!): CreateSystemReportResponse! @authenticate
 
     """
-    Create report, need to sign in
+    Create report, need to sign in, 신고글 작성하는 API입니다. (복무지, 복무지 리뷰, 포스트, 댓글)
     """
     createReport(createReportInput: CreateReportInput!): CreateReportResponse! @authenticate
 
     """
-    Delete report, need to sign in
+    Delete report, need to sign in, 신고글 삭제하는 API입니다. (상태가 접수중일때만 삭제 가능)
     """
     deleteReport(deleteReportInput: DeleteReportInput!): DeleteReportResponse! @authenticate
 
     """
-    Mark notification as read, need to sign in
+    Mark notification as read, need to sign in, 알림 읽음 처리하는 API입니다.
     """
     markNotificationAsRead(markNotificationAsReadInput: MarkNotificationAsReadInput!): MarkNotificationAsReadResponse! @authenticate
 
     """
-    Mark all notifications as read, need to sign in
+    Mark all notifications as read, need to sign in, 알림 전체 읽음 처리하는 API입니다.
     """
     markAllNotificationsAsRead: MarkAllNotificationsAsReadResponse! @authenticate
 
     """
-    Delete notification, need to sign in
+    Delete notification, need to sign in, 알림 삭제하는 API입니다.
     """
     deleteNotification(deleteNotificationInput: DeleteNotificationInput!): DeleteNotificationResponse! @authenticate
 
     """
-    Delete all notifications, need to sign in
+    Delete all notifications, need to sign in, 알림 전체 삭제하는 API입니다.
     """
     deleteAllNotifications:DeleteAllNotificationsResponse! @authenticate
 }
 
 type Subscription{
     """
-    Get real time notification, need to sign in
+    Get real time notification, need to sign in, 실시간 알림 구독하는 API입니다.
     """
     notificationRealTime:  NotificationRealTimeResponse! @authenticate # need to send with connect_init message(same spec with jwt header, in graphiql can put in headers) when send request
 
