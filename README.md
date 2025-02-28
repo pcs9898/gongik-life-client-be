@@ -44,16 +44,13 @@ api 보시라고 배포해둔 상태이나 msa프로젝트라 aws or gcp에 배�
 - Java 17
 - Spring Boot 3.2.5
 - Spring Cloud
-- Spring Cloud Gateway
 - Spring Graphql
 - Spring Security (jwt)
 - Spring Batch
 - Spring Data JPA
 - Spring Data Redis
-- Spring Boot Mail
 - Eureka Discovery
 - Eureka Client
-- Spring Kafka
 - Grpc
 - Websocket
 

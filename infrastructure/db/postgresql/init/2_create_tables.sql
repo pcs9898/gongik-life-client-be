@@ -428,6 +428,46 @@ CREATE TABLE post_likes
 );
 
 
+-- admin만 작성 가능
+CREATE TABLE notices
+(
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    admin_id       UUID          NOT NULL,
+    title         VARCHAR(100)  NOT NULL,
+    content       TEXT          NOT NULL,
+    like_count    INT              DEFAULT 0,
+    comment_count INT              DEFAULT 0,
+    created_at    TIMESTAMPTZ        DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ        DEFAULT CURRENT_TIMESTAMP,
+    deleted_at    TIMESTAMPTZ
+);
+
+-- 댓글 테이블
+CREATE TABLE notice_comments
+(
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    notice_id           UUID NOT NULL REFERENCES notices (id),
+    parent_comment_id UUID REFERENCES notice_comments (id),
+    user_id           UUID NOT NULL,
+    content           TEXT NOT NULL,
+    created_at        TIMESTAMPTZ        DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMPTZ        DEFAULT CURRENT_TIMESTAMP,
+    deleted_at        TIMESTAMPTZ,
+    CONSTRAINT check_no_self_reply CHECK (id != parent_comment_id
+)
+    );
+
+-- 공지사항 좋아요 테이블
+CREATE TABLE notice_likes
+(
+    notice_id    UUID NOT NULL REFERENCES posts (id),
+    user_id    UUID NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (notice_id, user_id)
+);
+
+
+
 
 
 -- Soft Delete를 위한 인덱스
@@ -448,6 +488,22 @@ CREATE INDEX idx_comments_by_user
 
 CREATE INDEX idx_comments_by_post_user
     ON comments (post_id, user_id, created_at DESC) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_notices_active
+    ON notices (created_at DESC) WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_notice_comments_top_level
+    ON notice_comments (notice_id, created_at DESC)
+    WHERE parent_comment_id IS NULL
+AND deleted_at IS NULL;
+
+CREATE INDEX idx_notice_comments_replies
+    ON notice_comments (parent_comment_id, created_at DESC)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_notice_likes_by_notice ON notice_likes (notice_id);
+
+CREATE INDEX idx_notice_likes_by_user ON notice_likes (user_id);
 
 
 \c gongik_life_client_workhours_db;
@@ -586,7 +642,216 @@ CREATE TABLE reports
         )
 );
 
+-- 신고 답변(또는 응답) 테이블 생성
+CREATE TABLE report_answers (
+                                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                                report_id UUID NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
+                                admin_id UUID NOT NULL,  -- 어드민 사용자의 아이디 (예: admin_users 테이블의 id)
+                                answer TEXT NOT NULL,    -- 관리자의 답변 내용
+                                created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+                                updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+);
+
+
 -- 인덱스
 CREATE INDEX idx_reports_by_user_id
     ON reports (user_id, created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX idx_report_answers_report_id
+    ON report_answers (report_id, created_at DESC);
+
+
+\c gongik_life_admin_user_db;
+
+CREATE TABLE users
+(
+    id            UUID PRIMARY KEY             DEFAULT gen_random_uuid(),
+    email         VARCHAR(255) UNIQUE NOT NULL,
+    is_active     BOOLEAN             NOT NULL DEFAULT true,
+    created_at    TIMESTAMPTZ                    DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMPTZ                    DEFAULT CURRENT_TIMESTAMP,
+    deleted_at    TIMESTAMPTZ
+);
+
+-- 역할(Role) 테이블: 어드민/관리자에게 부여할 역할 정보를 저장
+CREATE TABLE roles (
+                       id SERIAL PRIMARY KEY,
+                       role_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO roles (role_name)
+VALUES
+    ('ADMIN'),   -- Admin
+    ('SUPER_ADMIN'); -- Super Admin
+
+-- 사용자 로그인 이력 테이블: 사용자의 로그인 기록을 저장
+CREATE TABLE user_login_histories (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    last_login_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ip_address VARCHAR(45),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 인증 유형 테이블: EMAIL, GOOGLE, KAKAO, NAVER 등 인증 방법을 정의
+CREATE TABLE auth_types (
+                            id SERIAL PRIMARY KEY,
+                            auth_type_name VARCHAR(50) NOT NULL
+);
+
+INSERT INTO auth_types (auth_type_name)
+VALUES
+    ('EMAIL'),
+    ('GOOGLE');
+
+-- 사용자 인증 정보 테이블: 각 사용자별로 인증 유형에 따른 정보를 저장
+CREATE TABLE user_auths (
+                            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                            user_id UUID NOT NULL REFERENCES users(id),
+                            auth_type_id INT NOT NULL REFERENCES auth_types(id),
+                            password_hash VARCHAR(255),
+                            created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            deleted_at TIMESTAMPTZ,
+                            CONSTRAINT fk_user_auth UNIQUE (user_id, auth_type_id),
+                            CONSTRAINT valid_auth_data CHECK (
+                                (auth_type_id = 1 AND password_hash IS NOT NULL) OR
+                                (auth_type_id IN (2, 3, 4) AND password_hash IS NULL)
+                                )
+);
+
+-- 사용자 프로필 테이블: 사용자 별 추가 정보를 저장 (기관, 이름, 소개, 재직 기간 등)
+CREATE TABLE user_profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id),
+    name VARCHAR(30) NOT NULL,
+    role INT NOT NULL REFERENCES roles(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMPTZ,
+    CONSTRAINT fk_user_profile UNIQUE (user_id),
+);
+
+CREATE INDEX idx_user_login_histories_user_id_created_at
+    ON user_login_histories (user_id, created_at DESC);
+
+CREATE INDEX idx_user_auths_user_id
+    ON user_auths (user_id)
+    WHERE deleted_at IS NULL;
+
+CREATE INDEX idx_user_profiles_role
+    ON user_profiles (role);
+
+CREATE INDEX idx_user_profiles_created_at
+    ON user_profiles (created_at);
+
+
+
+\c gongik_life_admin_institution_db;
+
+
+CREATE TABLE institution_deletion_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    institution_id UUID NOT NULL,
+    report_id UUID,  -- 신고 처리된 경우에만 값이 들어갑니다.
+    admin_id UUID NOT NULL,
+    deletion_reason TEXT,  -- 어드민이 삭제한 경우 삭제 사유가 기록됩니다.
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_institution_report_or_reason CHECK (
+        report_id IS NOT NULL OR (report_id IS NULL AND deletion_reason IS NOT NULL)
+        )
+);
+
+CREATE TABLE institution_update_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    institution_id UUID NOT NULL,
+    admin_id UUID NOT NULL,
+    report_id UUID,  -- 신고 처리된 경우에만 값이 들어갑니다.
+    update_reason TEXT ,  -- 어드민이 수정한 경우 수정 사유가 기록됩니다.
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_institution_report_or_reason CHECK (
+        report_id IS NOT NULL OR (report_id IS NULL AND update_reason IS NOT NULL)
+        )
+);
+
+
+CREATE TABLE institution_review_deletion_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    institution_review_id UUID NOT NULL ,
+    report_id UUID,  -- 신고 처리된 경우에만 값이 들어갑니다.
+    admin_id UUID NOT NULL,
+    deletion_reason TEXT,  -- 어드민이 삭제한 경우 삭제 사유가 기록됩니다.
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_inst_review_report_or_reason CHECK (
+        report_id IS NOT NULL OR (report_id IS NULL AND deletion_reason IS NOT NULL)
+        )
+);
+
+
+CREATE INDEX idx_institution_deletion_logs_inst ON institution_deletion_logs (institution_id);
+CREATE INDEX idx_institution_deletion_logs_report ON institution_deletion_logs (report_id);
+CREATE INDEX idx_institution_deletion_logs_admin ON institution_deletion_logs (admin_id);
+CREATE INDEX idx_institution_deletion_logs_deleted_at ON institution_deletion_logs (deleted_at);
+
+CREATE INDEX idx_institution_update_logs_inst ON institution_update_logs (institution_id);
+CREATE INDEX idx_institution_update_logs_report ON institution_update_logs (report_id);
+CREATE INDEX idx_institution_update_logs_admin ON institution_update_logs (admin_id);
+CREATE INDEX idx_institution_update_logs_deleted_at ON institution_update_logs (deleted_at);
+
+CREATE INDEX idx_inst_review_deletion_logs_rev ON institution_review_deletion_logs (institution_review_id);
+CREATE INDEX idx_inst_review_deletion_logs_report ON institution_review_deletion_logs (report_id);
+CREATE INDEX idx_inst_review_deletion_logs_admin ON institution_review_deletion_logs (admin_id);
+CREATE INDEX idx_inst_review_deletion_logs_deleted_at ON institution_review_deletion_logs (deleted_at);
+
+
+
+
+
+\c gongik_life_admin_community_db;
+
+CREATE TABLE post_deletion_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    post_id UUID NOT NULL ,
+    report_id UUID,  -- 신고 처리된 경우에만 값이 들어갑니다.
+    admin_id UUID NOT NULL,
+    deletion_reason TEXT,  -- 관리자가 직접 삭제한 경우 삭제 사유가 기록됩니다.
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_post_report_or_reason CHECK (
+        report_id IS NOT NULL OR (report_id IS NULL AND deletion_reason IS NOT NULL)
+        )
+);
+
+
+CREATE TABLE comment_deletion_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    comment_id UUID NOT NULL,
+    report_id UUID,  -- 신고 처리된 경우에만 값이 들어갑니다.
+    admin_id UUID NOT NULL,
+    deletion_reason TEXT,  -- 관리자가 직접 삭제한 경우 삭제 사유가 기록됩니다.
+    deleted_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_comment_report_or_reason CHECK (
+        report_id IS NOT NULL OR (report_id IS NULL AND deletion_reason IS NOT NULL)
+        )
+);
+
+CREATE INDEX idx_post_deletion_logs_post_id ON post_deletion_logs (post_id);
+CREATE INDEX idx_post_deletion_logs_report_id ON post_deletion_logs (report_id);
+CREATE INDEX idx_post_deletion_logs_admin_id ON post_deletion_logs (admin_id);
+CREATE INDEX idx_post_deletion_logs_deleted_at ON post_deletion_logs (deleted_at);
+
+CREATE INDEX idx_comment_deletion_logs_comment_id ON comment_deletion_logs (comment_id);
+CREATE INDEX idx_comment_deletion_logs_report_id ON comment_deletion_logs (report_id);
+CREATE INDEX idx_comment_deletion_logs_admin_id ON comment_deletion_logs (admin_id);
+CREATE INDEX idx_comment_deletion_logs_deleted_at ON comment_deletion_logs (deleted_at);
+
 
