@@ -7,7 +7,7 @@
 - 이 프로젝트는 공익생활의 클라이언트 백엔드 부분을 담당하며 Spring Boot MSA 아키텍처로 구성되어 있습니다.
 - 인증 서버만 Rest API로 구현되어 있으며 나머지 서비스들은 GraphQL로 구현되어 있습니다. 밑에서 왜 이렇게 했는지 궁금증 있을만 한것들 한번에 설명하겠습니다.
 - Msa간 동기 통신 Grpc로, 비동기 통신은 Kafka로 구현되어 있습니다. (일부 인증 제외)
-- 2025년 2월 28일부터 어드민 백엔드를 nestjs (monolithic) 로 구현 중에 있습니다.
+- 2025년 2월 28일부터 어드민 백엔드([gongik-life-admin-be](https://github.com/pcs9898/gongik-life-admin-be))를 nestjs (monolithic) 로 구현 중에 있습니다. 
 
 ## Swagger, Graphiql 📝
 
